@@ -14,6 +14,7 @@ type Config struct {
 	MqURI         string `required:"true" envconfig:"MQ_URI" default:"amqp://guest:guest@127.0.0.1:5672"`
 	ConsulAddr    string `required:"false" envconfig:"CONSUL_ADDR" default:"http://localhost:8500"`
 	BaseStreamURL string `required:"true" envconfig:"BASE_STREAM_URL" default:"http://127.0.0.1:1935/hls/"`
+	OutputDir     string `required:"true" envconfig:"OUTPUT_DIR" default:"/opt/mnt/" description:"Mount point for GCSFUSE"`
 }
 
 var cfg Config
