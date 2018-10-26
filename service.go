@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 
@@ -43,7 +44,7 @@ func New() (*Service, error) {
 }
 
 func (s *Service) handleTranscodeTask(d amqp.Delivery) error {
-	task := new(proto.TranscodeTask)
+	task := new(proto.SimpleTranscodeTask)
 	err := json.Unmarshal(d.Body, task)
 	if err != nil {
 		return err
@@ -59,7 +60,23 @@ func (s *Service) handleTranscodeTask(d amqp.Delivery) error {
 		return err
 	}
 
-	generatePlaylist(path.Join(dir, "playlist.m3u8"))
+	if err := generatePlaylist(path.Join(dir, "playlist.m3u8")); err != nil {
+		return err
+	}
+
+	args := buildCmd(dir)
+
+	transcode(args)
+
+	return nil
+}
+
+func transcode(args []string) error {
+	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
+	if err != nil {
+		log.Errorf("failed to exec - output: %s", string(out))
+		return err
+	}
 
 	return nil
 }
