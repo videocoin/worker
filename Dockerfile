@@ -8,7 +8,7 @@ ADD . ./
 
 
 ENV GO111MODULE auto
-RUN go build -o bin/transcoder --ldflags '-w -linkmode external -extldflags "-static"' cmd/main.go
+RUN make build-alpine
 
 
 
