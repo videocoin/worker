@@ -13,7 +13,6 @@ import (
 	"github.com/streadway/amqp"
 	"gitlab.videocoin.io/videocoin/common/mqmux"
 	"gitlab.videocoin.io/videocoin/common/proto"
-	"gitlab.videocoin.io/videocoin/common/tools"
 	"gitlab.videocoin.io/videocoin/transcode/config"
 )
 
@@ -52,9 +51,7 @@ func (s *Service) handleTranscodeTask(d amqp.Delivery) error {
 
 	log.Infof("starting transcode task:\n%+v", task)
 
-	randomString := tools.RandomID(24)
-
-	dir := path.Join(s.cfg.OutputDir, randomString)
+	dir := path.Join(s.cfg.OutputDir, task.Id)
 
 	if err := prepareDir(dir); err != nil {
 		return err
@@ -72,12 +69,13 @@ func (s *Service) handleTranscodeTask(d amqp.Delivery) error {
 }
 
 func transcode(args []string) error {
+	log.Info("starting transcode")
 	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
 	if err != nil {
 		log.Errorf("failed to exec - output: %s", string(out))
 		return err
 	}
-
+	log.Info("transcode complete")
 	return nil
 }
 
