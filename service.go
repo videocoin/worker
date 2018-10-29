@@ -6,8 +6,10 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path"
 	"strings"
+	"syscall"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
@@ -40,6 +42,18 @@ func New() (*Service, error) {
 	s.mq.Consumer("transcoder", 1, false, s.handleTranscodeTask)
 
 	return s, nil
+}
+
+// Start creates new service and blocks until stop signal
+func Start() {
+	s, err := New()
+	_ = s
+
+	if err != nil {
+		panic(err)
+	}
+
+	handleExit()
 }
 
 func (s *Service) handleTranscodeTask(d amqp.Delivery) error {
@@ -111,4 +125,18 @@ func buildCmd(dir string) []string {
 
 	return cmd
 
+}
+
+var (
+	done  = make(chan bool)
+	errCh = make(chan error)
+)
+
+func handleExit() {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	sig := signals
+	log.Infof("recieved os signal: %v", <-sig)
+	done <- true
 }
