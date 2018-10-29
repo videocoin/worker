@@ -3,11 +3,11 @@ module gitlab.videocoin.io/videocoin/transcode
 require (
 	github.com/golang/lint v0.0.0-20181026193005-c67002cb31c3 // indirect
 	github.com/kelseyhightower/envconfig v1.3.0
-	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/kr/pty v1.1.3 // indirect
 	github.com/sirupsen/logrus v1.1.1
 	github.com/streadway/amqp v0.0.0-20180806233856-70e15c650864
 	gitlab.videocoin.io/videocoin/common v0.1.2-25-g542eb9a
+	gitlab.videocoin.io/videocoin/manager v0.0.0-20181029181606-1a55abc4c9b8 // indirect
 	golang.org/x/crypto v0.0.0-20181029175232-7e6ffbd03851 // indirect
 	golang.org/x/lint v0.0.0-20181026193005-c67002cb31c3 // indirect
 	golang.org/x/net v0.0.0-20181029044818-c44066c5c816 // indirect
