@@ -31,3 +31,15 @@ build-alpine:
 docker:
 	@echo "==> Docker building..."
 	docker build -t ${IMAGE_TAG} -t $(LATEST) . --squash
+
+rr:
+	export GOOS=linux
+	export GOARCH=amd64
+	export CGO_ENABLED=0
+
+	go build -a -installsuffix cgo -ldflags="-w -s" -o release/$(SERVICE_NAME) cmd/main.go
+	tar -C release -cvjf release/$(VERSION)_transcoder_linux_amd64.tar.bz2 transcoder
+
+publish:
+	gsutil -m cp release/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://vc-releases/transcoder/
+	gsutil -m cp gs://vc-releases/transcoder/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://vc-releases/transcoder/latest_transcoder_linux_amd64.tar.bz2

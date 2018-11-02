@@ -7,7 +7,7 @@ WORKDIR /go/src/gitlab.videocoin.io/videocoin/transcode
 ADD . ./
 
 
-ENV GO111MODULE auto
+ENV GO111MODULE off
 RUN make build-alpine
 
 
