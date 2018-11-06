@@ -39,13 +39,13 @@ func Load(loc string) *Config {
 		ctx := context.Background()
 		client, err := datastore.NewClient(ctx, os.Getenv("PROJECT_ID"))
 		if err != nil {
-			panic(err)
+			logrus.Fatalf("failed to create new client: %s", err)
 		}
 
 		key := datastore.NameKey("config", "transcoder", nil)
 		err = client.Get(ctx, key, &cfg)
 		if err != nil {
-			panic(err)
+			logrus.Fatalf("failed to get namekey: %s", err)
 		}
 
 		break
