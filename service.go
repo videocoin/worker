@@ -26,7 +26,7 @@ type Service struct {
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
-	cfg := config.Load()
+	cfg := config.Load(os.Getenv("CONFIG_LOC"))
 
 	mqmux, err := mqmux.NewWorkerMux(cfg.MqURI, "transcoder")
 	if err != nil {
