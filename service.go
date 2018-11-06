@@ -13,20 +13,20 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	"gitlab.videocoin.io/videocoin/common/models"
 	"gitlab.videocoin.io/videocoin/common/mqmux"
 	"gitlab.videocoin.io/videocoin/common/proto"
-	"gitlab.videocoin.io/videocoin/transcode/config"
 )
 
 // Service base struct for service reciever
 type Service struct {
 	mq  *mqmux.WorkerMux
-	cfg *config.Config
+	cfg *models.Transcoder
 }
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
-	cfg := config.Load(os.Getenv("CONFIG_LOC"))
+	cfg := LoadConfig(os.Getenv("CONFIG_LOC"))
 
 	mqmux, err := mqmux.NewWorkerMux(cfg.MqURI, "transcoder")
 	if err != nil {
