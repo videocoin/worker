@@ -16,13 +16,12 @@ import (
 	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
-	"gitlab.videocoin.io/videocoin/common/models"
 	"gitlab.videocoin.io/videocoin/common/proto"
 )
 
 // Service base struct for service reciever
 type Service struct {
-	cfg *models.Transcoder
+	cfg *Config
 	sc  stan.Conn
 }
 
