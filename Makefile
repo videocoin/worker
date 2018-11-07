@@ -32,7 +32,7 @@ docker:
 	@echo "==> Docker building..."
 	docker build -t ${IMAGE_TAG} -t $(LATEST) . --squash
 
-rr:
+package:
 	export GOOS=linux
 	export GOARCH=amd64
 	export CGO_ENABLED=0

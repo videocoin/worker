@@ -1,6 +1,8 @@
 package transcode
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,37 +13,59 @@ import (
 	"strings"
 	"syscall"
 
+	nats "github.com/nats-io/go-nats"
+	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
-	"github.com/streadway/amqp"
 	"gitlab.videocoin.io/videocoin/common/models"
-	"gitlab.videocoin.io/videocoin/common/mqmux"
 	"gitlab.videocoin.io/videocoin/common/proto"
 )
 
 // Service base struct for service reciever
 type Service struct {
-	mq  *mqmux.WorkerMux
 	cfg *models.Transcoder
+	sc  stan.Conn
 }
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
 	cfg := LoadConfig(os.Getenv("CONFIG_LOC"))
 
-	mqmux, err := mqmux.NewWorkerMux(cfg.MqURI, "transcoder")
+	// Generate unique connection name
+	b := make([]byte, 16)
+	if _, err := rand.Read(b); err != nil {
+		return nil, err
+	}
+
+	clientID := hex.EncodeToString(b)
+
+	// Use nats as underlying connection with secret token
+	nc, err := nats.Connect(cfg.NATsURL, nats.Token(cfg.NATsToken))
 	if err != nil {
-		log.Errorf("failed to make new mux worker: %s", err.Error())
+		return nil, err
+	}
+
+	// Wrap stan connection ontop of nats
+	sc, err := stan.Connect(cfg.Cluster, clientID, stan.NatsConn(nc))
+	if err != nil {
 		return nil, err
 	}
 
 	s := &Service{
-		mq:  mqmux,
 		cfg: cfg,
+		sc:  sc,
 	}
 
-	s.mq.Consumer("transcoder", 1, false, s.handleTranscodeTask)
+	s.subscribe()
 
 	return s, nil
+}
+
+func (s *Service) subscribe() {
+	hostname, _ := os.Hostname()
+	// Subscribe with durable name
+	s.sc.Subscribe("transcoder", func(m *stan.Msg) {
+		s.handleTranscodeTask(m.Data)
+	}, stan.DurableName(hostname))
 }
 
 // Start creates new service and blocks until stop signal
@@ -56,9 +80,9 @@ func Start() {
 	handleExit()
 }
 
-func (s *Service) handleTranscodeTask(d amqp.Delivery) error {
+func (s *Service) handleTranscodeTask(d []byte) error {
 	task := new(proto.SimpleTranscodeTask)
-	err := json.Unmarshal(d.Body, task)
+	err := json.Unmarshal(d, task)
 	if err != nil {
 		return err
 	}
