@@ -33,6 +33,7 @@ get-deps:
     - eval `ssh-agent -s`
     - echo ssh-add ~/.ssh/id_rsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
+    - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
     - make deps
 
 build-binary:
