@@ -8,10 +8,9 @@ variables:
   GOBIN: /go/bin
 
 before_script:
-  - mkdir -p /go/src/gitlab.videocoin.io/videocoin/transcode
-  - ln -s /builds /go/src/gitlab.videocoin.io
-  - cd /go/src/gitlab.videocoin.io/videocoin/transcode
-  - ls
+  - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds
+  - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
+  - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds
 
 stages:
   - build
@@ -28,6 +27,7 @@ build-binary:
     - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
     - google-cloud-sdk/bin/gcloud --quiet components update
     - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
+    - make dep
     - make package
     - export PATH=google-cloud-sdk/bin:$PATH
     - make publish

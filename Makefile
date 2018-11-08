@@ -19,7 +19,7 @@ main: deps build
 
 
 deps:
-	go mod verify && go mod tidy
+	go get
 
 build:
 	go build -o bin/$(SERVICE_NAME) cmd/main.go
