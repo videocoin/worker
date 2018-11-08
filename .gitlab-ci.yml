@@ -7,6 +7,7 @@ variables:
   GOPATH: /go/
   GOBIN: /go/bin
   GO111MODULE: "on"
+  PATH: google-cloud-sdk/bin:$PATH
 
 cache:
   paths:
@@ -20,17 +21,15 @@ before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
   - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
-  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
-  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-  - eval $(ssh-agent -s)
-  - ssh-add /root/.ssh/id_rsa
 
 stages:
+  - deps
+  - ssh
   - build
   - publish
 
-build-binary:
-  stage: build
+install-deps:
+  stage: deps
   script:
     - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl
     - git config --global url."git@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io"
@@ -41,9 +40,24 @@ build-binary:
     - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
     - google-cloud-sdk/bin/gcloud --quiet components update
     - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
+
+config-ssh:
+  stage: ssh
+  script:
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - eval $(ssh-agent -s)
+    - ssh-add /root/.ssh/id_rsa
+
+build-binary:
+  stage: build
+  script:
     - make deps
     - make package
-    - export PATH=google-cloud-sdk/bin:$PATH
-    - make publish
   only:
     - master
+
+upload:
+  stage: publish
+  script:
+    - make publish
