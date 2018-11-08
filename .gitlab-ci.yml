@@ -6,7 +6,7 @@ variables:
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
-  GO111MODULE: on
+  GO111MODULE: "on"
 
 cache:
   paths:
