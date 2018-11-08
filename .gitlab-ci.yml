@@ -46,8 +46,6 @@ config-ssh:
   script:
     - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-    - eval $(ssh-agent -s)
-    - ssh-add /root/.ssh/id_rsa
 
 build-binary:
   stage: build
