@@ -10,32 +10,22 @@ before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
   - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
+  - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
+  - git config --global url."git@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io"
+  - go version
+  - update-ca-certificates
+  - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
+  - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+  - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
+  - google-cloud-sdk/bin/gcloud --quiet components update
+  - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
+  - export PATH=google-cloud-sdk/bin:${PATH}
+  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
 stages:
-  - deps
-  - ssh
   - build
   - publish
-
-install-deps:
-  stage: deps
-  script:
-    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
-    - git config --global url."git@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io"
-    - go version
-    - update-ca-certificates
-    - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
-    - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
-    - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
-    - google-cloud-sdk/bin/gcloud --quiet components update
-    - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
-    - export PATH=google-cloud-sdk/bin:${PATH}
-
-config-ssh:
-  stage: ssh
-  script:
-    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 
 build-binary:
   stage: build
