@@ -20,6 +20,7 @@ before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds
   - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
+  - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
 
 stages:
   - build
