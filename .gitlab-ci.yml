@@ -7,7 +7,6 @@ variables:
   GOPATH: /go/
   GOBIN: /go/bin
   GO111MODULE: "on"
-  PATH: google-cloud-sdk/bin:$PATH
 
 cache:
   paths:
@@ -40,6 +39,7 @@ install-deps:
     - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
     - google-cloud-sdk/bin/gcloud --quiet components update
     - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
+    - export PATH=google-cloud-sdk/bin:$PATH
 
 config-ssh:
   stage: ssh
