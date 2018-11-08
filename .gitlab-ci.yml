@@ -8,9 +8,6 @@ variables:
   GOBIN: /go/bin
 
 before_script:
-  - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds
-  - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
-  - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds
 
 stages:
   - build
@@ -19,8 +16,8 @@ stages:
 build-binary:
   stage: build
   script:
-    - pwd
     - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl go
+    - go version
     - update-ca-certificates
     - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
     - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
