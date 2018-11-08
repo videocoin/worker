@@ -1,0 +1,26 @@
+image: docker:latest
+services:
+  - docker:dind
+variables:
+  DOCKER_DRIVER: overlay
+  GCP_PROJECT_ID: videocoin-183500
+
+stages:
+  - build
+  - publish
+
+build-binary:
+  stage: build
+  script:
+    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl
+    - update-ca-certificates
+    - echo $GCLOUD_SA | base64 -d > ${HOME}/gcp_sa.json
+    - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+    - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
+    - google-cloud-sdk/bin/gcloud --quiet components update
+    - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - make package
+    - export PATH=google-cloud-sdk/bin:$PATH
+    - make publish
+  only:
+    - master
