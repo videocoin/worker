@@ -7,7 +7,19 @@ variables:
   GOPATH: /go/
   GOBIN: /go/bin
 
+cache:
+  paths:
+    - /apt-cache
+    - /go/src/github.com
+    - /go/src/golang.org
+    - /go/src/google.golang.org
+    - /go/src/gopkg.in
+
 before_script:
+  - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds
+  - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
+  - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
+  - make dep
 
 stages:
   - build
