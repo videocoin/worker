@@ -4,6 +4,11 @@ services:
 variables:
   DOCKER_DRIVER: overlay
   GCP_PROJECT_ID: videocoin-183500
+  GOPATH: /go/
+  GOBIN: /go/bin
+
+before_script:
+  - cd /go/src/gitlab.videocoin.io/videocoin/transcode
 
 stages:
   - build
