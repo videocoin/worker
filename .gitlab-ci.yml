@@ -6,6 +6,7 @@ variables:
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
+  GO111MODULE: on
 
 cache:
   paths:
@@ -19,7 +20,6 @@ before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds
   - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
-  - make dep
 
 stages:
   - build
