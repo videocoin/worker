@@ -1,4 +1,4 @@
-image: docker:latest
+image: golang:1.11.1-alpine
 services:
   - docker:dind
 variables:
@@ -16,7 +16,7 @@ stages:
 build-binary:
   stage: build
   script:
-    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl go
+    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl
     - go version
     - update-ca-certificates
     - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
