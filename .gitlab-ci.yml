@@ -30,7 +30,7 @@ stages:
 install-deps:
   stage: deps
   script:
-    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh-client
+    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
     - git config --global url."git@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io"
     - go version
     - update-ca-certificates
