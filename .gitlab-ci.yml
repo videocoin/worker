@@ -12,7 +12,7 @@ stages:
 build-binary:
   stage: build
   script:
-    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl
+    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl go
     - update-ca-certificates
     - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
     - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
