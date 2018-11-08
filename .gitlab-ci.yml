@@ -2,19 +2,10 @@ image: golang:1.11.2-alpine
 services:
   - docker:dind
 variables:
-  DOCKER_DRIVER: overlay
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
   GO111MODULE: "on"
-
-cache:
-  paths:
-    - /apt-cache
-    - /go/src/github.com
-    - /go/src/golang.org
-    - /go/src/google.golang.org
-    - /go/src/gopkg.in
 
 before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
