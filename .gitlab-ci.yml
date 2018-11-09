@@ -18,20 +18,12 @@ before_script:
   # use ci token
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf ssh://git@gitlab.videocoin.io/videocoin/
 
+  - go get
+
 stages:
-  - deps
   - test
   - build
   - publish
-
-get-deps:
-  stage: deps
-  script:
-    - go get
-  artifacts:
-    paths:
-      - vendor
-      - /go/src/
 
 run-tests:
   stage: test
