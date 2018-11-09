@@ -22,7 +22,7 @@ before_script:
   - chmod 700 ~/.ssh
   - chmod 0600 ~/.ssh/id_rsa
   - ssh-add ~/.ssh/id_rsa
-  - git clone git@gitlab.videocoin.io:videocoin/common.git
+  - git clone git@gitlab.videocoin.io:videocoin/manager.git
 stages:
   - build
   - publish
