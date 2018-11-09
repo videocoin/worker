@@ -13,9 +13,10 @@ before_script:
   - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
   - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
-  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videcoin.io/".insteadOf "https://gitlab.videcoin.io/"
+  - git config --global url."gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videcoin.io/".insteadOf "gitlab.videcoin.io/"
   - update-ca-certificates
-
+  - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videcoin.io/videocoin/common
+  - mv common /go/src/gitlab.videocoin.io/videocoin/
 stages:
   - deps
   - build
