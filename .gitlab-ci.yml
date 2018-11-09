@@ -14,7 +14,7 @@ before_script:
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
   - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
   - update-ca-certificates
-  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/transcode.git".insteadOf git@gitlab.videocoin.io:videocoin/transcode.git
+  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf git@gitlab.videocoin.io:videocoin/
   - eval $(ssh-agent -s)
   - mkdir -p ~/.ssh
   - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
@@ -22,7 +22,7 @@ before_script:
   - chmod 700 ~/.ssh
   - chmod 0600 ~/.ssh/id_rsa
   - ssh-add ~/.ssh/id_rsa
-  - git clone git@gitlab.videocoin.io:videocoin/transcode.git
+  - git clone git@gitlab.videocoin.io:videocoin/common.git
 stages:
   - build
   - publish
