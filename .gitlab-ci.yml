@@ -35,7 +35,6 @@ get-deps:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
     - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - make deps
 
 build-binary:
   stage: build
