@@ -32,7 +32,6 @@ get-deps:
     - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
     - eval `ssh-agent -s`
     - echo ssh-add ~/.ssh/id_rsa
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
     - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
 
