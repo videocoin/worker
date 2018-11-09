@@ -20,7 +20,7 @@ get-deps:
     - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
     - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
     - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
-    - git config --global url."git@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io"
+    - git config --global url."git@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io/"
     - go version
     - update-ca-certificates
     - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
