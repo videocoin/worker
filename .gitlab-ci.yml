@@ -14,7 +14,11 @@ before_script:
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
   - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
   - update-ca-certificates
-  - git clone gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io:videocoin/transcode.git
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - git clone git@gitlab.videocoin.io:videocoin/transcode.git
 stages:
   - build
   - publish
