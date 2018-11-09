@@ -6,7 +6,7 @@ variables:
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
-  GO111MODULE: "on"
+  GO111MODULE: "off"
 
 before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
@@ -15,13 +15,6 @@ before_script:
   - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
   - update-ca-certificates
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf git@gitlab.videocoin.io:videocoin/
-  - eval $(ssh-agent -s)
-  - mkdir -p ~/.ssh
-  - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-  - cat ~/.ssh/id_rsa
-  - chmod 700 ~/.ssh
-  - chmod 0600 ~/.ssh/id_rsa
-  - ssh-add ~/.ssh/id_rsa
   - git clone git@gitlab.videocoin.io:videocoin/common.git
   - mv common /go/src/gitlab.videocoin.io/videocoin/common
 stages:
@@ -31,6 +24,7 @@ stages:
 build-binary:
   stage: build
   script:
+    - go get
     - make package
   only:
     - master
