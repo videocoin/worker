@@ -16,6 +16,7 @@ before_script:
   - update-ca-certificates
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf git@gitlab.videocoin.io:videocoin/
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf ssh://git@gitlab.videocoin.io/videocoin/
+  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf git@gitlab.videocoin.io/videocoin/
   # - git clone git@gitlab.videocoin.io:videocoin/common.git
   # - mv common /go/src/gitlab.videocoin.io/videocoin/common
 stages:
@@ -25,7 +26,7 @@ stages:
 build-binary:
   stage: build
   script:
-    # - go get
+    - go get
     - make package
   artifacts:
     paths:
