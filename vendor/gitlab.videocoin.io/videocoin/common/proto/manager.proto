@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "proto";
+
+import "google/api/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+service ManagerService {
+  rpc CreateStream(StreamRequest) returns (StreamResponse) {
+    option (google.api.http) = {
+      post : "/api/v1/stream/create/{application_id}/{stream_id}"
+    };
+  };
+
+  rpc StopStream(StreamRequest) returns (StreamResponse) {
+    option (google.api.http) = {
+      post : "/api/v1/stream/stop/{application_id}/{stream_id}"
+    };
+  };
+}
+
+message StreamRequest {
+    string application_id  = 1;
+    string stream_id = 2;
+    int32 user_id = 3;
+}
+
+message StreamResponse {
+    string message = 1;
+}
+

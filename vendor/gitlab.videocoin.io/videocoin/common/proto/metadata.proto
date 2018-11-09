@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "proto";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.sizer_all) = false;
+
+message Metadata {
+    string job_id = 1;
+    string task_id = 2;
+    uint64 event_id = 3;
+    string broadcast_id = 4 [(validator.field) = {regex: "[a-z0-9-]{36}"}];
+    string platform_id = 5 [(validator.field) = {regex: ".+"}];
+    uint64 user_id = 6 [(validator.field) = {int_gt: 0}];
+    map<string, string> trace = 7;
+    string variant_id = 8;
+    bool is_live = 9;
+    string hostname = 10;
+    string camera_id = 11;
+}

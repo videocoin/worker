@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "proto";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.sizer_all) = false;
+
+
+message AudioOutput {
+    string codec = 1;
+    uint32 bitrate = 2;
+    bool is_silent = 3;
+}

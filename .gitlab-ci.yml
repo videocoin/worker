@@ -14,23 +14,10 @@ before_script:
   - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
   - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
   - update-ca-certificates
-  - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videcoin.io/videocoin/common
-  - mv common /go/src/gitlab.videocoin.io/videocoin/
+
 stages:
-  - deps
   - build
   - publish
-
-get-deps:
-  stage: deps
-  script:
-    - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
-    - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
-    - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
-    - google-cloud-sdk/bin/gcloud --quiet components update
-    - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
-    - export PATH=google-cloud-sdk/bin:${PATH}
-    - make deps
 
 build-binary:
   stage: build
@@ -39,7 +26,13 @@ build-binary:
   only:
     - master
 
-upload:
+upload-package:
   stage: publish
   script:
+    - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
+    - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+    - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
+    - google-cloud-sdk/bin/gcloud --quiet components update
+    - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
+    - export PATH=google-cloud-sdk/bin:${PATH}
     - make publish

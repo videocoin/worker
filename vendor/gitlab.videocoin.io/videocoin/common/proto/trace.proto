@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "proto";
+
+import "google/protobuf/timestamp.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+message TraceInfo {
+    google.protobuf.Timestamp sent_at = 1 [(gogoproto.stdtime) = true];
+    string sender = 2;
+    string hostname = 3;
+}

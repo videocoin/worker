@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "proto";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+
+option optimize_for = SPEED;
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.sizer_all) = false;
+
+
+message TranscodeProgress {
+    string broadcast_id = 1 [(gogoproto.moretags) = "gorm:\"primary_key:transcoder_id,broadcast_id;type:char(32)\""];
+    string transcoder_id = 2 [(gogoproto.moretags) = "gorm:\"primary_key:transcoder_id,broadcast_id;type:char(32)\""];
+    int64 processed_frames = 3  [(gogoproto.moretags) = "gorm:\"type:int(32)\""];
+    int64 total_frames = 4 [(gogoproto.moretags) = "gorm:\"type:int(32)\""];
+    double fps = 5 [(gogoproto.moretags) = "gorm:\"type:float(10,6)\""];
+    string bitrate = 6 [(gogoproto.moretags) = "gorm:\"type:varchar(64)\""];
+    string speed = 7 [(gogoproto.moretags) = "gorm:\"type:varchar(32)\""];
+    double eta = 8 [(gogoproto.moretags) = "gorm:\"type:float(10,6)\""];
+    string percentage_done = 9 [(gogoproto.moretags) = "gorm:\"type:varchar(16)\""];
+    string time_elapsed = 10 [(gogoproto.moretags) = "gorm:\"type:varchar(16)\""];
+    string last_updated = 11 [(gogoproto.moretags) = "gorm:\"type:timestamp\""];
+}
