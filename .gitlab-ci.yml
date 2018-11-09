@@ -6,7 +6,7 @@ variables:
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
-  GO111MODULE: "on"
+  GO111MODULE: "off"
 
 before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
@@ -20,17 +20,36 @@ before_script:
   # - git clone git@gitlab.videocoin.io:videocoin/common.git
   # - mv common /go/src/gitlab.videocoin.io/videocoin/common
 stages:
+  - deps
+  - test
   - build
   - publish
 
+get-deps:
+  stage: deps
+  script:
+    - go get
+  artifacts:
+    paths:
+      - vendor
+      - /go/src/
+
+run-tests:
+  stage: test
+  script:
+    - make test
+  artifacts:
+    paths:
+      - vendor
+      - /go/src/
 build-binary:
   stage: build
   script:
-    - go get
     - make package
   artifacts:
     paths:
-      - release
+      - vendor
+      - /go/src/
   only:
     - master
 

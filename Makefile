@@ -18,6 +18,9 @@ VERSION=$$(git rev-parse --short HEAD)
 main: deps build
 
 
+test:
+	go test -v -short ./...
+
 deps:
 	go mod verify && go mod tidy
 
