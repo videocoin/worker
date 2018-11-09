@@ -6,7 +6,7 @@ variables:
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
-  GO111MODULE: "off"
+  GO111MODULE: "on"
 
 before_script:
   - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
@@ -25,7 +25,7 @@ stages:
 build-binary:
   stage: build
   script:
-    - go get
+    # - go get
     - make package
   artifacts:
     paths:
