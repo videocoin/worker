@@ -61,4 +61,5 @@ upload-package:
     - google-cloud-sdk/bin/gcloud --quiet components update
     - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
     - export PATH=google-cloud-sdk/bin:${PATH}
+
     - make publish
