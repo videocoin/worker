@@ -32,7 +32,6 @@ run-tests:
   artifacts:
     paths:
       - vendor
-      - /go/src/
 build-binary:
   stage: build
   script:
@@ -40,11 +39,13 @@ build-binary:
   artifacts:
     paths:
       - vendor
-      - /go/src/
+      - release
   only:
     - master
 
 upload-package:
+  before_script:
+    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
   stage: publish
   script:
     - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
