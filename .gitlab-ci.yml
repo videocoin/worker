@@ -1,6 +1,8 @@
 image: golang:1.11.2-alpine
-services: docker:dind
+services:
+  - docker:dind
 variables:
+  DOCKER_DRIVER: overlay
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
