@@ -17,6 +17,7 @@ before_script:
   - eval $(ssh-agent -s)
   - mkdir -p ~/.ssh
   - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+  - cat ~/.ssh/id_rsa
   - chmod 700 ~/.ssh
   - chmod 0600 ~/.ssh/id_rsa
   - ssh-add
