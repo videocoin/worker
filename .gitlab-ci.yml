@@ -15,8 +15,8 @@ before_script:
   - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
   - update-ca-certificates
   - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf git@gitlab.videocoin.io:videocoin/
-  - git clone git@gitlab.videocoin.io:videocoin/common.git
-  - mv common /go/src/gitlab.videocoin.io/videocoin/common
+  # - git clone git@gitlab.videocoin.io:videocoin/common.git
+  # - mv common /go/src/gitlab.videocoin.io/videocoin/common
 stages:
   - build
   - publish
@@ -26,6 +26,9 @@ build-binary:
   script:
     - go get
     - make package
+  artifacts:
+    paths:
+      - release
   only:
     - master
 
