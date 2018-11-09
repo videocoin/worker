@@ -1,12 +1,18 @@
 image: golang:1.11.2-alpine
-
+services: docker:dind
 variables:
   GCP_PROJECT_ID: videocoin-183500
   GOPATH: /go/
   GOBIN: /go/bin
   GO111MODULE: "on"
 
-# before_script:
+before_script:
+  - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
+  - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
+  - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
+  - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
+  - git config --global url."gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io/"
+  - update-ca-certificates
 
 stages:
   - deps
@@ -16,24 +22,13 @@ stages:
 get-deps:
   stage: deps
   script:
-    - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
-    - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
-    - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
-    - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
-    - git config --global url."gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videcoin.io:".insteadOf "https://gitlab.videcoin.io/"
-    - go version
-    - update-ca-certificates
     - echo $GCLOUD_SA > ${HOME}/gcp_sa.json
     - wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
     - tar zxvf google-cloud-sdk.tar.gz && ./google-cloud-sdk/install.sh --usage-reporting=false --path-update=true
     - google-cloud-sdk/bin/gcloud --quiet components update
     - google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/gcp_sa.json
     - export PATH=google-cloud-sdk/bin:${PATH}
-    - echo "$SSH_PRIVATE_KEY" >> ~/.ssh/id_rsa && chmod 0600 ~/.ssh/id_rsa
-    - eval `ssh-agent -s`
-    - echo ssh-add ~/.ssh/id_rsa
-    - echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
+    - make deps
 
 build-binary:
   stage: build
