@@ -27,7 +27,7 @@ type Service struct {
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
-	cfg := LoadConfig(os.Getenv("CONFIG_LOC"))
+	cfg := LoadConfig()
 
 	// Generate unique connection name
 	b := make([]byte, 16)
