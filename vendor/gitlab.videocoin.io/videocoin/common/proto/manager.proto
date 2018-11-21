@@ -4,9 +4,12 @@ package proto;
 
 option go_package = "proto";
 
+import "health.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/mwitkow/go-proto-validators/validator.proto";
+
 
 service ManagerService {
   rpc CreateStream(StreamRequest) returns (StreamResponse) {
@@ -20,7 +23,14 @@ service ManagerService {
       post : "/api/v1/stream/stop/{application_id}/{stream_id}"
     };
   };
+
+  rpc Health(google.protobuf.Empty) returns (HealthStatus) {
+    option (google.api.http) = {
+      get : "/healthz"
+    };
+  }
 }
+
 
 message StreamRequest {
     string application_id  = 1;
