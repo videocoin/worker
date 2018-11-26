@@ -19,15 +19,19 @@ main: deps build
 
 
 test:
+	@echo "==> Running tests..."
 	go test -v -short ./...
 
 deps:
+	@echo "==> Running go dep..."
 	go mod verify && go mod tidy
 
 build:
+	@echo "==> Building..."
 	go build -o bin/$(SERVICE_NAME) cmd/main.go
 
 build-alpine:
+	@echo "==> Building for alpine..."
 	go build -o bin/$(SERVICE_NAME) --ldflags '-w -linkmode external -extldflags "-static"' cmd/main.go
 
 
@@ -36,6 +40,7 @@ docker:
 	docker build -t ${IMAGE_TAG} -t $(LATEST) . --squash
 
 package:
+	@echo "==> Building package..."
 	export GOOS=linux
 	export GOARCH=amd64
 	export CGO_ENABLED=0
@@ -43,5 +48,6 @@ package:
 	tar -C release -cvjf release/$(VERSION)_transcoder_linux_amd64.tar.bz2 transcoder
 
 publish:
+	@echo "==> Pushing to storage..."
 	gsutil -m cp release/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://vc-releases/transcoder/
 	gsutil -m cp gs://vc-releases/transcoder/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://vc-releases/transcoder/latest_transcoder_linux_amd64.tar.bz2
