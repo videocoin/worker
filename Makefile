@@ -15,7 +15,7 @@ LATEST=$(DOCKER_REGISTRY)/$(GOOGLE_PROJECT)/$(SERVICE_NAME):latest
 VERSION=$$(git rev-parse --short HEAD)
 
 
-main: deps build
+main: package publish
 
 
 test:
