@@ -79,7 +79,7 @@ func (s *Service) handleTranscodeTask(d []byte) error {
 	task := new(proto.SimpleTranscodeTask)
 	err := json.Unmarshal(d, task)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	log.Infof("starting transcode task:\n%+v", task)
@@ -87,11 +87,11 @@ func (s *Service) handleTranscodeTask(d []byte) error {
 	dir := path.Join(s.cfg.OutputDir, task.Id)
 
 	if err := prepareDir(dir); err != nil {
-		return err
+		panic(err)
 	}
 
 	if err := generatePlaylist(path.Join(dir, "playlist.m3u8")); err != nil {
-		return err
+		panic(err)
 	}
 
 	args := buildCmd(task.InputUrl, dir)
