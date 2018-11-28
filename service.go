@@ -3,7 +3,7 @@ package transcode
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"flag"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,6 +16,7 @@ import (
 	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
+	pb "gitlab.videocoin.io/videocoin/common/proto"
 )
 
 // Service base struct for service reciever
@@ -55,28 +56,31 @@ func New() (*Service, error) {
 
 }
 
+func (s *Service) subscribe() {
+	hostname, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+	// Subscribe with durable name
+	s.sc.Subscribe(hostname, func(m *stan.Msg) {
+		task := pb.SimpleTranscodeTask{}
+		if err := json.Unmarshal(m.Data, &task); err != nil {
+			panic(err)
+		}
+
+		s.handleTranscodeTask(task.Id, task.InputUrl)
+
+	}, stan.DurableName("transcode-main"))
+}
+
 // Start creates new service and blocks until stop signal
 func Start() {
-	var inputURL = flag.String("input_url", "", "input stream url")
-	var taskID = flag.String("task_id", "", "id of task")
 	s, err := New()
 	if err != nil {
 		panic(err)
 	}
 
-	flag.Parse()
-
-	if taskID == nil || *taskID == "" {
-		flag.PrintDefaults()
-		return
-	}
-
-	if inputURL == nil || *inputURL == "" {
-		flag.PrintDefaults()
-		return
-	}
-
-	s.handleTranscodeTask(*taskID, *inputURL)
+	s.subscribe()
 
 	handleExit()
 }
