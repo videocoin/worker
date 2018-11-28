@@ -49,32 +49,28 @@ func New() (*Service, error) {
 		return nil, err
 	}
 
-	s := &Service{
+	return &Service{
 		cfg: cfg,
 		sc:  sc,
-	}
+	}, nil
 
-	s.subscribe()
-
-	return s, nil
 }
 
 func (s *Service) subscribe() {
-	hostname, _ := os.Hostname()
 	// Subscribe with durable name
 	s.sc.Subscribe("transcoder", func(m *stan.Msg) {
 		s.handleTranscodeTask(m.Data)
-	}, stan.DurableName(hostname))
+	}, stan.DurableName("transcode-main"))
 }
 
 // Start creates new service and blocks until stop signal
 func Start() {
 	s, err := New()
-	_ = s
-
 	if err != nil {
 		panic(err)
 	}
+
+	s.subscribe()
 
 	handleExit()
 }
