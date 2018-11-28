@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "proto";
+
+import "google/protobuf/timestamp.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option optimize_for = SPEED;
+
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.sizer_all) = false;
+
+enum TranscodeStatus {
+    option (gogoproto.goproto_enum_prefix) = false;
+    option (gogoproto.enum_customname) = "TranscodeStatus";
+  
+    none = 0 [ (gogoproto.enumvalue_customname) = "TranscodeStatusNone" ];
+    pending = 1 [ (gogoproto.enumvalue_customname) = "TranscodeStatusPending" ];
+    transcoding = 2 [ (gogoproto.enumvalue_customname) = "TranscodeStatusTranscoding" ];
+    canceld = 3 [ (gogoproto.enumvalue_customname) = "TranscodeStatusCanceled" ];
+    failed = 4 [ (gogoproto.enumvalue_customname) = "TranscodeStatusFailed" ];
+    completed = 5 [ (gogoproto.enumvalue_customname) = "TranscodeStatusCompleted" ];
+  }
+  
+
+
+
+message SimpleTranscodeTask {
+    string id = 1;
+    string input_url = 2;
+    string output_url =3;
+    string status = 4;
+    int32 user_id = 5;
+    google.protobuf.Timestamp created_at = 6 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp updated_at = 7 [(gogoproto.stdtime) = true];
+}
+

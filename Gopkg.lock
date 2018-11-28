@@ -2,11 +2,10 @@
 
 
 [[projects]]
-  digest = "1:35621fe20f140f05a0c4ef662c26c0ab4ee50bca78aa30fe87d33120bd28165e"
+  digest = "1:3f7c586d2fd571c4f2e3d313c0638b33b999055de507d5f11fafe27e5adc30db"
   name = "github.com/gogo/protobuf"
   packages = [
     "gogoproto",
-    "jsonpb",
     "proto",
     "protoc-gen-gogo/descriptor",
     "sortkeys",
@@ -111,22 +110,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3d59cb62c49efa751febb1fabbfcc51a1762f60105de5daebac674006f51e276"
+  digest = "1:8d98e50ad1d29e10576c113fe4e41be02f82a5275c4b127341185b63ee105ea5"
   name = "gitlab.videocoin.io/videocoin/common"
   packages = [
     "proto",
-    "protoutil",
+    "vars",
   ]
   pruneopts = "UT"
-  revision = "87271613df77bbe1e8cb88299a6ec7c3598cfc24"
+  revision = "d7d9fa9dc9de547c19c27eefff4063a40e0148e3"
 
 [[projects]]
   branch = "master"
-  digest = "1:3f3a05ae0b95893d90b9b3b5afdb79a9b3d96e4e36e099d841ae602e4aca0da8"
+  digest = "1:38f553aff0273ad6f367cb0a0f8b6eecbaef8dc6cb8b50e57b6a81c1d5b1e332"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
+  revision = "eb0de9b17e854e9b1ccd9963efafc79862359959"
 
 [[projects]]
   branch = "master"
@@ -146,14 +145,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f343f077a5b0bc3a3788b3a04e24dd417e3e25b2acb529c413e212d2c42416ef"
+  digest = "1:0c7cb58af944f9690af91474a75371eecfe54c1ce3771a8dc08924430ee785d3"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "0cf1ed9e522b7dbb416f080a5c8003de9b702bf4"
+  revision = "4ed8d59d0b35e1e29334a206d1b3f38b1e5dfb31"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -187,7 +186,7 @@
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
-  revision = "b5d43981345bdb2c233eb4bf3277847b48c6fdc6"
+  revision = "31ac5d88444a9e7ad18077db9a165d793ad06a2e"
 
 [[projects]]
   digest = "1:c3ad9841823db6da420a5625b367913b4ff54bbe60e8e3c98bd20e243e62e2d2"
@@ -233,6 +232,7 @@
     "github.com/nats-io/go-nats-streaming",
     "github.com/sirupsen/logrus",
     "gitlab.videocoin.io/videocoin/common/proto",
+    "gitlab.videocoin.io/videocoin/common/vars",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

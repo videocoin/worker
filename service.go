@@ -17,6 +17,7 @@ import (
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 	pb "gitlab.videocoin.io/videocoin/common/proto"
+	"gitlab.videocoin.io/videocoin/common/vars"
 )
 
 // Service base struct for service reciever
@@ -68,9 +69,18 @@ func (s *Service) subscribe() {
 			panic(err)
 		}
 
-		s.handleTranscodeTask(task.Id, task.InputUrl)
+		s.handleTranscodeTask(&task)
 
 	}, stan.DurableName("transcode-main"))
+}
+
+func (s *Service) reportStatus(task *pb.SimpleTranscodeTask) error {
+	data, err := json.Marshal(&task)
+	if err != nil {
+		return err
+	}
+
+	return s.sc.Publish(vars.TranscodeStatus, data)
 }
 
 // Start creates new service and blocks until stop signal
@@ -85,23 +95,29 @@ func Start() {
 	handleExit()
 }
 
-func (s *Service) handleTranscodeTask(taskID string, inputURL string) error {
+func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 
-	log.Infof("starting transcode task:\n%+s using input: %s", taskID, inputURL)
+	log.Infof("starting transcode task:\n%+s using input: %s", task.Id, task.InputUrl)
 
-	dir := path.Join(s.cfg.OutputDir, taskID)
+	dir := path.Join(s.cfg.OutputDir, task.Id)
 
 	if err := prepareDir(dir); err != nil {
-		panic(err)
+		return err
 	}
 
 	if err := generatePlaylist(path.Join(dir, "playlist.m3u8")); err != nil {
 		panic(err)
 	}
 
-	args := buildCmd(inputURL, dir)
+	args := buildCmd(task.InputUrl, dir)
 
 	transcode(args)
+
+	task.Status = pb.TranscodeStatusTranscoding.String()
+
+	if err := s.reportStatus(task); err != nil {
+		return err
+	}
 
 	return nil
 }

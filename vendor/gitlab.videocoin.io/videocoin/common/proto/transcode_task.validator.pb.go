@@ -18,57 +18,6 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-func (this *TranscodeTask) Validate() error {
-	if this.CreatedAt != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.CreatedAt); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("CreatedAt", err)
-		}
-	}
-	if this.UpdatedAt != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.UpdatedAt); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("UpdatedAt", err)
-		}
-	}
-	if this.Metadata != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Metadata); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Metadata", err)
-		}
-	}
-	if this.Input != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Input); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Input", err)
-		}
-	}
-	if this.Output != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Output); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Output", err)
-		}
-	}
-	return nil
-}
-func (this *TranscodeTaskInput) Validate() error {
-	if this.Video != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Video); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Video", err)
-		}
-	}
-	return nil
-}
-func (this *TranscodeTaskOutput) Validate() error {
-	for _, item := range this.Video {
-		if item != nil {
-			if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(item); err != nil {
-				return github_com_mwitkow_go_proto_validators.FieldError("Video", err)
-			}
-		}
-	}
-	if this.Auido != nil {
-		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.Auido); err != nil {
-			return github_com_mwitkow_go_proto_validators.FieldError("Auido", err)
-		}
-	}
-	return nil
-}
 func (this *SimpleTranscodeTask) Validate() error {
 	if this.CreatedAt != nil {
 		if err := github_com_mwitkow_go_proto_validators.CallValidatorIfExists(this.CreatedAt); err != nil {
