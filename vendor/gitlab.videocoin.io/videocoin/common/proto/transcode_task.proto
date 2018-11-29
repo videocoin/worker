@@ -16,7 +16,7 @@ option (gogoproto.sizer_all) = false;
 enum TranscodeStatus {
     option (gogoproto.goproto_enum_prefix) = false;
     option (gogoproto.enum_customname) = "TranscodeStatus";
-  
+
     none = 0 [ (gogoproto.enumvalue_customname) = "TranscodeStatusNone" ];
     pending = 1 [ (gogoproto.enumvalue_customname) = "TranscodeStatusPending" ];
     transcoding = 2 [ (gogoproto.enumvalue_customname) = "TranscodeStatusTranscoding" ];
@@ -24,7 +24,7 @@ enum TranscodeStatus {
     failed = 4 [ (gogoproto.enumvalue_customname) = "TranscodeStatusFailed" ];
     completed = 5 [ (gogoproto.enumvalue_customname) = "TranscodeStatusCompleted" ];
   }
-  
+
 
 
 
@@ -34,7 +34,8 @@ message SimpleTranscodeTask {
     string output_url =3;
     string status = 4;
     int32 user_id = 5;
-    google.protobuf.Timestamp created_at = 6 [(gogoproto.stdtime) = true];
-    google.protobuf.Timestamp updated_at = 7 [(gogoproto.stdtime) = true];
+    string application_id = 6;
+    google.protobuf.Timestamp created_at = 7 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp updated_at = 8 [(gogoproto.stdtime) = true];
 }
 

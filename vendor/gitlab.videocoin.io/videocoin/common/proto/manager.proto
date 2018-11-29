@@ -36,9 +36,11 @@ message StreamRequest {
     string application_id  = 1;
     string stream_id = 2;
     int32 user_id = 3;
+
 }
 
 message StreamResponse {
     string message = 1;
+    string output_url= 2;
 }
 

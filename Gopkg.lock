@@ -110,14 +110,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8d98e50ad1d29e10576c113fe4e41be02f82a5275c4b127341185b63ee105ea5"
+  digest = "1:7f8e1bfba9e6ebdce44e1c889ce60806f70022a7bd8527fb47ec94544f0389cb"
   name = "gitlab.videocoin.io/videocoin/common"
   packages = [
     "proto",
     "vars",
   ]
   pruneopts = "UT"
-  revision = "d7d9fa9dc9de547c19c27eefff4063a40e0148e3"
+  revision = "62424568b2f2f644758e55fee826bcc40ee2915c"
 
 [[projects]]
   branch = "master"
