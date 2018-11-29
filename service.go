@@ -62,6 +62,8 @@ func (s *Service) subscribe() {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Infof("listenoing on channel: %s", hostname)
 	// Subscribe with durable name
 	s.sc.Subscribe(hostname, func(m *stan.Msg) {
 		task := pb.SimpleTranscodeTask{}
