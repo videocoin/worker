@@ -43,7 +43,7 @@
 
 [[constraint]]
   branch = "master"
-  name = "gitlab.videocoin.io/videocoin/common"
+  name = "github.com/videocoin/common"
 
 [prune]
   go-tests = true

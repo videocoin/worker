@@ -111,7 +111,7 @@
 [[projects]]
   branch = "master"
   digest = "1:7f8e1bfba9e6ebdce44e1c889ce60806f70022a7bd8527fb47ec94544f0389cb"
-  name = "gitlab.videocoin.io/videocoin/common"
+  name = "github.com/videocoin/common"
   packages = [
     "proto",
     "vars",
@@ -231,8 +231,8 @@
     "github.com/nats-io/go-nats",
     "github.com/nats-io/go-nats-streaming",
     "github.com/sirupsen/logrus",
-    "gitlab.videocoin.io/videocoin/common/proto",
-    "gitlab.videocoin.io/videocoin/common/vars",
+    "github.com/videocoin/common/proto",
+    "github.com/videocoin/common/vars",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

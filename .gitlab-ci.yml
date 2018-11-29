@@ -10,13 +10,13 @@ variables:
 
 before_script:
   # configure gopath structure
-  - mkdir -p /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds /root/.ssh
-  - cp -r $CI_PROJECT_DIR /go/src/gitlab.videocoin.io/videocoin/transcode
-  - ln -s /go/src/gitlab.videocoin.io/videocoin /go/src/_/builds/videocoin
+  - mkdir -p /go/src/github.com/videocoin /go/src/_/builds /root/.ssh
+  - cp -r $CI_PROJECT_DIR /go/src/github.com/videocoin/transcode
+  - ln -s /go/src/github.com/videocoin /go/src/_/builds/videocoin
   # required installs
   - apk add --update make ca-certificates openssl python build-base alpine-sdk musl-dev musl openssh openssh-client
   # use ci token
-  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.videocoin.io/videocoin/".insteadOf ssh://git@gitlab.videocoin.io/videocoin/
+  - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@github.com/videocoin/".insteadOf ssh://git@github.com/videocoin/
 
   - go get
 

@@ -16,8 +16,8 @@ import (
 	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
-	pb "gitlab.videocoin.io/videocoin/common/proto"
-	"gitlab.videocoin.io/videocoin/common/vars"
+	pb "github.com/videocoin/common/proto"
+	"github.com/videocoin/common/vars"
 )
 
 // Service base struct for service reciever
