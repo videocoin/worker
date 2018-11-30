@@ -1,6 +1,7 @@
 package transcode
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -15,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"cloud.google.com/go/storage"
 	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
@@ -107,18 +109,21 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	log.Infof("starting transcode task:\n%+s using input: %s", task.Id, task.InputUrl)
 
 	dir := path.Join(s.cfg.OutputDir, task.Id)
+	m3u8 := path.Join(dir, "playlist.m3u8")
 
 	if err := prepareDir(dir); err != nil {
 		return err
 	}
 
-	if err := generatePlaylist(path.Join(dir, "playlist.m3u8")); err != nil {
+	if err := generatePlaylist(m3u8); err != nil {
 		panic(err)
 	}
 
 	args := buildCmd(task.InputUrl, dir)
 
 	transcode(args, task.InputUrl)
+
+	makePublic(cfg.Bucket, m3u8)
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
@@ -143,13 +148,17 @@ func transcode(args []string, streamurl string) error {
 
 func generatePlaylist(filename string) error {
 	m3u8 := []byte(`#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=640x360
+#EXT-X-PLAYLIST-TYPE:EVENT
+#EXT-X-TARGETDURATION:10
+#EXT-X-VERSION:4
+#EXT-X-STREAM-INF:BANDWIDTH=1048576,RESOLUTION=640x360
 360p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1400000,RESOLUTION=842x480
+#EXT-X-STREAM-INF:BANDWIDTH=3145728,RESOLUTION=842x480
 480p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=2800000,RESOLUTION=1280x720
+#EXT-X-STREAM-INF:BANDWIDTH=5242880,RESOLUTION=1280x720
 720p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=8388608,RESOLUTION=1920x1080
+1080p.m3u8
 `)
 
 	return ioutil.WriteFile(filename, m3u8, 0644)
@@ -165,6 +174,20 @@ func waitForStreamReady(streamurl string) {
 		log.Infof("waiting for stream %s to become ready...", streamurl)
 		time.Sleep(30 * time.Second)
 	}
+}
+
+func makePublic(bucket string, object string) {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Errorf("failed to get storage client: %s", err.Error())
+		return
+	}
+	acl := client.Bucket(bucket).Object(object).ACL()
+	if err := acl.Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
+		log.Errorf("failed to make object public: %s", err.Error())
+	}
+
 }
 
 func prepareDir(dir string) error {
