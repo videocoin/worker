@@ -158,14 +158,12 @@ func generatePlaylist(filename string) error {
 func waitForStreamReady(streamurl string) {
 	maxretry := 10
 	for i := 0; i < maxretry; i++ {
-		resp, err := http.Head(streamurl)
-		if resp.StatusCode != 200 || err != nil {
-			log.Info("waiting for stream to become ready...")
-			time.Sleep(30 * time.Second)
-			continue
-		} else if resp.StatusCode == 200 {
+		resp, _ := http.Head(streamurl)
+		if resp.StatusCode == 200 {
 			return
 		}
+		log.Infof("waiting for stream %s to become ready...", streamurl)
+		time.Sleep(30 * time.Second)
 	}
 }
 
