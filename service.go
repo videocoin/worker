@@ -72,7 +72,9 @@ func (s *Service) subscribe() {
 			panic(err)
 		}
 
-		s.handleTranscodeTask(&task)
+		if err := s.handleTranscodeTask(&task); err != nil {
+			log.Errorf("Failed to transcode incoming stream: %s", err.Error())
+		}
 
 	}, stan.DurableName("transcode-main"))
 }
