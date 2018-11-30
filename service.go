@@ -6,12 +6,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path"
 	"strings"
 	"syscall"
+	"time"
 
 	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
@@ -65,7 +67,7 @@ func (s *Service) subscribe() {
 
 	log.Infof("listenoing on channel: %s", hostname)
 	// Subscribe with durable name
-	s.sc.QueueSubscribe(hostname, vars.TranscodeStatusQueueGroup, func(m *stan.Msg) {
+	s.sc.QueueSubscribe("transcode", vars.TranscodeStatusQueueGroup, func(m *stan.Msg) {
 		log.Infof("msg recieved!")
 		task := pb.SimpleTranscodeTask{}
 		if err := json.Unmarshal(m.Data, &task); err != nil {
@@ -116,7 +118,7 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 
 	args := buildCmd(task.InputUrl, dir)
 
-	transcode(args)
+	transcode(args, task.InputUrl)
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
@@ -127,7 +129,8 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	return nil
 }
 
-func transcode(args []string) error {
+func transcode(args []string, streamurl string) error {
+	waitForStreamReady(streamurl)
 	log.Info("starting transcode")
 	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
 	if err != nil {
@@ -150,6 +153,20 @@ func generatePlaylist(filename string) error {
 `)
 
 	return ioutil.WriteFile(filename, m3u8, 0644)
+}
+
+func waitForStreamReady(streamurl string) {
+	maxretry := 10
+	for i := 0; i < maxretry; i++ {
+		resp, err := http.Head(streamurl)
+		if resp.StatusCode != 200 || err != nil {
+			log.Info("waiting for stream to become ready...")
+			time.Sleep(30 * time.Second)
+			continue
+		} else if resp.StatusCode == 200 {
+			return
+		}
+	}
 }
 
 func prepareDir(dir string) error {
