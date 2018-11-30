@@ -66,6 +66,7 @@ func (s *Service) subscribe() {
 	log.Infof("listenoing on channel: %s", hostname)
 	// Subscribe with durable name
 	s.sc.QueueSubscribe(hostname, vars.TranscodeStatusQueueGroup, func(m *stan.Msg) {
+		log.Infof("msg recieved!")
 		task := pb.SimpleTranscodeTask{}
 		if err := json.Unmarshal(m.Data, &task); err != nil {
 			panic(err)
