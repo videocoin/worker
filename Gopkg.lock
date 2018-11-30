@@ -2,6 +2,22 @@
 
 
 [[projects]]
+  digest = "1:08636edd4ac1b095a9689b7a07763aa70e035068e0ff0e9dbfe2b6299b98e498"
+  name = "cloud.google.com/go"
+  packages = [
+    "compute/metadata",
+    "iam",
+    "internal",
+    "internal/optional",
+    "internal/trace",
+    "internal/version",
+    "storage",
+  ]
+  pruneopts = "UT"
+  revision = "74b12019e2aa53ec27882158f59192d7cd6d1998"
+  version = "v0.33.1"
+
+[[projects]]
   digest = "1:3f7c586d2fd571c4f2e3d313c0638b33b999055de507d5f11fafe27e5adc30db"
   name = "github.com/gogo/protobuf"
   packages = [
@@ -32,6 +48,14 @@
   pruneopts = "UT"
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
   version = "v1.2.0"
+
+[[projects]]
+  digest = "1:e04cc716992a302cacf6d726409a05aa9546241998b24356d6dd0f01bc5a374e"
+  name = "github.com/googleapis/gax-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b001040cd31805261cbd978842099e326dfa857b"
+  version = "v2.0.2"
 
 [[projects]]
   digest = "1:3cbc83a159e161c6cf3e64590ae19da29069ecd8d92f9400ab6fda15e93cbc5f"
@@ -117,7 +141,30 @@
     "vars",
   ]
   pruneopts = "UT"
-  revision = "62424568b2f2f644758e55fee826bcc40ee2915c"
+  revision = "e923865a4b6e89e821c836929a0086204c85aee4"
+
+[[projects]]
+  digest = "1:3b5a3bc35810830ded5e26ef9516e933083a2380d8e57371fdfde3c70d7c6952"
+  name = "go.opencensus.io"
+  packages = [
+    ".",
+    "exemplar",
+    "internal",
+    "internal/tagencoding",
+    "plugin/ochttp",
+    "plugin/ochttp/propagation/b3",
+    "stats",
+    "stats/internal",
+    "stats/view",
+    "tag",
+    "trace",
+    "trace/internal",
+    "trace/propagation",
+    "trace/tracestate",
+  ]
+  pruneopts = "UT"
+  revision = "b7bf3cdb64150a8c8c53b769fdeb2ba581bd4d4b"
+  version = "v0.18.0"
 
 [[projects]]
   branch = "master"
@@ -129,10 +176,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6ca51c5d8a610b3da56856df7a8f8f3e075eba8d5f7a4acbadd79b2d2a368054"
+  digest = "1:5ad570851feb57bcc5c147ee81a54cdd023a8c66a5c716d57faed25a7b6c1dff"
   name = "golang.org/x/net"
   packages = [
     "context",
+    "context/ctxhttp",
     "http/httpguts",
     "http2",
     "http2/hpack",
@@ -142,6 +190,20 @@
   ]
   pruneopts = "UT"
   revision = "fae4c4e3ad76c295c3d6d259f898136b4bf833a8"
+
+[[projects]]
+  branch = "master"
+  digest = "1:632f90938b07f6e07ec6d2118f8af83add0aba9ff07d96f879fb9785797104f5"
+  name = "golang.org/x/oauth2"
+  packages = [
+    ".",
+    "google",
+    "internal",
+    "jws",
+    "jwt",
+  ]
+  pruneopts = "UT"
+  revision = "28207608b83849a028d4f12e46533a6b6894ecaf"
 
 [[projects]]
   branch = "master"
@@ -179,10 +241,50 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ec1919b8b80839559effbe3eabcebf92238d12d3dd9182e51deb5da3ed12e5e9"
+  digest = "1:393c8b9fe02baff033b9e9988030f45c2cf81083a3275cb63865f77a634632aa"
+  name = "google.golang.org/api"
+  packages = [
+    "gensupport",
+    "googleapi",
+    "googleapi/internal/uritemplates",
+    "googleapi/transport",
+    "internal",
+    "iterator",
+    "option",
+    "storage/v1",
+    "transport/http",
+    "transport/http/internal/propagation",
+  ]
+  pruneopts = "UT"
+  revision = "af4fc4062c262223ddc2d92f5f35a93690db383a"
+
+[[projects]]
+  digest = "1:d2a8db567a76203e3b41c1f632d86485ffd57f8e650a0d1b19d240671c2fddd7"
+  name = "google.golang.org/appengine"
+  packages = [
+    ".",
+    "internal",
+    "internal/app_identity",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/modules",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch",
+  ]
+  pruneopts = "UT"
+  revision = "4a4468ece617fc8205e99368fa2200e9d1fad421"
+  version = "v1.3.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:1ba78ad987af2d56273afa3221ed3a798d918b711a8354120eafac022b87ce3b"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
+    "googleapis/iam/v1",
+    "googleapis/rpc/code",
     "googleapis/rpc/status",
   ]
   pruneopts = "UT"
@@ -227,6 +329,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "cloud.google.com/go/storage",
     "github.com/kelseyhightower/envconfig",
     "github.com/nats-io/go-nats",
     "github.com/nats-io/go-nats-streaming",
