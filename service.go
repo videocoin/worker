@@ -1,18 +1,22 @@
 package transcode
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path"
 	"strings"
 	"syscall"
+	"time"
 
+	"cloud.google.com/go/storage"
 	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
@@ -65,13 +69,16 @@ func (s *Service) subscribe() {
 
 	log.Infof("listenoing on channel: %s", hostname)
 	// Subscribe with durable name
-	s.sc.Subscribe(hostname, func(m *stan.Msg) {
+	s.sc.QueueSubscribe(strings.TrimSpace(hostname), vars.TranscodeStatusQueueGroup, func(m *stan.Msg) {
+		log.Infof("msg recieved!")
 		task := pb.SimpleTranscodeTask{}
 		if err := json.Unmarshal(m.Data, &task); err != nil {
 			panic(err)
 		}
 
-		s.handleTranscodeTask(&task)
+		if err := s.handleTranscodeTask(&task); err != nil {
+			log.Errorf("Failed to transcode incoming stream: %s", err.Error())
+		}
 
 	}, stan.DurableName("transcode-main"))
 }
@@ -102,29 +109,34 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	log.Infof("starting transcode task:\n%+s using input: %s", task.Id, task.InputUrl)
 
 	dir := path.Join(s.cfg.OutputDir, task.Id)
+	m3u8 := path.Join(dir, "playlist.m3u8")
 
 	if err := prepareDir(dir); err != nil {
-		return err
+		log.Error(err.Error())
+		// return err
 	}
 
-	if err := generatePlaylist(path.Join(dir, "playlist.m3u8")); err != nil {
+	if err := generatePlaylist(m3u8); err != nil {
 		panic(err)
 	}
 
 	args := buildCmd(task.InputUrl, dir)
 
-	transcode(args)
+	transcode(args, task.InputUrl)
+
+	makePublic(cfg.Bucket, m3u8)
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
 	if err := s.reportStatus(task); err != nil {
-		return err
+		log.Errorf("failed to report status")
 	}
 
 	return nil
 }
 
-func transcode(args []string) error {
+func transcode(args []string, streamurl string) error {
+	waitForStreamReady(streamurl)
 	log.Info("starting transcode")
 	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
 	if err != nil {
@@ -137,16 +149,43 @@ func transcode(args []string) error {
 
 func generatePlaylist(filename string) error {
 	m3u8 := []byte(`#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=640x360
+#EXT-X-STREAM-INF:BANDWIDTH=1048576,RESOLUTION=640x360
 360p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1400000,RESOLUTION=842x480
+#EXT-X-STREAM-INF:BANDWIDTH=3145728,RESOLUTION=842x480
 480p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=2800000,RESOLUTION=1280x720
+#EXT-X-STREAM-INF:BANDWIDTH=5242880,RESOLUTION=1280x720
 720p.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=8388608,RESOLUTION=1920x1080
+1080p.m3u8
 `)
 
 	return ioutil.WriteFile(filename, m3u8, 0644)
+}
+
+func waitForStreamReady(streamurl string) {
+	maxretry := 10
+	for i := 0; i < maxretry; i++ {
+		resp, _ := http.Head(streamurl)
+		if resp.StatusCode == 200 {
+			return
+		}
+		log.Infof("waiting for stream %s to become ready...", streamurl)
+		time.Sleep(30 * time.Second)
+	}
+}
+
+func makePublic(bucket string, object string) {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Errorf("failed to get storage client: %s", err.Error())
+		return
+	}
+	acl := client.Bucket(bucket).Object(object).ACL()
+	if err := acl.Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
+		log.Errorf("failed to make object public: %s", err.Error())
+	}
+
 }
 
 func prepareDir(dir string) error {
