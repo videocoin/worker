@@ -6,8 +6,9 @@ GOOS = linux
 GOARCH = amd64
 
 SERVICE_NAME = transcoder
-PROJECT_ID?=
 DOCKER_REGISTRY = us.gcr.io
+PROJECT_ID?=
+RELEASE_BUCKET?=
 
 IMAGE_TAG=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):$(VERSION)
 LATEST=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):latest
@@ -49,5 +50,5 @@ package:
 
 publish:
 	@echo "==> Pushing to storage..."
-	gsutil -m cp release/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://vc-releases/transcoder/
-	gsutil -m cp gs://vc-releases/transcoder/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://vc-releases/transcoder/latest_transcoder_linux_amd64.tar.bz2
+	gsutil -m cp release/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/transcoder/
+	gsutil -m cp gs://${RELEASE_BUCKET}/transcoder/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/transcoder/latest_transcoder_linux_amd64.tar.bz2
