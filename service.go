@@ -69,7 +69,7 @@ func (s *Service) subscribe() {
 
 	log.Infof("listenoing on channel: %s", hostname)
 	// Subscribe with durable name
-	s.sc.QueueSubscribe("transcode", vars.TranscodeStatusQueueGroup, func(m *stan.Msg) {
+	s.sc.QueueSubscribe(strings.TrimSpace(hostname), vars.TranscodeStatusQueueGroup, func(m *stan.Msg) {
 		log.Infof("msg recieved!")
 		task := pb.SimpleTranscodeTask{}
 		if err := json.Unmarshal(m.Data, &task); err != nil {
@@ -112,7 +112,8 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	m3u8 := path.Join(dir, "playlist.m3u8")
 
 	if err := prepareDir(dir); err != nil {
-		return err
+		log.Error(err.Error())
+		// return err
 	}
 
 	if err := generatePlaylist(m3u8); err != nil {
@@ -128,7 +129,7 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
 	if err := s.reportStatus(task); err != nil {
-		return err
+		log.Errorf("failed to report status")
 	}
 
 	return nil
@@ -148,9 +149,6 @@ func transcode(args []string, streamurl string) error {
 
 func generatePlaylist(filename string) error {
 	m3u8 := []byte(`#EXTM3U
-#EXT-X-PLAYLIST-TYPE:EVENT
-#EXT-X-TARGETDURATION:10
-#EXT-X-VERSION:4
 #EXT-X-STREAM-INF:BANDWIDTH=1048576,RESOLUTION=640x360
 360p.m3u8
 #EXT-X-STREAM-INF:BANDWIDTH=3145728,RESOLUTION=842x480
