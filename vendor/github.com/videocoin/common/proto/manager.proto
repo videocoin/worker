@@ -5,11 +5,26 @@ package proto;
 option go_package = "proto";
 
 import "health.proto";
-import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
+import "google/api/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/mwitkow/go-proto-validators/validator.proto";
 
+import "transcode_task.proto";
+
+// Enable custom Marshal method.
+option (gogoproto.marshaler_all) = true;
+// Enable custom Unmarshal method.
+option (gogoproto.unmarshaler_all) = true;
+// Enable custom Size method (Required by Marshal and Unmarshal).
+option (gogoproto.sizer_all) = true;
+// Enable registration with golang/protobuf for the grpc-gateway.
+option (gogoproto.goproto_registration) = true;
+// Enable generation of XXX_MessageName methods for grpc-go/status.
+option (gogoproto.messagename_all) = true;
 
 service ManagerService {
   rpc CreateStream(StreamRequest) returns (StreamResponse) {
@@ -21,6 +36,12 @@ service ManagerService {
   rpc StopStream(StreamRequest) returns (StreamResponse) {
     option (google.api.http) = {
       post : "/api/v1/stream/stop/{application_id}/{stream_id}"
+    };
+  };
+
+  rpc GetTask(GetTaskRequest) returns (SimpleTranscodeTask) {
+    option (google.api.http) = {
+      get : "/api/v1/stream/{id}"
     };
   };
 
@@ -42,5 +63,9 @@ message StreamRequest {
 message StreamResponse {
     string message = 1;
     string output_url= 2;
+}
+
+message GetTaskRequest {
+    string id =1 ;
 }
 

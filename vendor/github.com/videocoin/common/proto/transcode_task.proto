@@ -35,7 +35,7 @@ message SimpleTranscodeTask {
     string status = 4;
     int32 user_id = 5;
     string application_id = 6;
-    google.protobuf.Timestamp created_at = 7 [(gogoproto.stdtime) = true];
-    google.protobuf.Timestamp updated_at = 8 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
 }
 
