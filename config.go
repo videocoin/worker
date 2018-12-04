@@ -16,6 +16,7 @@ type Config struct {
 	OutputDir      string `required:"true" envconfig:"OUTPUT_DIR" default:"/opt/mnt/" description:"Mount point for GCSFUSE"`
 	NATsURL        string `required:"true" envconfig:"NATS_URL" default:"nats://nats:4222"`
 	NATsToken      string `required:"true" envconfig:"NATS_TOKEN"`
+	ManagerRPCADDR string `required:"true" envconfig:"MANAGER_RPC_ADDR" default:"manager:50051"`
 	Cluster        string `required:"true" envconfig:"NATS_CLUSTER"`
 }
 

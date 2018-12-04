@@ -17,21 +17,25 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/golang/protobuf/ptypes/empty"
 	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/videocoin/common/proto"
 	"github.com/videocoin/common/vars"
+	"google.golang.org/grpc"
 )
 
 // Service base struct for service reciever
 type Service struct {
-	cfg *Config
-	sc  stan.Conn
+	cfg     *Config
+	sc      stan.Conn
+	manager pb.ManagerServiceClient
 }
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
+
 	cfg := LoadConfig()
 
 	// Generate unique connection name
@@ -54,33 +58,26 @@ func New() (*Service, error) {
 		return nil, err
 	}
 
-	return &Service{
-		cfg: cfg,
-		sc:  sc,
-	}, nil
+	//grpcDialOpts := grpcclient.DialOpts("debug")
 
-}
-
-func (s *Service) subscribe() {
-	hostname, err := os.Hostname()
+	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	log.Infof("listenoing on channel: %s", hostname)
-	// Subscribe with durable name
-	s.sc.QueueSubscribe(strings.TrimSpace(hostname), vars.TranscodeStatusQueueGroup, func(m *stan.Msg) {
-		log.Infof("msg recieved!")
-		task := pb.SimpleTranscodeTask{}
-		if err := json.Unmarshal(m.Data, &task); err != nil {
-			panic(err)
-		}
+	manager := pb.NewManagerServiceClient(managerConn)
 
-		if err := s.handleTranscodeTask(&task); err != nil {
-			log.Errorf("Failed to transcode incoming stream: %s", err.Error())
-		}
+	status, err := manager.Health(context.Background(), &empty.Empty{})
+	if status.GetStatus() != "healthy" || err != nil {
+		return nil, err
+	}
 
-	}, stan.DurableName("transcode-main"))
+	return &Service{
+		cfg:     cfg,
+		sc:      sc,
+		manager: manager,
+	}, nil
+
 }
 
 func (s *Service) reportStatus(task *pb.SimpleTranscodeTask) error {
@@ -98,8 +95,18 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
+	hostname, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+	ctx := context.Background()
 
-	s.subscribe()
+	task, err := s.manager.GetTask(ctx, &pb.GetTaskRequest{Id: hostname})
+	if err != nil {
+		panic(err)
+	}
+
+	s.handleTranscodeTask(task)
 
 	handleExit()
 }
