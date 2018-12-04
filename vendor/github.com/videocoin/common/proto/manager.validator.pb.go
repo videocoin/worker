@@ -15,14 +15,11 @@ import _ "github.com/mwitkow/go-proto-validators"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
 import _ "google.golang.org/genproto/protobuf/field_mask"
 
-import time "time"
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-var _ = time.Kitchen
 
 func (this *StreamRequest) Validate() error {
 	return nil

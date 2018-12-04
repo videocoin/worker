@@ -10,13 +10,10 @@ import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/golang/protobuf/ptypes/timestamp"
 
-import time "time"
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-var _ = time.Kitchen
 
 func (this *SimpleTranscodeTask) Validate() error {
 	if this.CreatedAt != nil {
