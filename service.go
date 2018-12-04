@@ -58,9 +58,9 @@ func New() (*Service, error) {
 		return nil, err
 	}
 
-	//grpcDialOpts := grpcclient.DialOpts("debug")
+	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR)
+	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR, opts...)
 	if err != nil {
 		return nil, err
 	}
