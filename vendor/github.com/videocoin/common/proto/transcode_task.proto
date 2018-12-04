@@ -6,6 +6,8 @@ option go_package = "proto";
 
 import "google/protobuf/timestamp.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "null.proto";
+
 
 option optimize_for = SPEED;
 
@@ -35,7 +37,7 @@ message SimpleTranscodeTask {
     string status = 4;
     int32 user_id = 5;
     string application_id = 6;
-    google.protobuf.Timestamp created_at = 7;
-    google.protobuf.Timestamp updated_at = 8;
+    NullTime created_at = 7  [ (gogoproto.moretags) = "gorm:\"type:DATETIME;DEFAULT:CURRENT_TIMESTAMP\"" ];;
+    NullTime updated_at = 8  [ (gogoproto.moretags) = "gorm:\"type:DATETIME;DEFAULT:CURRENT_TIMESTAMP\"" ];;
 }
 

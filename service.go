@@ -131,7 +131,7 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 
 	transcode(args, task.InputUrl)
 
-	makePublic(cfg.Bucket, m3u8)
+	//	makePublic(cfg.Bucket, m3u8)
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
@@ -142,16 +142,15 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	return nil
 }
 
-func transcode(args []string, streamurl string) error {
+func transcode(args []string, streamurl string) {
 	waitForStreamReady(streamurl)
 	log.Info("starting transcode")
 	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
 	if err != nil {
 		log.Errorf("failed to exec - output: %s", string(out))
-		return err
+		panic(err)
 	}
 	log.Info("transcode complete")
-	return nil
 }
 
 func generatePlaylist(filename string) error {

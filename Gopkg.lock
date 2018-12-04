@@ -134,14 +134,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:db007070c8933d51a18a23ce9a299dc8d5276632211199ee122d8114914fc973"
+  digest = "1:7920a9c557a29fc6d4e91fbd7e65c72032f88fe2af29d4c5ad921b4454c63a8b"
   name = "github.com/videocoin/common"
   packages = [
     "proto",
     "vars",
   ]
   pruneopts = "UT"
-  revision = "4a8c008bbbc8a50fad512dd084013913da8c3fcc"
+  revision = "29e9ed80394b4da84b8fb8e1127ca0294fd99624"
 
 [[projects]]
   digest = "1:3b5a3bc35810830ded5e26ef9516e933083a2380d8e57371fdfde3c70d7c6952"
@@ -279,14 +279,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c687169ea4f1554252009306cc8305fc86b9c5a68fbd0e61e7cadd8ed6504767"
+  digest = "1:a7d48ca460ca1b4f6ccd8c95502443afa05df88aee84de7dbeb667a8754e8fa6"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
     "googleapis/iam/v1",
     "googleapis/rpc/code",
     "googleapis/rpc/status",
-    "protobuf/field_mask",
   ]
   pruneopts = "UT"
   revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
