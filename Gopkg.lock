@@ -134,14 +134,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:42160abbac7f3f1f634f492979a478d5a295ded42b303cba22a98d8c7c9573bb"
+  digest = "1:9461ad73253bf55e9d11de09b30d065a29d27881ed95d3094b592bb5136015a8"
   name = "github.com/videocoin/common"
   packages = [
     "proto",
     "vars",
   ]
   pruneopts = "UT"
-  revision = "e34ae11ebe11424ef1673cfeef61d1d96d145599"
+  revision = "fba6b50cf0d188b615051e0bf55182f85abd9d9f"
 
 [[projects]]
   digest = "1:3b5a3bc35810830ded5e26ef9516e933083a2380d8e57371fdfde3c70d7c6952"
@@ -279,13 +279,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a7d48ca460ca1b4f6ccd8c95502443afa05df88aee84de7dbeb667a8754e8fa6"
+  digest = "1:c687169ea4f1554252009306cc8305fc86b9c5a68fbd0e61e7cadd8ed6504767"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
     "googleapis/iam/v1",
     "googleapis/rpc/code",
     "googleapis/rpc/status",
+    "protobuf/field_mask",
   ]
   pruneopts = "UT"
   revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
@@ -330,12 +331,14 @@
   analyzer-version = 1
   input-imports = [
     "cloud.google.com/go/storage",
+    "github.com/golang/protobuf/ptypes/empty",
     "github.com/kelseyhightower/envconfig",
     "github.com/nats-io/go-nats",
     "github.com/nats-io/go-nats-streaming",
     "github.com/sirupsen/logrus",
     "github.com/videocoin/common/proto",
     "github.com/videocoin/common/vars",
+    "google.golang.org/grpc",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
