@@ -37,7 +37,7 @@ message SimpleTranscodeTask {
     string status = 4;
     int32 user_id = 5;
     string application_id = 6;
-    NullTime created_at = 7  [ (gogoproto.moretags) = "gorm:\"type:DATETIME;DEFAULT:CURRENT_TIMESTAMP\"" ];;
-    NullTime updated_at = 8  [ (gogoproto.moretags) = "gorm:\"type:DATETIME;DEFAULT:CURRENT_TIMESTAMP\"" ];;
+    NullTime created_at = 7  [ (gogoproto.moretags) = "json:\"created_at\" gorm:\"type:timestamp;default:current_timestamp;NOT NULL\""];
+    NullTime updated_at = 8  [ (gogoproto.moretags) = "json:\"updated_at\" gorm:\"type:timestamp;default:current_timestamp;NOT NULL\""];
 }
 
