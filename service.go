@@ -116,7 +116,7 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	log.Infof("starting transcode task:\n%+s using input: %s", task.Id, task.InputUrl)
 
 	dir := path.Join(s.cfg.OutputDir, task.Id)
-	m3u8 := path.Join(dir, "playlist.m3u8")
+	m3u8 := path.Join(dir, "master_playlist.m3u8")
 
 	if err := prepareDir(dir); err != nil {
 		log.Error(err.Error())
@@ -155,13 +155,13 @@ func transcode(args []string, streamurl string) {
 
 func generatePlaylist(filename string) error {
 	m3u8 := []byte(`#EXTM3U
-#EXT-X-STREAM-INF:BANDWIDTH=1048576,RESOLUTION=640x360
+#EXT-X-STREAM-INF:BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
 360p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=3145728,RESOLUTION=842x480
+#EXT-X-STREAM-INF:BANDWIDTH=3145728,RESOLUTION=842x480,CODECS="avc1.42e00a,mp4a.40.2"
 480p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=5242880,RESOLUTION=1280x720
+#EXT-X-STREAM-INF:BANDWIDTH=5242880,RESOLUTION=1280x720,CODECS="avc1.42e00a,mp4a.40.2"
 720p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=8388608,RESOLUTION=1920x1080
+#EXT-X-STREAM-INF:BANDWIDTH=8388608,RESOLUTION=1920x1080,CODECS="avc1.42e00a,mp4a.40.2"
 1080p.m3u8
 `)
 
