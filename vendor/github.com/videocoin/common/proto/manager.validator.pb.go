@@ -30,3 +30,6 @@ func (this *StreamResponse) Validate() error {
 func (this *GetTaskRequest) Validate() error {
 	return nil
 }
+func (this *GetStreamRequest) Validate() error {
+	return nil
+}
