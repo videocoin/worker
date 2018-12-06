@@ -24,6 +24,9 @@ var _ = time.Kitchen
 func (this *StreamRequest) Validate() error {
 	return nil
 }
+func (this *UpdateStreamStatusRequest) Validate() error {
+	return nil
+}
 func (this *StreamResponse) Validate() error {
 	return nil
 }

@@ -134,14 +134,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6b180f2bbece53d341b898c816dfd546997c70d5cd3b84a7e668ed3e13f88676"
+  digest = "1:987a69582a671340c215ebc8cc5087cf117eb88da9dbf18f6357ec5e1fe6ec1d"
   name = "github.com/videocoin/common"
   packages = [
     "proto",
     "vars",
   ]
   pruneopts = "UT"
-  revision = "e1a6b778059d8bf20f5ef11632c2ae36d6f5a9ce"
+  revision = "2b760829b0b8da01949079aae62b078eb5782889"
 
 [[projects]]
   digest = "1:3b5a3bc35810830ded5e26ef9516e933083a2380d8e57371fdfde3c70d7c6952"
@@ -214,7 +214,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "a5c9d58dba9a56f97aaa86f55e638b718c5a6c42"
+  revision = "70b957f3b65e069b4930ea94e2721eefa0f8f695"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -256,7 +256,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "6142e720c068c6cd71f2258e007ff1991572e1d5"
+  revision = "1a5ef82f9af45ef51c486291ef2b0a16d82fdb95"
 
 [[projects]]
   digest = "1:d2a8db567a76203e3b41c1f632d86485ffd57f8e650a0d1b19d240671c2fddd7"
