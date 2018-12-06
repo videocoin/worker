@@ -3,8 +3,6 @@ package transcode
 import (
 	"context"
 	"crypto/rand"
-	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -18,11 +16,9 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
-	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/videocoin/common/proto"
-	"github.com/videocoin/common/vars"
 	"google.golang.org/grpc"
 )
 
@@ -44,20 +40,6 @@ func New() (*Service, error) {
 		return nil, err
 	}
 
-	clientID := hex.EncodeToString(b)
-
-	// Use nats as underlying connection with secret token
-	nc, err := nats.Connect(cfg.NATsURL, nats.Token(cfg.NATsToken))
-	if err != nil {
-		return nil, err
-	}
-
-	// Wrap stan connection ontop of nats
-	sc, err := stan.Connect(cfg.Cluster, clientID, stan.NatsConn(nc))
-	if err != nil {
-		return nil, err
-	}
-
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR, opts...)
@@ -74,19 +56,24 @@ func New() (*Service, error) {
 
 	return &Service{
 		cfg:     cfg,
-		sc:      sc,
 		manager: manager,
 	}, nil
 
 }
 
-func (s *Service) reportStatus(task *pb.SimpleTranscodeTask) error {
-	data, err := json.Marshal(&task)
+func (s *Service) reportStatus(userID int32, applicationID string, status string) error {
+	ctx := context.Background()
+	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
+		UserId:        userID,
+		ApplicationId: applicationID,
+		Status:        status,
+	})
+
 	if err != nil {
 		return err
 	}
 
-	return s.sc.Publish(vars.TranscodeStatus, data)
+	return nil
 }
 
 // Start creates new service and blocks until stop signal
@@ -135,7 +122,7 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
-	if err := s.reportStatus(task); err != nil {
+	if err := s.reportStatus(task.UserId, task.ApplicationId, task.Status); err != nil {
 		log.Errorf("failed to report status")
 	}
 
