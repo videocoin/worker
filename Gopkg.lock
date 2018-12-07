@@ -134,12 +134,9 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:987a69582a671340c215ebc8cc5087cf117eb88da9dbf18f6357ec5e1fe6ec1d"
+  digest = "1:637dc94eec67265a0b109b1f95d3ffc0739a166f1dffc4f412a5bd22415c87cd"
   name = "github.com/videocoin/common"
-  packages = [
-    "proto",
-    "vars",
-  ]
+  packages = ["proto"]
   pruneopts = "UT"
   revision = "2b760829b0b8da01949079aae62b078eb5782889"
 
@@ -337,11 +334,9 @@
     "cloud.google.com/go/storage",
     "github.com/golang/protobuf/ptypes/empty",
     "github.com/kelseyhightower/envconfig",
-    "github.com/nats-io/go-nats",
     "github.com/nats-io/go-nats-streaming",
     "github.com/sirupsen/logrus",
     "github.com/videocoin/common/proto",
-    "github.com/videocoin/common/vars",
     "google.golang.org/grpc",
   ]
   solver-name = "gps-cdcl"
