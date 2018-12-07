@@ -3,8 +3,6 @@ package transcode
 import (
 	"context"
 	"crypto/rand"
-	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -18,11 +16,9 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
-	nats "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/videocoin/common/proto"
-	"github.com/videocoin/common/vars"
 	"google.golang.org/grpc"
 )
 
@@ -44,20 +40,6 @@ func New() (*Service, error) {
 		return nil, err
 	}
 
-	clientID := hex.EncodeToString(b)
-
-	// Use nats as underlying connection with secret token
-	nc, err := nats.Connect(cfg.NATsURL, nats.Token(cfg.NATsToken))
-	if err != nil {
-		return nil, err
-	}
-
-	// Wrap stan connection ontop of nats
-	sc, err := stan.Connect(cfg.Cluster, clientID, stan.NatsConn(nc))
-	if err != nil {
-		return nil, err
-	}
-
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR, opts...)
@@ -74,19 +56,24 @@ func New() (*Service, error) {
 
 	return &Service{
 		cfg:     cfg,
-		sc:      sc,
 		manager: manager,
 	}, nil
 
 }
 
-func (s *Service) reportStatus(task *pb.SimpleTranscodeTask) error {
-	data, err := json.Marshal(&task)
+func (s *Service) reportStatus(userID int32, applicationID string, status string) error {
+	ctx := context.Background()
+	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
+		UserId:        userID,
+		ApplicationId: applicationID,
+		Status:        status,
+	})
+
 	if err != nil {
 		return err
 	}
 
-	return s.sc.Publish(vars.TranscodeStatus, data)
+	return nil
 }
 
 // Start creates new service and blocks until stop signal
@@ -116,7 +103,7 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	log.Infof("starting transcode task:\n%+s using input: %s", task.Id, task.InputUrl)
 
 	dir := path.Join(s.cfg.OutputDir, task.Id)
-	m3u8 := path.Join(dir, "playlist.m3u8")
+	m3u8 := path.Join(dir, "master_playlist.m3u8")
 
 	if err := prepareDir(dir); err != nil {
 		log.Error(err.Error())
@@ -131,39 +118,36 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 
 	transcode(args, task.InputUrl)
 
-	makePublic(cfg.Bucket, m3u8)
+	//	makePublic(cfg.Bucket, m3u8)
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
-	if err := s.reportStatus(task); err != nil {
+	if err := s.reportStatus(task.UserId, task.ApplicationId, task.Status); err != nil {
 		log.Errorf("failed to report status")
 	}
 
 	return nil
 }
 
-func transcode(args []string, streamurl string) error {
+func transcode(args []string, streamurl string) {
 	waitForStreamReady(streamurl)
 	log.Info("starting transcode")
 	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
 	if err != nil {
 		log.Errorf("failed to exec - output: %s", string(out))
-		return err
+		panic(err)
 	}
 	log.Info("transcode complete")
-	return nil
 }
 
 func generatePlaylist(filename string) error {
 	m3u8 := []byte(`#EXTM3U
-#EXT-X-STREAM-INF:BANDWIDTH=1048576,RESOLUTION=640x360
+#EXT-X-STREAM-INF:BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
 360p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=3145728,RESOLUTION=842x480
+#EXT-X-STREAM-INF:BANDWIDTH=3145728,RESOLUTION=842x480,CODECS="avc1.42e00a,mp4a.40.2"
 480p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=5242880,RESOLUTION=1280x720
+#EXT-X-STREAM-INF:BANDWIDTH=5242880,RESOLUTION=1280x720,CODECS="avc1.42e00a,mp4a.40.2"
 720p.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=8388608,RESOLUTION=1920x1080
-1080p.m3u8
 `)
 
 	return ioutil.WriteFile(filename, m3u8, 0644)
@@ -201,16 +185,16 @@ func prepareDir(dir string) error {
 
 func buildCmd(inputURL string, dir string) []string {
 
-	p360 := fmt.Sprintf("-vf scale=w=640:h=360:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -b:v 800k -maxrate 856k -bufsize 1200k -hls_segment_filename %s/360p_%%03d.ts %s/360p.m3u8", dir, dir)
-	p480 := fmt.Sprintf("-vf scale=w=842:h=480:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -b:v 1400k -maxrate 1498k -bufsize 2100k -hls_segment_filename %s/480p_%%03d.ts %s/480p.m3u8", dir, dir)
-	p720 := fmt.Sprintf("-vf scale=w=1280:h=720:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -b:v 2800k -maxrate 2996k -bufsize 4200k -hls_segment_filename %s/720p_%%03d.ts %s/720p.m3u8", dir, dir)
-	p1080 := fmt.Sprintf("-vf scale=w=1920:h=1080:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -b:v 5000k -maxrate 5350k -bufsize 7500k -hls_segment_filename %s/1080p_%%03d.ts %s/1080p.m3u8", dir, dir)
+	p360 := fmt.Sprintf("-vf scale=w=640:h=360:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 3 -b:v 800k -maxrate 856k -bufsize 1200k -hls_segment_filename %s/360p_%%03d.ts %s/360p.m3u8", dir, dir)
+	p480 := fmt.Sprintf("-vf scale=w=842:h=480:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 3 -b:v 1400k -maxrate 1498k -bufsize 2100k -hls_segment_filename %s/480p_%%03d.ts %s/480p.m3u8", dir, dir)
+	p720 := fmt.Sprintf("-vf scale=w=1280:h=720:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 3 -b:v 2800k -maxrate 2996k -bufsize 4200k -hls_segment_filename %s/720p_%%03d.ts %s/720p.m3u8", dir, dir)
+	// /	p1080 := fmt.Sprintf("-vf scale=w=1920:h=1080:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -b:v 5000k -maxrate 5350k -bufsize 7500k -hls_segment_filename %s/1080p_%%03d.ts %s/1080p.m3u8", dir, dir)
 
 	cmd := []string{"-i", inputURL}
 	cmd = append(cmd, strings.Split(p360, " ")...)
 	cmd = append(cmd, strings.Split(p480, " ")...)
 	cmd = append(cmd, strings.Split(p720, " ")...)
-	cmd = append(cmd, strings.Split(p1080, " ")...)
+	//cmd = append(cmd, strings.Split(p1080, " ")...)
 
 	return cmd
 

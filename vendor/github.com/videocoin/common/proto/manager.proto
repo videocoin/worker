@@ -6,9 +6,6 @@ option go_package = "proto";
 
 import "health.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/field_mask.proto";
 import "google/api/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/mwitkow/go-proto-validators/validator.proto";
@@ -50,6 +47,19 @@ service ManagerService {
       get : "/healthz"
     };
   }
+
+  rpc GetStream(GetStreamRequest) returns (SimpleTranscodeTask) {
+    option (google.api.http) = {
+      get : "/api/v1/stream/{user_id}/{application_id}"
+    };
+  };
+
+  rpc UpdateStreamStatus(UpdateStreamStatusRequest) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      post : "/api/v1/stream/{user_id}/{application_id}/{status}"
+    };
+  };
+
 }
 
 
@@ -57,7 +67,12 @@ message StreamRequest {
     string application_id  = 1;
     string stream_id = 2;
     int32 user_id = 3;
+}
 
+message UpdateStreamStatusRequest {
+  int32 user_id = 1;
+  string application_id = 2;
+  string status = 3;
 }
 
 message StreamResponse {
@@ -69,3 +84,7 @@ message GetTaskRequest {
     string id =1 ;
 }
 
+message GetStreamRequest {
+    string application_id = 1;
+    int32 user_id =2;
+}

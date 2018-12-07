@@ -14,8 +14,8 @@
     "storage",
   ]
   pruneopts = "UT"
-  revision = "74b12019e2aa53ec27882158f59192d7cd6d1998"
-  version = "v0.33.1"
+  revision = "0ebda48a7f143b1cce9eb37a8c1106ac762a3430"
+  version = "v0.34.0"
 
 [[projects]]
   digest = "1:3f7c586d2fd571c4f2e3d313c0638b33b999055de507d5f11fafe27e5adc30db"
@@ -134,14 +134,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:db007070c8933d51a18a23ce9a299dc8d5276632211199ee122d8114914fc973"
+  digest = "1:637dc94eec67265a0b109b1f95d3ffc0739a166f1dffc4f412a5bd22415c87cd"
   name = "github.com/videocoin/common"
-  packages = [
-    "proto",
-    "vars",
-  ]
+  packages = ["proto"]
   pruneopts = "UT"
-  revision = "4a8c008bbbc8a50fad512dd084013913da8c3fcc"
+  revision = "2b760829b0b8da01949079aae62b078eb5782889"
 
 [[projects]]
   digest = "1:3b5a3bc35810830ded5e26ef9516e933083a2380d8e57371fdfde3c70d7c6952"
@@ -207,14 +204,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0c7cb58af944f9690af91474a75371eecfe54c1ce3771a8dc08924430ee785d3"
+  digest = "1:b9dceb1408ba5105803d5859193bc7d89ac3199b611cf8681dbaa0aa09c10d9c"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4ed8d59d0b35e1e29334a206d1b3f38b1e5dfb31"
+  revision = "70b957f3b65e069b4930ea94e2721eefa0f8f695"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -256,7 +253,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "6142e720c068c6cd71f2258e007ff1991572e1d5"
+  revision = "1a5ef82f9af45ef51c486291ef2b0a16d82fdb95"
 
 [[projects]]
   digest = "1:d2a8db567a76203e3b41c1f632d86485ffd57f8e650a0d1b19d240671c2fddd7"
@@ -279,37 +276,41 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c687169ea4f1554252009306cc8305fc86b9c5a68fbd0e61e7cadd8ed6504767"
+  digest = "1:a7d48ca460ca1b4f6ccd8c95502443afa05df88aee84de7dbeb667a8754e8fa6"
   name = "google.golang.org/genproto"
   packages = [
     "googleapis/api/annotations",
     "googleapis/iam/v1",
     "googleapis/rpc/code",
     "googleapis/rpc/status",
-    "protobuf/field_mask",
   ]
   pruneopts = "UT"
   revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
 
 [[projects]]
-  digest = "1:c3ad9841823db6da420a5625b367913b4ff54bbe60e8e3c98bd20e243e62e2d2"
+  digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"
   name = "google.golang.org/grpc"
   packages = [
     ".",
     "balancer",
     "balancer/base",
     "balancer/roundrobin",
+    "binarylog/grpc_binarylog_v1",
     "codes",
     "connectivity",
     "credentials",
+    "credentials/internal",
     "encoding",
     "encoding/proto",
     "grpclog",
     "internal",
     "internal/backoff",
+    "internal/binarylog",
     "internal/channelz",
     "internal/envconfig",
     "internal/grpcrand",
+    "internal/grpcsync",
+    "internal/syscall",
     "internal/transport",
     "keepalive",
     "metadata",
@@ -323,8 +324,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "2e463a05d100327ca47ac218281906921038fd95"
-  version = "v1.16.0"
+  revision = "df014850f6dee74ba2fc94874043a9f3f75fbfd8"
+  version = "v1.17.0"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -333,11 +334,9 @@
     "cloud.google.com/go/storage",
     "github.com/golang/protobuf/ptypes/empty",
     "github.com/kelseyhightower/envconfig",
-    "github.com/nats-io/go-nats",
     "github.com/nats-io/go-nats-streaming",
     "github.com/sirupsen/logrus",
     "github.com/videocoin/common/proto",
-    "github.com/videocoin/common/vars",
     "google.golang.org/grpc",
   ]
   solver-name = "gps-cdcl"

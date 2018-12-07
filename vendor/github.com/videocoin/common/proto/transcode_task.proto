@@ -5,13 +5,21 @@ package proto;
 option go_package = "proto";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "null.proto";
 
-option optimize_for = SPEED;
 
-option (gogoproto.unmarshaler_all) = false;
-option (gogoproto.marshaler_all) = false;
-option (gogoproto.sizer_all) = false;
+// Enable custom Marshal method.
+option (gogoproto.marshaler_all) = true;
+// Enable custom Unmarshal method.
+option (gogoproto.unmarshaler_all) = true;
+// Enable custom Size method (Required by Marshal and Unmarshal).
+option (gogoproto.sizer_all) = true;
+// Enable registration with golang/protobuf for the grpc-gateway.
+option (gogoproto.goproto_registration) = true;
+// Enable generation of XXX_MessageName methods for grpc-go/status.
+option (gogoproto.messagename_all) = true;
 
 enum TranscodeStatus {
     option (gogoproto.goproto_enum_prefix) = false;
@@ -35,7 +43,7 @@ message SimpleTranscodeTask {
     string status = 4;
     int32 user_id = 5;
     string application_id = 6;
-    google.protobuf.Timestamp created_at = 7;
-    google.protobuf.Timestamp updated_at = 8;
+    NullTime created_at = 7;
+    NullTime updated_at = 8;
 }
 
