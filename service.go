@@ -92,9 +92,6 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
-
-	go s.handleTranscodeTask(task)
-
 	//	makePublic(cfg.Bucket, m3u8)
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
@@ -102,6 +99,8 @@ func Start() {
 	if err := s.reportStatus(task.UserId, task.ApplicationId, task.Status); err != nil {
 		log.Errorf("failed to report status")
 	}
+
+	go s.handleTranscodeTask(task)
 
 	handleExit()
 }
