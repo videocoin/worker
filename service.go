@@ -96,7 +96,11 @@ func Start() {
 
 	task.Status = pb.TranscodeStatusTranscoding.String()
 
-	if err := s.reportStatus(task.UserId, task.ApplicationId, task.Status); err != nil {
+	if _, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
+		UserId:        task.UserId,
+		ApplicationId: task.ApplicationId,
+		Status:        task.Status,
+	}); err != nil {
 		log.Errorf("failed to report status")
 	}
 
