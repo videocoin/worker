@@ -93,7 +93,15 @@ func Start() {
 		panic(err)
 	}
 
-	s.handleTranscodeTask(task)
+	go s.handleTranscodeTask(task)
+
+	//	makePublic(cfg.Bucket, m3u8)
+
+	task.Status = pb.TranscodeStatusTranscoding.String()
+
+	if err := s.reportStatus(task.UserId, task.ApplicationId, task.Status); err != nil {
+		log.Errorf("failed to report status")
+	}
 
 	handleExit()
 }
@@ -117,14 +125,6 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	args := buildCmd(task.InputUrl, dir)
 
 	transcode(args, task.InputUrl)
-
-	//	makePublic(cfg.Bucket, m3u8)
-
-	task.Status = pb.TranscodeStatusTranscoding.String()
-
-	if err := s.reportStatus(task.UserId, task.ApplicationId, task.Status); err != nil {
-		log.Errorf("failed to report status")
-	}
 
 	return nil
 }
