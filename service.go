@@ -114,7 +114,7 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	log.Infof("starting transcode task: %+s using input: %s", task.Id, task.InputUrl)
 
 	dir := path.Join(s.cfg.OutputDir, task.Id)
-	m3u8 := path.Join(dir, "master_playlist.m3u8")
+	m3u8 := path.Join(dir, "index.m3u8")
 
 	if err := prepareDir(dir); err != nil {
 		log.Error(err.Error())
@@ -188,10 +188,16 @@ func prepareDir(dir string) error {
 
 func buildCmd(inputURL string, dir string) []string {
 
-	p360 := fmt.Sprintf("-vf scale=w=640:h=360:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 60 -hls_wrap 10 -start_number 1 -flags -global_header -b:v 800k -maxrate 856k -bufsize 1200k -hls_segment_filename %s/360p_%%03d.ts %s/360p.m3u8", dir, dir)
-	p480 := fmt.Sprintf("-vf scale=w=842:h=480:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 60 -hls_wrap 10 -start_number 1 -flags -global_header -b:v 1400k -maxrate 1498k -bufsize 2100k -hls_segment_filename %s/480p_%%03d.ts %s/480p.m3u8", dir, dir)
-	p720 := fmt.Sprintf("-vf scale=w=1280:h=720:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 60 -hls_wrap 10 -start_number 1 -flags -global_header -b:v 2800k -maxrate 2996k -bufsize 4200k -hls_segment_filename %s/720p_%%03d.ts %s/720p.m3u8", dir, dir)
+	// p360 := fmt.Sprintf("-vf scale=w=640:h=360:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 60 -hls_wrap 10 -start_number 1 -flags -global_header -b:v 800k -maxrate 856k -bufsize 1200k -hls_segment_filename %s/360p_%%03d.ts %s/360p.m3u8", dir, dir)
+	// p480 := fmt.Sprintf("-vf scale=w=842:h=480:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 60 -hls_wrap 10 -start_number 1 -flags -global_header -b:v 1400k -maxrate 1498k -bufsize 2100k -hls_segment_filename %s/480p_%%03d.ts %s/480p.m3u8", dir, dir)
+	// p720 := fmt.Sprintf("-vf scale=w=1280:h=720:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -hls_list_size 60 -hls_wrap 10 -start_number 1 -flags -global_header -b:v 2800k -maxrate 2996k -bufsize 4200k -hls_segment_filename %s/720p_%%03d.ts %s/720p.m3u8", dir, dir)
 	// /	p1080 := fmt.Sprintf("-vf scale=w=1920:h=1080:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -crf 20 -sc_threshold 0 -g 48 -keyint_min 48 -hls_time 10 -hls_playlist_type event -b:v 5000k -maxrate 5350k -bufsize 7500k -hls_segment_filename %s/1080p_%%03d.ts %s/1080p.m3u8", dir, dir)
+
+	p360 := fmt.Sprintf("-hls_flags delete_segments+append_list -f segment -vf scale=w=640:h=360:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_list_size 3 -segment_format mpegts -segment_list %s/360p/index.m3u8 %s/360p/%%03d.ts", dir, dir)
+
+	p480 := fmt.Sprintf("-hls_flags delete_segments+append_list -f segment -vf scale=w=842:h=480:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_list_size 3 -segment_format mpegts -segment_list %s/480p/index.m3u8 %s/480p/%%03d.ts", dir, dir)
+
+	p720 := fmt.Sprintf("-hls_flags delete_segments+append_list -f segment -vf scale=w=1280:h=720:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_list_size 3 -segment_format mpegts -segment_list %s/720p/index.m3u8 %s/720p/%%03d.ts", dir, dir)
 
 	cmd := []string{"-i", inputURL}
 	cmd = append(cmd, strings.Split(p360, " ")...)
