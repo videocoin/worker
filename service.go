@@ -111,7 +111,7 @@ func Start() {
 
 func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 
-	log.Infof("starting transcode task:\n%+s using input: %s", task.Id, task.InputUrl)
+	log.Infof("starting transcode task: %+s using input: %s", task.Id, task.InputUrl)
 
 	dir := path.Join(s.cfg.OutputDir, task.Id)
 	m3u8 := path.Join(dir, "master_playlist.m3u8")
