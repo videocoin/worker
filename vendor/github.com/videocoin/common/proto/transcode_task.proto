@@ -42,7 +42,7 @@ message SimpleTranscodeTask {
     string input_url = 2;
     string output_url =3;
     string status = 4;
-    int32 user_id = 5;
+    string user_id = 5;
     string application_id = 6;
     string created_at = 7 [ (gogoproto.moretags) = "gorm:\"created_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
     string updated_at = 8 [ (gogoproto.moretags) = "gorm:\"updated_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];

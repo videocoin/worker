@@ -18,7 +18,7 @@
   version = "v0.34.0"
 
 [[projects]]
-  digest = "1:3f7c586d2fd571c4f2e3d313c0638b33b999055de507d5f11fafe27e5adc30db"
+  digest = "1:452644cddfec8736ad410d9a5a4eacce21810873ceaa938ae373edf2f2c0fe84"
   name = "github.com/gogo/protobuf"
   packages = [
     "gogoproto",
@@ -28,8 +28,8 @@
     "types",
   ]
   pruneopts = "UT"
-  revision = "636bf0302bc95575d69441b25a2603156ffdddf1"
-  version = "v1.1.1"
+  revision = "4cbf7e384e768b4e01799441fdf2a706a5635ae7"
+  version = "v1.2.0"
 
 [[projects]]
   digest = "1:e3180bea674449a3d8c40341b39423e44e79d68ddb200f94f5c0020a42685ee8"
@@ -98,7 +98,7 @@
   revision = "0950a79900071e9f3f5979b78078c599376422fd"
 
 [[projects]]
-  digest = "1:4ce94f3d2074662c04677db471456feb56078244ebcfe3789e6e95901c085bc5"
+  digest = "1:53caa020dd4a0d34b65e725c3388e5a3b5b20b2863c6caf8c77473f3937f10d9"
   name = "github.com/nats-io/go-nats"
   packages = [
     ".",
@@ -106,8 +106,8 @@
     "util",
   ]
   pruneopts = "UT"
-  revision = "fb0396ee0bdb8018b0fef30d6d1de798ce99cd05"
-  version = "v1.6.0"
+  revision = "13c7fc7590db68b18f2015600f8765a02d705b5d"
+  version = "v1.7.0"
 
 [[projects]]
   digest = "1:cf80370e775e26aa54b8d87304244ad56e19886b422f4ede3bb4aec7ff3f83cc"
@@ -119,6 +119,14 @@
   pruneopts = "UT"
   revision = "e15a53f85e4932540600a16b56f6c4f65f58176f"
   version = "v0.4.0"
+
+[[projects]]
+  digest = "1:0b5d91120efc54504bc253fda90b08c4be88cd78a4023ef60019e95bb0cdc136"
+  name = "github.com/nats-io/nkeys"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "1546a3320a8f195a5b5c84aef8309377c2e411d5"
+  version = "v0.0.2"
 
 [[projects]]
   digest = "1:c3cd663f2f30b92536b9f290ac85c6310dae36a14cb8961553ae9ccf0d85ae41"
@@ -138,11 +146,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9b2520c9e040583dba3699319baf188bfb19bc577a002e07e27ffade27fda31d"
+  digest = "1:3532a95111bff298ee640349269794d00d9edc2af7fa951fef383d3761a5695f"
   name = "github.com/videocoin/common"
   packages = ["proto"]
   pruneopts = "UT"
-  revision = "806fc54dc486b40341471e6218e9ca256a773747"
+  revision = "007cf5774ab8814797ca1c185560a1f4f04d38ce"
 
 [[projects]]
   digest = "1:3b5a3bc35810830ded5e26ef9516e933083a2380d8e57371fdfde3c70d7c6952"
@@ -169,15 +177,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:38f553aff0273ad6f367cb0a0f8b6eecbaef8dc6cb8b50e57b6a81c1d5b1e332"
+  digest = "1:cfd661f1a52594117f2a753bb640a86d4dbf3e0d778c2641bfbc750e6a1c8be7"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "ssh/terminal",
+  ]
   pruneopts = "UT"
   revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
 
 [[projects]]
   branch = "master"
-  digest = "1:29fe5460430a338b64f4a0259a6c59a1e2350bbcff54fa66f906fa8d10515c4d"
+  digest = "1:8ecb828bb550a8c6b7d75b8261a42c369461311616ebe5451966d067f5f993bf"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -190,7 +202,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
 
 [[projects]]
   branch = "master"
@@ -208,14 +220,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:268575c4d9e27391ede5e3559c7f41a15dbf108678672afade864e08d6c34574"
+  digest = "1:ba8cbf57cfd92d5f8592b4aca1a35d92c162363d32aeabd5b12555f8896635e7"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "2a47403f2ae58167c4d75973960ccc62b28cb0d8"
+  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -257,7 +269,7 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "1a5ef82f9af45ef51c486291ef2b0a16d82fdb95"
+  revision = "874d9dc5b186e361475b082852f136f094555c30"
 
 [[projects]]
   digest = "1:d2a8db567a76203e3b41c1f632d86485ffd57f8e650a0d1b19d240671c2fddd7"
