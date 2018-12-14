@@ -61,7 +61,7 @@ func New() (*Service, error) {
 
 }
 
-func (s *Service) reportStatus(userID int32, applicationID string, status string) error {
+func (s *Service) reportStatus(userID string, applicationID string, status string) error {
 	ctx := context.Background()
 	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
 		UserId:        userID,
