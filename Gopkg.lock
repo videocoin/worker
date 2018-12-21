@@ -54,12 +54,15 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:e04cc716992a302cacf6d726409a05aa9546241998b24356d6dd0f01bc5a374e"
+  digest = "1:cd9864c6366515827a759931746738ede6079faa08df9c584596370d6add135c"
   name = "github.com/googleapis/gax-go"
-  packages = ["."]
+  packages = [
+    ".",
+    "v2",
+  ]
   pruneopts = "UT"
-  revision = "b001040cd31805261cbd978842099e326dfa857b"
-  version = "v2.0.2"
+  revision = "c8a15bac9b9fe955bd9f900272f9a306465d28cf"
+  version = "v2.0.3"
 
 [[projects]]
   digest = "1:1125fb981553dec25344f857eb68ccf2438c3696bc2f718acbb56321933490d0"
@@ -70,8 +73,8 @@
     "utilities",
   ]
   pruneopts = "UT"
-  revision = "01c07cdabb480b6d67b5c5586ae3b66e806de513"
-  version = "v1.6.2"
+  revision = "719aaadb1a4f7b11606d454e266fe5c5f789796f"
+  version = "v1.6.3"
 
 [[projects]]
   digest = "1:edbef42561faa44c19129b68d1e109fbc1647f63239250391eadc8d0e7c9f669"
@@ -146,11 +149,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3532a95111bff298ee640349269794d00d9edc2af7fa951fef383d3761a5695f"
+  digest = "1:97a6f6184e19bf2a7d0ce8acc8dc2c19e3a7a7031958a6479e87c38139fd2bff"
   name = "github.com/videocoin/common"
   packages = ["proto"]
   pruneopts = "UT"
-  revision = "007cf5774ab8814797ca1c185560a1f4f04d38ce"
+  revision = "baa58d7199aa6dc18d2573b06912d58ccb651bbb"
+
+[[projects]]
+  branch = "master"
+  digest = "1:d938521514fcd8c9a4ba946135684088e0ff468136d2efaec6b7b72626c37634"
+  name = "github.com/videocoin/transcode"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "092569c0e626e30aa132f23ea098e02d221ea4fb"
 
 [[projects]]
   digest = "1:3b5a3bc35810830ded5e26ef9516e933083a2380d8e57371fdfde3c70d7c6952"
@@ -202,7 +213,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [[projects]]
   branch = "master"
@@ -220,14 +231,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ba8cbf57cfd92d5f8592b4aca1a35d92c162363d32aeabd5b12555f8896635e7"
+  digest = "1:3d5e79e10549fd9119cbefd614b6d351ef5bd0be2f2b103a4199788e784cbc68"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
+  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -269,10 +280,10 @@
     "transport/http/internal/propagation",
   ]
   pruneopts = "UT"
-  revision = "874d9dc5b186e361475b082852f136f094555c30"
+  revision = "65a46cafb132eff435c7d1e0f439cc73c8eebb85"
 
 [[projects]]
-  digest = "1:d2a8db567a76203e3b41c1f632d86485ffd57f8e650a0d1b19d240671c2fddd7"
+  digest = "1:fa026a5c59bd2df343ec4a3538e6288dcf4e2ec5281d743ae82c120affe6926a"
   name = "google.golang.org/appengine"
   packages = [
     ".",
@@ -287,8 +298,8 @@
     "urlfetch",
   ]
   pruneopts = "UT"
-  revision = "4a4468ece617fc8205e99368fa2200e9d1fad421"
-  version = "v1.3.0"
+  revision = "e9657d882bb81064595ca3b56cbe2546bbabf7b1"
+  version = "v1.4.0"
 
 [[projects]]
   digest = "1:8e6d8d611c9419926d80dbe1886c6bc8cf08a3c0bfe01014d883022a1379877f"
@@ -353,6 +364,7 @@
     "github.com/nats-io/go-nats-streaming",
     "github.com/sirupsen/logrus",
     "github.com/videocoin/common/proto",
+    "github.com/videocoin/transcode",
     "google.golang.org/grpc",
   ]
   solver-name = "gps-cdcl"

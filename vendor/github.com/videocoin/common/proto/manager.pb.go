@@ -42,7 +42,7 @@ func (m *StreamRequest) Reset()         { *m = StreamRequest{} }
 func (m *StreamRequest) String() string { return proto.CompactTextString(m) }
 func (*StreamRequest) ProtoMessage()    {}
 func (*StreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_26dea584ca0e3de1, []int{0}
+	return fileDescriptor_manager_a7d8e5e5576910f5, []int{0}
 }
 func (m *StreamRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -105,7 +105,7 @@ func (m *UpdateStreamStatusRequest) Reset()         { *m = UpdateStreamStatusReq
 func (m *UpdateStreamStatusRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateStreamStatusRequest) ProtoMessage()    {}
 func (*UpdateStreamStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_26dea584ca0e3de1, []int{1}
+	return fileDescriptor_manager_a7d8e5e5576910f5, []int{1}
 }
 func (m *UpdateStreamStatusRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -167,7 +167,7 @@ func (m *StreamResponse) Reset()         { *m = StreamResponse{} }
 func (m *StreamResponse) String() string { return proto.CompactTextString(m) }
 func (*StreamResponse) ProtoMessage()    {}
 func (*StreamResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_26dea584ca0e3de1, []int{2}
+	return fileDescriptor_manager_a7d8e5e5576910f5, []int{2}
 }
 func (m *StreamResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -221,7 +221,7 @@ func (m *GetTaskRequest) Reset()         { *m = GetTaskRequest{} }
 func (m *GetTaskRequest) String() string { return proto.CompactTextString(m) }
 func (*GetTaskRequest) ProtoMessage()    {}
 func (*GetTaskRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_26dea584ca0e3de1, []int{3}
+	return fileDescriptor_manager_a7d8e5e5576910f5, []int{3}
 }
 func (m *GetTaskRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -269,7 +269,7 @@ func (m *GetStreamRequest) Reset()         { *m = GetStreamRequest{} }
 func (m *GetStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*GetStreamRequest) ProtoMessage()    {}
 func (*GetStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_26dea584ca0e3de1, []int{4}
+	return fileDescriptor_manager_a7d8e5e5576910f5, []int{4}
 }
 func (m *GetStreamRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1533,9 +1533,9 @@ var (
 	ErrIntOverflowManager   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("manager.proto", fileDescriptor_manager_26dea584ca0e3de1) }
+func init() { proto.RegisterFile("manager.proto", fileDescriptor_manager_a7d8e5e5576910f5) }
 
-var fileDescriptor_manager_26dea584ca0e3de1 = []byte{
+var fileDescriptor_manager_a7d8e5e5576910f5 = []byte{
 	// 607 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x54, 0xcb, 0x6e, 0xd3, 0x4c,
 	0x14, 0xae, 0xfd, 0xab, 0x69, 0x73, 0xd4, 0x46, 0xd5, 0xf4, 0xfa, 0x3b, 0x60, 0x22, 0x4b, 0x48,

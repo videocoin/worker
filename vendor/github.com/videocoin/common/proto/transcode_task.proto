@@ -32,6 +32,7 @@ enum TranscodeStatus {
     canceld = 3 [ (gogoproto.enumvalue_customname) = "TranscodeStatusCanceled" ];
     failed = 4 [ (gogoproto.enumvalue_customname) = "TranscodeStatusFailed" ];
     completed = 5 [ (gogoproto.enumvalue_customname) = "TranscodeStatusCompleted" ];
+    ready = 6 [ (gogoproto.enumvalue_customname) = "TranscodeStatusReady" ];
   }
 
 

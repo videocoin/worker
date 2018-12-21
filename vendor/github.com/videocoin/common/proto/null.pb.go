@@ -39,7 +39,7 @@ func (m *NullString) Reset()         { *m = NullString{} }
 func (m *NullString) String() string { return proto.CompactTextString(m) }
 func (*NullString) ProtoMessage()    {}
 func (*NullString) Descriptor() ([]byte, []int) {
-	return fileDescriptor_null_954d805ac955a812, []int{0}
+	return fileDescriptor_null_a1714022790c5c6b, []int{0}
 }
 func (m *NullString) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -94,7 +94,7 @@ func (m *NullInt32) Reset()         { *m = NullInt32{} }
 func (m *NullInt32) String() string { return proto.CompactTextString(m) }
 func (*NullInt32) ProtoMessage()    {}
 func (*NullInt32) Descriptor() ([]byte, []int) {
-	return fileDescriptor_null_954d805ac955a812, []int{1}
+	return fileDescriptor_null_a1714022790c5c6b, []int{1}
 }
 func (m *NullInt32) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -149,7 +149,7 @@ func (m *NullInt64) Reset()         { *m = NullInt64{} }
 func (m *NullInt64) String() string { return proto.CompactTextString(m) }
 func (*NullInt64) ProtoMessage()    {}
 func (*NullInt64) Descriptor() ([]byte, []int) {
-	return fileDescriptor_null_954d805ac955a812, []int{2}
+	return fileDescriptor_null_a1714022790c5c6b, []int{2}
 }
 func (m *NullInt64) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -193,7 +193,7 @@ func (m *NullInt64) GetValid() bool {
 }
 
 type NullTime struct {
-	Time                 *time.Time `protobuf:"bytes,1,opt,name=time,stdtime" json:"time,omitempty"`
+	Time                 *time.Time `protobuf:"bytes,1,opt,name=time,proto3,stdtime" json:"time,omitempty"`
 	Valid                bool       `protobuf:"varint,2,opt,name=valid,proto3" json:"valid,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
@@ -204,7 +204,7 @@ func (m *NullTime) Reset()         { *m = NullTime{} }
 func (m *NullTime) String() string { return proto.CompactTextString(m) }
 func (*NullTime) ProtoMessage()    {}
 func (*NullTime) Descriptor() ([]byte, []int) {
-	return fileDescriptor_null_954d805ac955a812, []int{3}
+	return fileDescriptor_null_a1714022790c5c6b, []int{3}
 }
 func (m *NullTime) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -988,9 +988,9 @@ var (
 	ErrIntOverflowNull   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("null.proto", fileDescriptor_null_954d805ac955a812) }
+func init() { proto.RegisterFile("null.proto", fileDescriptor_null_a1714022790c5c6b) }
 
-var fileDescriptor_null_954d805ac955a812 = []byte{
+var fileDescriptor_null_a1714022790c5c6b = []byte{
 	// 249 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xca, 0x2b, 0xcd, 0xc9,
 	0xd1, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x05, 0x53, 0x52, 0xf2, 0xe9, 0xf9, 0xf9, 0xe9,
