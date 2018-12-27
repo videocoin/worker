@@ -120,16 +120,16 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 
 	if err := prepareDir(dir); err != nil {
 		log.Error(err.Error())
-		// return err
 	}
+
+	log.Info("monitoring chunks")
+	go s.monitorChunks(path.Join(dir, "360p"), task)
 
 	if err := generatePlaylist(m3u8); err != nil {
 		panic(err)
 	}
 
 	args := buildCmd(task.InputUrl, dir)
-
-	go s.monitorChunks(path.Join(dir, "360p"), task)
 
 	transcode(args, task.InputUrl)
 
@@ -144,7 +144,7 @@ func (s *Service) monitorChunks(dir string, task *pb.SimpleTranscodeTask) {
 			log.Warnf("failed to read dir: %s", err.Error())
 		}
 
-		if len(files) < 10 {
+		if len(files) < 2 {
 			continue
 		}
 
