@@ -220,13 +220,13 @@ func prepareDir(dir string) error {
 }
 
 func buildCmd(inputURL string, dir string) []string {
-	p360 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=w=640:h=360:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/360p/index.m3u8 %s/360p/%%03d.ts", dir, dir)
+	p360 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=640:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/360p/index.m3u8 %s/360p/%%03d.ts", dir, dir)
 
-	p480 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=w=842:h=480:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/480p/index.m3u8 %s/480p/%%03d.ts", dir, dir)
+	p480 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=842:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/480p/index.m3u8 %s/480p/%%03d.ts", dir, dir)
 
-	p720 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=w=1280:h=720:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/720p/index.m3u8 %s/720p/%%03d.ts", dir, dir)
+	p720 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1280:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/720p/index.m3u8 %s/720p/%%03d.ts", dir, dir)
 
-	p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=w=1920:h=1080:force_original_aspect_ratio=decrease -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
+	p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1920:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
 
 	cmd := []string{"-re", "-i", inputURL}
 	cmd = append(cmd, strings.Split(p360, " ")...)
