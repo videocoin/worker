@@ -182,8 +182,6 @@ func generatePlaylist(filename string) error {
 480p/index.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=5242880,RESOLUTION=1280x720,CODECS="avc1.42e00a,mp4a.40.2"
 720p/index.m3u8
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=10485760,RESOLUTION=1920x1080,CODECS="avc1.42e00a,mp4a.40.2"
-1080p/index.m3u8
 `)
 
 	return ioutil.WriteFile(filename, m3u8, 0644)
@@ -226,13 +224,13 @@ func buildCmd(inputURL string, dir string) []string {
 
 	p720 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1280:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/720p/index.m3u8 %s/720p/%%03d.ts", dir, dir)
 
-	p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1920:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
+	//p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1920:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
 
 	cmd := []string{"-re", "-i", inputURL}
 	cmd = append(cmd, strings.Split(p360, " ")...)
 	cmd = append(cmd, strings.Split(p480, " ")...)
 	cmd = append(cmd, strings.Split(p720, " ")...)
-	cmd = append(cmd, strings.Split(p1080, " ")...)
+	//cmd = append(cmd, strings.Split(p1080, " ")...)
 
 	return cmd
 
