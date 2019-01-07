@@ -51,7 +51,7 @@ func New() (*Service, error) {
 
 	status, err := manager.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get healthy status: %v", err)
 	}
 
 	ctx := context.Background()
