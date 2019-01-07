@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/any.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "null.proto";
+
+
+// Enable custom Marshal method.
+option (gogoproto.marshaler_all) = true;
+// Enable custom Unmarshal method.
+option (gogoproto.unmarshaler_all) = true;
+// Enable custom Size method (Required by Marshal and Unmarshal).
+option (gogoproto.sizer_all) = true;
+// Enable registration with golang/protobuf for the grpc-gateway.
+option (gogoproto.goproto_registration) = true;
+// Enable generation of XXX_MessageName methods for grpc-go/status.
+option (gogoproto.messagename_all) = false;
+
+enum TranscodeStatus {
+    option (gogoproto.goproto_enum_prefix) = false;
+    option (gogoproto.enum_customname) = "TranscodeStatus";
+
+    none = 0 [ (gogoproto.enumvalue_customname) = "TranscodeStatusNone" ];
+    pending = 1 [ (gogoproto.enumvalue_customname) = "TranscodeStatusPending" ];
+    transcoding = 2 [ (gogoproto.enumvalue_customname) = "TranscodeStatusTranscoding" ];
+    canceld = 3 [ (gogoproto.enumvalue_customname) = "TranscodeStatusCanceled" ];
+    failed = 4 [ (gogoproto.enumvalue_customname) = "TranscodeStatusFailed" ];
+    completed = 5 [ (gogoproto.enumvalue_customname) = "TranscodeStatusCompleted" ];
+    ready = 6 [ (gogoproto.enumvalue_customname) = "TranscodeStatusReady" ];
+  }
+
+
+
+
+message SimpleTranscodeTask {
+    string id = 1;
+    string input_url = 2;
+    string output_url =3;
+    string status = 4;
+    string user_id = 5;
+    string application_id = 6;
+    bytes chunks = 7 [ (gogoproto.moretags) = "gorm:\"chunks;type:json;DEFAULT:NULL\" sql:\"type:json;DEFAULT:null\"" ];
+    string created_at = 8 [ (gogoproto.moretags) = "gorm:\"created_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
+    string updated_at = 9 [ (gogoproto.moretags) = "gorm:\"updated_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
+    
+}
+
