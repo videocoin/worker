@@ -20,7 +20,7 @@ require (
 	github.com/nats-io/nuid v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.3.0
 	github.com/stretchr/testify v1.3.0 // indirect
-	github.com/videocoin/common v0.0.0-20190107213615-3827b3823e2b
+	github.com/videocoin/common v0.0.0-20190108000549-0e9bdeb507cd
 	golang.org/x/crypto v0.0.0-20190103213133-ff983b9c42bc // indirect
 	golang.org/x/net v0.0.0-20190107210223-45ffb0cd1ba0 // indirect
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
