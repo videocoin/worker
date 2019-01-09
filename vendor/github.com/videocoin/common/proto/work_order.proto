@@ -28,11 +28,12 @@ enum WorkOrderStatus {
 
     none = 0 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusNone" ];
     pending = 1 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusPending" ];
-    transcoding = 2 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusTranscoding" ];
-    canceld = 3 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCanceled" ];
-    failed = 4 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusFailed" ];
-    completed = 5 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCompleted" ];
-    ready = 6 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusReady" ];
+    work_started = 2 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusWorkStarted" ];
+    transcoding = 3 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusTranscoding" ];
+    canceld = 4 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCanceled" ];
+    failed = 5 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusFailed" ];
+    completed = 6 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCompleted" ];
+    ready = 7 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusReady" ];
   }
 
 
@@ -46,8 +47,9 @@ message WorkOrder {
     string user_id = 5;
     string application_id = 6;
     uint32 transcoder_id = 7;
-    bytes chunks = 8 [ (gogoproto.moretags) = "gorm:\"chunks;type:json;DEFAULT:NULL\" sql:\"type:json;DEFAULT:null\"" ];
+    bytes chunks = 8 [ (gogoproto.moretags) = "gorm:\"chunks;type:json;DEFAULT:NULL\"sql:\"type:json;DEFAULT:null\"" ];
     string created_at = 9 [ (gogoproto.moretags) = "gorm:\"created_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
     string updated_at = 10 [ (gogoproto.moretags) = "gorm:\"updated_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
+    bytes worker = 11 [ (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" ];
 }
 
