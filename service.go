@@ -85,17 +85,13 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
-	hostname, err := os.Hostname()
+
+	task, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
 	if err != nil {
 		panic(err)
 	}
 
-	task, err := s.manager.GetTask(s.ctx, &pb.GetTaskRequest{Id: hostname})
-	if err != nil {
-		panic(err)
-	}
-
-	task.Status = pb.TranscodeStatusTranscoding.String()
+	task.Status = pb.WorkOrderStatusTranscoding.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		UserId:        task.UserId,
@@ -110,11 +106,11 @@ func Start() {
 	handleExit()
 }
 
-func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
+func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
-	log.Infof("starting transcode task: %+s using input: %s", task.Id, task.InputUrl)
+	log.Infof("starting transcode task: %d using input: %s", workOrder.Id, workOrder.InputUrl)
 
-	dir := path.Join(s.cfg.OutputDir, task.Id)
+	dir := path.Join(s.cfg.OutputDir, workOrder.StreamHash)
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	if err := prepareDir(dir); err != nil {
@@ -122,20 +118,20 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	}
 
 	log.Info("monitoring chunks")
-	go s.monitorChunks(path.Join(dir, "360p"), task)
+	go s.monitorChunks(path.Join(dir, "360p"), workOrder)
 
 	if err := generatePlaylist(m3u8); err != nil {
 		panic(err)
 	}
 
-	args := buildCmd(task.InputUrl, dir)
+	args := buildCmd(workOrder.InputUrl, dir)
 
-	transcode(args, task.InputUrl)
+	transcode(args, workOrder.InputUrl)
 
 	return nil
 }
 
-func (s *Service) monitorChunks(dir string, task *pb.SimpleTranscodeTask) {
+func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 	for {
 		time.Sleep(2 * time.Second)
 		files, err := ioutil.ReadDir(dir)
@@ -150,7 +146,7 @@ func (s *Service) monitorChunks(dir string, task *pb.SimpleTranscodeTask) {
 		break
 	}
 
-	task.Status = pb.TranscodeStatusReady.String()
+	task.Status = pb.WorkOrderStatusReady.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		UserId:        task.UserId,
