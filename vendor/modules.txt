@@ -51,7 +51,7 @@ github.com/nats-io/nkeys
 github.com/nats-io/nuid
 # github.com/sirupsen/logrus v1.3.0
 github.com/sirupsen/logrus
-# github.com/videocoin/common v0.1.4
+# github.com/videocoin/common v0.1.5
 github.com/videocoin/common/proto
 # go.opencensus.io v0.18.0
 go.opencensus.io/trace

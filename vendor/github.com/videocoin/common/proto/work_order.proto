@@ -41,15 +41,16 @@ enum WorkOrderStatus {
 
 message WorkOrder {
     uint32 id = 1;
-    string input_url = 2;
-    string output_url =3;
-    string status = 4;
-    string user_id = 5;
-    string application_id = 6;
-    uint32 transcoder_id = 7;
-    bytes chunks = 8 [ (gogoproto.moretags) = "gorm:\"chunks;type:json;DEFAULT:NULL\"sql:\"type:json;DEFAULT:null\"" ];
-    string created_at = 9 [ (gogoproto.moretags) = "gorm:\"created_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
-    string updated_at = 10 [ (gogoproto.moretags) = "gorm:\"updated_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
-    bytes worker = 11 [ (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" ];
+    uint32 transcoder_id = 2;
+    string stream_hash = 3;
+    string user_id = 4;
+    string application_id = 5;
+    string input_url = 6;
+    string output_url =7;
+    string status = 8;
+    bytes chunks = 9 [ (gogoproto.moretags) = "gorm:\"chunks;type:json;DEFAULT:NULL\"sql:\"type:json;DEFAULT:null\"" ];
+    string created_at = 10 [ (gogoproto.moretags) = "gorm:\"created_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
+    string updated_at = 11 [ (gogoproto.moretags) = "gorm:\"updated_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
+    bytes worker = 12 [ (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" ];
 }
 
