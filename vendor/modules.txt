@@ -28,7 +28,7 @@ github.com/golang/protobuf/protoc-gen-go/generator/internal/remap
 github.com/golang/protobuf/protoc-gen-go/plugin
 # github.com/googleapis/gax-go v2.0.2+incompatible
 github.com/googleapis/gax-go
-# github.com/grpc-ecosystem/grpc-gateway v1.6.3
+# github.com/grpc-ecosystem/grpc-gateway v1.6.4
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/grpc-ecosystem/grpc-gateway/runtime/internal
@@ -51,7 +51,7 @@ github.com/nats-io/nkeys
 github.com/nats-io/nuid
 # github.com/sirupsen/logrus v1.3.0
 github.com/sirupsen/logrus
-# github.com/videocoin/common v0.0.0-20190108000549-0e9bdeb507cd
+# github.com/videocoin/common v0.1.0
 github.com/videocoin/common/proto
 # go.opencensus.io v0.18.0
 go.opencensus.io/trace
@@ -72,7 +72,7 @@ go.opencensus.io/internal/tagencoding
 golang.org/x/crypto/ssh/terminal
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/ed25519/internal/edwards25519
-# golang.org/x/net v0.0.0-20190107210223-45ffb0cd1ba0
+# golang.org/x/net v0.0.0-20190108225652-1e06a53dbb7e
 golang.org/x/net/context
 golang.org/x/net/trace
 golang.org/x/net/internal/timeseries
@@ -87,7 +87,7 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20190107173414-20be8e55dc7b
+# golang.org/x/sys v0.0.0-20190109145017-48ac38b7c8cb
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # golang.org/x/text v0.3.0
@@ -117,7 +117,7 @@ google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
-# google.golang.org/genproto v0.0.0-20181221175505-bd9b4fb69e2f
+# google.golang.org/genproto v0.0.0-20190108161440-ae2f86662275
 google.golang.org/genproto/googleapis/iam/v1
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/rpc/code

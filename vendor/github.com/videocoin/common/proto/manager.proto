@@ -10,7 +10,7 @@ import "google/api/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/mwitkow/go-proto-validators/validator.proto";
 
-import "transcode_task.proto";
+import "work_order.proto";
 
 // Enable custom Marshal method.
 option (gogoproto.marshaler_all) = true;
@@ -36,9 +36,9 @@ service ManagerService {
     };
   };
 
-  rpc GetTask(GetTaskRequest) returns (SimpleTranscodeTask) {
+  rpc GetJob(GetTaskRequest) returns (WorkOrder) {
     option (google.api.http) = {
-      get : "/api/v1/stream/{id}"
+      get : "/api/v1/get_job"
     };
   };
 
@@ -48,7 +48,7 @@ service ManagerService {
     };
   }
 
-  rpc GetStream(GetStreamRequest) returns (SimpleTranscodeTask) {
+  rpc GetStream(GetJobRequest) returns (WorkOrder) {
     option (google.api.http) = {
       get : "/api/v1/stream/{user_id}/{application_id}"
     };
@@ -62,14 +62,14 @@ service ManagerService {
 
   rpc SetChunkVerificationStatus(SetChunkVerificationRequest) returns (SetChunkVerificationResponse) {
     option (google.api.http) = {
-      post : "/api/v1/verify/{id}/{chunk_id}/{hash_distance}"
+      post : "/api/v1/verify/{job_id}/{chunk_id}/{hash_distance}"
     };
   };
 
 }
 
 message SetChunkVerificationRequest {
-  string id = 1;
+  string job_id = 1;
   string chunk_id = 2;
   int32 hash_distance = 3;
 }
@@ -95,9 +95,7 @@ message StreamResponse {
     string output_url= 2;
 }
 
-message GetTaskRequest {
-    string id =1 ;
-}
+message GetJobRequest {}
 
 message GetStreamRequest {
     string application_id = 1;
