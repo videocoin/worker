@@ -22,10 +22,13 @@ import (
 
 // CSync syncer struct
 type CSync struct {
-	ctx    context.Context
-	client storage.Client
-	cfg    *Config
-	log    *logrus.Entry
+	ctx context.Context
+	cfg *Config
+	log *logrus.Entry
+}
+
+func CSyncInit() *CSync {
+
 }
 
 func getDuration(input string) (float64, error) {
@@ -131,7 +134,6 @@ func (c *CSync) upload(filename string, output string) error {
 	if err != nil {
 		return err
 	}
-	_ = f
 
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
@@ -147,7 +149,7 @@ func (c *CSync) upload(filename string, output string) error {
 		CacheControl: "public, max-age=315360000",
 	}
 
-	if _, err := svc.Objects.Insert(c.bucket, object).PreDefinedAcl("publicread").Do(); err != nil {
+	if _, err := svc.Objects.Insert(c.cfg.Bucket, object).Media(f).PredefinedAcl("publicread").Do(); err != nil {
 		return err
 	}
 
