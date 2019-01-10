@@ -22,13 +22,16 @@ import (
 
 // CSync syncer struct
 type CSync struct {
-	ctx context.Context
 	cfg *Config
 	log *logrus.Entry
 }
 
-func CSyncInit() *CSync {
-
+// CSyncInit Returns initialized csync object
+func CSyncInit(cfg *Config) *CSync {
+	return &CSync{
+		log: log.WithField("name", "csync"),
+		cfg: cfg,
+	}
 }
 
 func getDuration(input string) (float64, error) {
@@ -43,7 +46,8 @@ func getDuration(input string) (float64, error) {
 	return strconv.ParseFloat(cleanOut, 64)
 }
 
-func syncDirectory(bucket string, folder string, streamHash string, inputURL string) {
+// SyncDir watches file system and processes chunks as they are written
+func (c *CSync) SyncDir(bucket string, folder string, streamHash string, inputURL string) {
 	//create playlist
 	// wait for chunk
 	// get chunk dir
@@ -75,21 +79,21 @@ func syncDirectory(bucket string, folder string, streamHash string, inputURL str
 				if path.Base(event.Name) == "0.ts" {
 					duration, err := getDuration(path.Join(folder, event.Name))
 					if err != nil {
-						log.Errorf("failed to get duration: %s", err.Error())
+						c.log.Errorf("failed to get duration: %s", err.Error())
 					}
 
 					playlist.TargetDuration = duration
 				}
 
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(event.Name, "tmp") && !strings.Contains(event.Name, ".m3u8") {
-					log.Println("created file:", path.Base(event.Name))
+					c.log.Println("created file:", path.Base(event.Name))
 				}
 
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
 				}
-				log.Println("error:", err)
+				c.log.Println("error:", err)
 			}
 		}
 	}()
@@ -101,7 +105,8 @@ func syncDirectory(bucket string, folder string, streamHash string, inputURL str
 	<-done
 }
 
-func (c *CSync) doWork(chunkname string, folder string, playlist *m3u8.MediaPlaylist) error {
+// DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
+func (c *CSync) DoTheDamnThing(chunkname string, folder string, playlist *m3u8.MediaPlaylist) error {
 	// create playlist
 	// wait for chunk
 	// get chunk dir
@@ -129,7 +134,8 @@ func (c *CSync) doWork(chunkname string, folder string, playlist *m3u8.MediaPlay
 	return nil
 }
 
-func (c *CSync) upload(filename string, output string) error {
+// Upload uploads an object to gcs with publicread acl
+func (c *CSync) Upload(filename string, output string) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -139,6 +145,7 @@ func (c *CSync) upload(filename string, output string) error {
 	if err != nil {
 		return err
 	}
+
 	svc, err := storage.New(client)
 	if err != nil {
 		return err
