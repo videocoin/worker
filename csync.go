@@ -157,6 +157,7 @@ func (c *CSync) Upload(filename string, output string) error {
 	}
 
 	if _, err := svc.Objects.Insert(c.cfg.Bucket, object).Media(f).PredefinedAcl("publicread").Do(); err != nil {
+
 		return err
 	}
 
