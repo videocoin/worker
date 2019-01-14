@@ -51,7 +51,7 @@ func New() (*Service, error) {
 
 	status, err := manager.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get healthy status: %v", err)
 	}
 
 	ctx := context.Background()
@@ -85,18 +85,13 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
-	hostname, err := os.Hostname()
+
+	task, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
 	if err != nil {
 		panic(err)
 	}
 
-	task, err := s.manager.GetTask(s.ctx, &pb.GetTaskRequest{Id: hostname})
-	if err != nil {
-		panic(err)
-	}
-	//	makePublic(cfg.Bucket, m3u8)
-
-	task.Status = pb.TranscodeStatusTranscoding.String()
+	task.Status = pb.WorkOrderStatusTranscoding.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		UserId:        task.UserId,
@@ -111,11 +106,11 @@ func Start() {
 	handleExit()
 }
 
-func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
+func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
-	log.Infof("starting transcode task: %+s using input: %s", task.Id, task.InputUrl)
+	log.Infof("starting transcode task: %d using input: %s", workOrder.Id, workOrder.InputUrl)
 
-	dir := path.Join(s.cfg.OutputDir, task.Id)
+	dir := path.Join(s.cfg.OutputDir, workOrder.StreamHash)
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	if err := prepareDir(dir); err != nil {
@@ -123,20 +118,20 @@ func (s *Service) handleTranscodeTask(task *pb.SimpleTranscodeTask) error {
 	}
 
 	log.Info("monitoring chunks")
-	go s.monitorChunks(path.Join(dir, "360p"), task)
+	go s.monitorChunks(path.Join(dir, "360p"), workOrder)
 
 	if err := generatePlaylist(m3u8); err != nil {
 		panic(err)
 	}
 
-	args := buildCmd(task.InputUrl, dir)
+	args := buildCmd(workOrder.InputUrl, dir)
 
-	transcode(args, task.InputUrl)
+	transcode(args, workOrder.InputUrl)
 
 	return nil
 }
 
-func (s *Service) monitorChunks(dir string, task *pb.SimpleTranscodeTask) {
+func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 	for {
 		time.Sleep(2 * time.Second)
 		files, err := ioutil.ReadDir(dir)
@@ -151,7 +146,7 @@ func (s *Service) monitorChunks(dir string, task *pb.SimpleTranscodeTask) {
 		break
 	}
 
-	task.Status = pb.TranscodeStatusReady.String()
+	task.Status = pb.WorkOrderStatusReady.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		UserId:        task.UserId,
@@ -182,8 +177,6 @@ func generatePlaylist(filename string) error {
 480p/index.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=5242880,RESOLUTION=1280x720,CODECS="avc1.42e00a,mp4a.40.2"
 720p/index.m3u8
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=10485760,RESOLUTION=1920x1080,CODECS="avc1.42e00a,mp4a.40.2"
-1080p/index.m3u8
 `)
 
 	return ioutil.WriteFile(filename, m3u8, 0644)
@@ -220,19 +213,19 @@ func prepareDir(dir string) error {
 }
 
 func buildCmd(inputURL string, dir string) []string {
-	p360 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=640:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/360p/index.m3u8 %s/360p/%%03d.ts", dir, dir)
+	p360 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=640:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/360p/index.m3u8 %s/360p/%%d.ts", dir, dir)
 
-	p480 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=842:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/480p/index.m3u8 %s/480p/%%03d.ts", dir, dir)
+	p480 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=842:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/480p/index.m3u8 %s/480p/%%d.ts", dir, dir)
 
-	p720 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1280:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/720p/index.m3u8 %s/720p/%%03d.ts", dir, dir)
+	p720 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1280:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/720p/index.m3u8 %s/720p/%%d.ts", dir, dir)
 
-	p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1920:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 1 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
+	//p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1920:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
 
 	cmd := []string{"-re", "-i", inputURL}
 	cmd = append(cmd, strings.Split(p360, " ")...)
 	cmd = append(cmd, strings.Split(p480, " ")...)
 	cmd = append(cmd, strings.Split(p720, " ")...)
-	cmd = append(cmd, strings.Split(p1080, " ")...)
+	//cmd = append(cmd, strings.Split(p1080, " ")...)
 
 	return cmd
 
