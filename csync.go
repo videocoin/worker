@@ -45,7 +45,7 @@ func getDuration(input string) (float64, error) {
 }
 
 // SyncDir watches file system and processes chunks as they are written
-func (c *CSync) SyncDir(workOrderID uint32, bucket string, folder string, streamHash string, inputURL string) {
+func (c *CSync) SyncDir(userID string, appID string, workOrderID uint32, bucket string, folder string, streamHash string, inputURL string) {
 	//create playlist
 	// wait for chunk
 	// get chunk dir
@@ -54,7 +54,6 @@ func (c *CSync) SyncDir(workOrderID uint32, bucket string, folder string, stream
 	// upload playlist
 
 	var q = new(JobQueue)
-	_ = q
 
 	playlist, err := m3u8.NewMediaPlaylist(0, 0)
 	if err != nil {
@@ -89,7 +88,7 @@ func (c *CSync) SyncDir(workOrderID uint32, bucket string, folder string, stream
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(event.Name, "tmp") && !strings.Contains(event.Name, ".m3u8") {
 					c.log.Println("created file:", path.Base(event.Name))
 					q.Push(Job{ChunkName: event.Name, Folder: folder, Playlist: playlist})
-					c.Work(workOrderID, q)
+					c.Work(userID, appID, workOrderID, q)
 
 				}
 
@@ -111,15 +110,22 @@ func (c *CSync) SyncDir(workOrderID uint32, bucket string, folder string, stream
 
 // Work execute jobs only if at least two are in queue
 // This prevents accidently working a chunk that ffmpeg has not finished writing yet
-func (c *CSync) Work(workOrderID uint32, jobs *JobQueue) {
+func (c *CSync) Work(userID string, appID string, workOrderID uint32, jobs *JobQueue) {
 	if jobs.Len() >= 2 {
 		job := jobs.Pop()
-		c.DoTheDamnThing(workOrderID, job.ChunkName, job.Folder, job.Playlist)
+		c.DoTheDamnThing(userID, appID, workOrderID, job.ChunkName, job.Folder, job.Playlist)
 	}
 }
 
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
-func (c *CSync) DoTheDamnThing(workOrderID uint32, chunkname string, folder string, playlist *m3u8.MediaPlaylist) error {
+func (c *CSync) DoTheDamnThing(
+	userID string,
+	appID string,
+	workOrderID uint32,
+	chunkname string,
+	folder string,
+	playlist *m3u8.MediaPlaylist) error {
+
 	var b = make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		return err
@@ -151,7 +157,7 @@ func (c *CSync) DoTheDamnThing(workOrderID uint32, chunkname string, folder stri
 		return err
 	}
 
-	c.VerifyChunk(workOrderID, c.cfg.BaseStreamURL, fmt.Sprintf("https://storage.googleapis.com/vc-test-fuse/t5d1830f57c1c62d627a5/index.m3u8"))
+	c.VerifyChunk(workOrderID, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, userID, appID, chunkname), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s", c.cfg.Bucket, folder, newChunkName))
 
 	return nil
 }
