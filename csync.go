@@ -4,6 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path"
@@ -11,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2/google"
 
@@ -21,10 +23,6 @@ import (
 )
 
 // CSync syncer struct
-type CSync struct {
-	cfg *Config
-	log *logrus.Entry
-}
 
 // CSyncInit Returns initialized csync object
 func CSyncInit(cfg *Config) *CSync {
@@ -54,6 +52,9 @@ func (c *CSync) SyncDir(bucket string, folder string, streamHash string, inputUR
 	// append to playlist
 	// upload chunk
 	// upload playlist
+
+	var q = new(JobQueue)
+	_ = q
 
 	playlist, err := m3u8.NewMediaPlaylist(0, 0)
 	if err != nil {
@@ -87,6 +88,9 @@ func (c *CSync) SyncDir(bucket string, folder string, streamHash string, inputUR
 
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(event.Name, "tmp") && !strings.Contains(event.Name, ".m3u8") {
 					c.log.Println("created file:", path.Base(event.Name))
+					q.Push(Job{ChunkName: event.Name, Folder: folder, Playlist: playlist})
+					c.Work(q)
+
 				}
 
 			case err, ok := <-watcher.Errors:
@@ -105,42 +109,79 @@ func (c *CSync) SyncDir(bucket string, folder string, streamHash string, inputUR
 	<-done
 }
 
+// Work execute jobs only if at least two are in queue
+// This prevents accidently working a chunk that ffmpeg has not finished writing yet
+func (c *CSync) Work(jobs *JobQueue) {
+	if jobs.Len() >= 2 {
+		job := jobs.Pop()
+		c.DoTheDamnThing(job.ChunkName, job.Folder, job.Playlist)
+	}
+}
+
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
 func (c *CSync) DoTheDamnThing(chunkname string, folder string, playlist *m3u8.MediaPlaylist) error {
-	// create playlist
-	// wait for chunk
-	// get chunk dir
-	// append to playlist
-	// upload chunk
-	// upload playlist
-	// call verifier
-
 	var b = make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		return err
 	}
 
-	duration, err := getDuration(path.Join(folder, chunkname))
+	duration, err := getDuration(path.Join(cfg.OutputDir, folder, chunkname))
 	if err != nil {
 		return err
 	}
 
-	newName := fmt.Sprintf("%x.ts", b)
+	newChunkName := fmt.Sprintf("%x.ts", b)
 
-	if err = playlist.Append(newName, duration, ""); err != nil {
+	if err = playlist.Append(newChunkName, duration, ""); err != nil {
 		return err
 	}
+
+	chunk, err := os.Open(path.Join(cfg.OutputDir, folder, chunkname))
+	if err != nil {
+		c.log.Errorf("failed to open chunk: %s", err.Error())
+	}
+
+	// Upload chunk
+	if err = c.Upload(path.Join(folder, newChunkName), chunk); err != nil {
+		return err
+	}
+
+	// Upload playlist
+	if err = c.Upload(path.Join(folder, "index.m3u8"), playlist.Encode()); err != nil {
+		return err
+	}
+
+	//c.VerifyChunk()
+
+	return nil
+}
+
+// VerifyChunk blahg
+func (c *CSync) VerifyChunk(jobID int, src string, res string) error {
+	client := &http.Client{}
+
+	form := url.Values{}
+	form.Add("source_chunk_url", src)
+	form.Add("result_chunk_url", res)
+	form.Add("job_id", strconv.Itoa(jobID))
+
+	request, err := http.NewRequest("POST", "URL", strings.NewReader(form.Encode()))
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+
+	c.log.Infof("verifier response: code [ %d ]", resp.StatusCode)
 
 	return nil
 }
 
 // Upload uploads an object to gcs with publicread acl
-func (c *CSync) Upload(filename string, output string) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-
+func (c *CSync) Upload(output string, r io.Reader) error {
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
 		return err
@@ -156,10 +197,32 @@ func (c *CSync) Upload(filename string, output string) error {
 		CacheControl: "public, max-age=315360000",
 	}
 
-	if _, err := svc.Objects.Insert(c.cfg.Bucket, object).Media(f).PredefinedAcl("publicread").Do(); err != nil {
+	if _, err := svc.Objects.Insert(c.cfg.Bucket, object).Media(r).PredefinedAcl("publicread").Do(); err != nil {
 
 		return err
 	}
 
 	return nil
+}
+
+// Pop returns item in FIFO
+func (q *JobQueue) Pop() (job Job) {
+	if len(q.Jobs) == 0 {
+		return Job{}
+	}
+
+	job, q.Jobs = q.Jobs[0], q.Jobs[1:]
+
+	return
+
+}
+
+// Push item to end of array
+func (q *JobQueue) Push(job Job) {
+	q.Jobs = append(q.Jobs, job)
+}
+
+// Len returns length of job queue
+func (q *JobQueue) Len() int {
+	return len(q.Jobs)
 }

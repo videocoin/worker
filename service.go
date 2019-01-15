@@ -16,19 +16,10 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
-	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/videocoin/common/proto"
 	"google.golang.org/grpc"
 )
-
-// Service base struct for service reciever
-type Service struct {
-	cfg     *Config
-	sc      stan.Conn
-	manager pb.ManagerServiceClient
-	ctx     context.Context
-}
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
