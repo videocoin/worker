@@ -76,7 +76,9 @@ func (c *CSync) SyncDir(userID string, appID string, workOrderID uint32, bucket 
 					return
 				}
 
-				if path.Base(event.Name) == "0.ts" {
+				chunk := path.Base(event.Name)
+
+				if chunk == "0.ts" {
 					duration, err := getDuration(path.Join(folder, event.Name))
 					if err != nil {
 						c.log.Errorf("failed to get duration: %s", err.Error())
@@ -85,9 +87,9 @@ func (c *CSync) SyncDir(userID string, appID string, workOrderID uint32, bucket 
 					playlist.TargetDuration = duration
 				}
 
-				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(event.Name, "tmp") && !strings.Contains(event.Name, ".m3u8") {
-					c.log.Println("created file:", path.Base(event.Name))
-					q.Push(Job{ChunkName: event.Name, Folder: folder, Playlist: playlist})
+				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(chunk, "tmp") && !strings.Contains(chunk, ".m3u8") {
+					c.log.Println("created file:", chunk)
+					q.Push(Job{ChunkName: chunk, Folder: folder, Playlist: playlist})
 					c.Work(userID, appID, workOrderID, q)
 
 				}

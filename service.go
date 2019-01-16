@@ -82,6 +82,8 @@ func Start() {
 		panic(err)
 	}
 
+	fmt.Printf("TASK: %+v", task)
+
 	task.Status = pb.WorkOrderStatusTranscoding.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
@@ -170,7 +172,7 @@ func generatePlaylist(filename string) error {
 720p/index.m3u8
 `)
 
-	return ioutil.WriteFile(filename, m3u8, 0644)
+	return ioutil.WriteFile(filename, m3u8, 0755)
 }
 
 func waitForStreamReady(streamurl string) {
@@ -200,7 +202,7 @@ func makePublic(bucket string, object string) {
 }
 
 func prepareDir(dir string) error {
-	return os.MkdirAll(dir, 0666)
+	return os.MkdirAll(dir, 0777)
 }
 
 func buildCmd(inputURL string, dir string) []string {
