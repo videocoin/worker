@@ -34,4 +34,5 @@ type Service struct {
 	sc      stan.Conn
 	manager proto.ManagerServiceClient
 	ctx     context.Context
+	csyc    *CSync
 }

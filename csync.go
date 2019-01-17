@@ -15,6 +15,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	log "github.com/sirupsen/logrus"
+	pb "github.com/videocoin/common/proto"
 	"golang.org/x/oauth2/google"
 
 	storage "google.golang.org/api/storage/v1"
@@ -45,7 +46,7 @@ func getDuration(input string) (float64, error) {
 }
 
 // SyncDir watches file system and processes chunks as they are written
-func (c *CSync) SyncDir(userID string, appID string, workOrderID uint32, bucket string, folder string, streamHash string, inputURL string) {
+func (c *CSync) SyncDir(workOrder *pb.WorkOrder, folder string) {
 	//create playlist
 	// wait for chunk
 	// get chunk dir
@@ -90,7 +91,7 @@ func (c *CSync) SyncDir(userID string, appID string, workOrderID uint32, bucket 
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(chunk, "tmp") && !strings.Contains(chunk, ".m3u8") {
 					c.log.Println("created file:", chunk)
 					q.Push(Job{ChunkName: chunk, Folder: folder, Playlist: playlist})
-					c.Work(userID, appID, workOrderID, q)
+					c.Work(workOrder.UserId, workOrder.ApplicationId, workOrder.Id, q)
 
 				}
 
