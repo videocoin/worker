@@ -131,9 +131,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
 	args := buildCmd(workOrder.InputUrl, dir)
 
-	s.csyc.SyncDir(workOrder, dir360p)
-	s.csyc.SyncDir(workOrder, dir480p)
-	s.csyc.SyncDir(workOrder, dir720p)
+	go s.csyc.SyncDir(workOrder)
 
 	transcode(args, workOrder.InputUrl)
 

@@ -20,7 +20,7 @@ type (
 	// Job used to queue up chunk work
 	Job struct {
 		ChunkName string
-		Folder    string
+		ChunksDir string
 		Playlist  *m3u8.MediaPlaylist
 	}
 
