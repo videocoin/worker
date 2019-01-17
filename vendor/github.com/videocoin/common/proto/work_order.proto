@@ -41,7 +41,7 @@ enum WorkOrderStatus {
 
 message WorkOrder {
     uint32 id = 1;
-    uint32 transcoder_id = 2;
+    string transcoder_id = 2;
     string stream_hash = 3;
     string user_id = 4;
     string application_id = 5;

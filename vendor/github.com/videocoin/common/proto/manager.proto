@@ -60,7 +60,7 @@ service ManagerService {
     };
   };
 
-  rpc SetChunkVerificationStatus(SetChunkVerificationRequest) returns (SetChunkVerificationResponse) {
+  rpc SetChunkVerificationStatus(SetChunkVerificationRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post : "/api/v1/verify/{job_id}/{chunk_id}/{hash_distance}"
     };
@@ -69,9 +69,9 @@ service ManagerService {
 }
 
 message SetChunkVerificationRequest {
-  string job_id = 1;
+  uint32 job_id = 1;
   string chunk_id = 2;
-  int32 hash_distance = 3;
+  uint32 hash_distance = 3;
 }
 
 message SetChunkVerificationResponse {
