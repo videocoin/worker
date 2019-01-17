@@ -51,6 +51,7 @@ func New() (*Service, error) {
 		cfg:     cfg,
 		manager: manager,
 		ctx:     ctx,
+		csyc:    CSyncInit(cfg),
 	}, nil
 
 }
@@ -106,7 +107,18 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 	dir := path.Join(s.cfg.OutputDir, workOrder.StreamHash)
 	m3u8 := path.Join(dir, "index.m3u8")
 
-	if err := prepareDir(dir); err != nil {
+	dir360p := path.Join(dir, "360p")
+	if err := prepareDir(dir360p); err != nil {
+		log.Error(err.Error())
+	}
+
+	dir480p := path.Join(dir, "480p")
+	if err := prepareDir(dir480p); err != nil {
+		log.Error(err.Error())
+	}
+
+	dir720p := path.Join(dir, "720p")
+	if err := prepareDir(dir720p); err != nil {
 		log.Error(err.Error())
 	}
 
@@ -118,6 +130,10 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 	}
 
 	args := buildCmd(workOrder.InputUrl, dir)
+
+	s.csyc.SyncDir(workOrder, dir360p)
+	s.csyc.SyncDir(workOrder, dir480p)
+	s.csyc.SyncDir(workOrder, dir720p)
 
 	transcode(args, workOrder.InputUrl)
 
