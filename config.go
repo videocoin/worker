@@ -11,6 +11,7 @@ import (
 type Config struct {
 	LogLevel       string `required:"true" default:"debug" envconfig:"LOG_LEVEL" default:"DEBUG"`
 	BaseStreamURL  string `required:"true" envconfig:"BASE_STREAM_URL" default:"http://ingest.videocoin.io:8080/hls"`
+	VerifierURL    string `required:"true" envconfig:"VERIFIER_URL" default:"http://verifier:8100"`
 	BaseStorageURL string `required:"true" envconfig:"BASE_STORAGE_URL"`
 	Bucket         string `required:"true" envconfig:"FUSE_BUCKET"`
 	OutputDir      string `required:"true" envconfig:"OUTPUT_DIR" default:"/opt/mnt/" description:"Mount point for GCSFUSE"`
