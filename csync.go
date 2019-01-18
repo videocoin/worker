@@ -83,16 +83,6 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, chunkDir string) {
 
 				chunk := path.Base(event.Name)
 
-				if chunk == "0.ts" {
-					fileLoc := path.Join(fullPath, chunk)
-					duration, err := c.getDuration(fileLoc)
-					if err != nil {
-						c.log.Errorf("failed to get duration: %s from: %s ", err.Error(), fileLoc)
-					}
-
-					playlist.TargetDuration = duration
-				}
-
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(chunk, "tmp") && !strings.Contains(chunk, ".m3u8") {
 					c.log.Println("created file:", chunk)
 					q.Push(Job{ChunkName: chunk, ChunksDir: chunkDir, Playlist: playlist})
@@ -119,7 +109,7 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, chunkDir string) {
 // Work execute jobs only if at least two are in queue
 // This prevents accidently working a chunk that ffmpeg has not finished writing yet
 func (c *CSync) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
-	if jobs.Len() >= 2 {
+	if jobs.Len() >= 3 {
 		job := jobs.Pop()
 		c.DoTheDamnThing(workOrder, &job)
 	}
@@ -135,6 +125,14 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
 	chunkLoc := path.Join(c.cfg.OutputDir, workOrder.StreamHash, job.ChunksDir, job.ChunkName)
 	uploadPath := path.Join(workOrder.StreamHash, job.ChunksDir)
+	if job.ChunkName == "0.ts" {
+		duration, err := c.getDuration(chunkLoc)
+		if err != nil {
+			c.log.Errorf("failed to get duration: %s from: %s ", err.Error(), chunkLoc)
+		}
+
+		job.Playlist.TargetDuration = duration
+	}
 
 	duration, err := c.getDuration(chunkLoc)
 	if err != nil {
