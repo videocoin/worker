@@ -10,29 +10,31 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// CSync Chunk Sync holds config and logger
-type CSync struct {
-	cfg *Config
-	log *logrus.Entry
-}
+type (
+	// CSync struct for handling sync logic
+	CSync struct {
+		cfg *Config
+		log *logrus.Entry
+	}
 
-// Job used for makign a delay buffer for chunk verification
-type Job struct {
-	ChunkName string
-	Folder    string
-	Playlist  *m3u8.MediaPlaylist
-}
+	// Job used to queue up chunk work
+	Job struct {
+		ChunkName string
+		ChunksDir string
+		Playlist  *m3u8.MediaPlaylist
+	}
 
-// JobQueue simple slice of jobs
-type JobQueue struct {
-	Jobs []Job
-}
+	// JobQueue simple slice of jobs
+	JobQueue struct {
+		Jobs []Job
+	}
 
-// Service base struct for service reciever
-type Service struct {
-	cfg     *Config
-	sc      stan.Conn
-	manager proto.ManagerServiceClient
-	ctx     context.Context
-	csyc    *CSync
-}
+	// Service primary reciever for service
+	Service struct {
+		cfg     *Config
+		sc      stan.Conn
+		manager proto.ManagerServiceClient
+		ctx     context.Context
+		csyc    *CSync
+	}
+)

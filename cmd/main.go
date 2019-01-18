@@ -1,7 +1,20 @@
 package main
 
-import "github.com/videocoin/transcode"
+import (
+	"fmt"
+	"time"
+
+	"github.com/videocoin/transcode"
+)
 
 func main() {
-	transcode.Start()
+	for {
+		err := transcode.Start()
+		if err != nil {
+			fmt.Printf("error on start: %s retrying...", err.Error())
+			time.Sleep(10 * time.Second)
+			continue
+		}
+	}
+
 }

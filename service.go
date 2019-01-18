@@ -72,18 +72,16 @@ func (s *Service) reportStatus(userID string, applicationID string, status strin
 }
 
 // Start creates new service and blocks until stop signal
-func Start() {
+func Start() error {
 	s, err := New()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	task, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	fmt.Printf("TASK: %+v", task)
 
 	task.Status = pb.WorkOrderStatusTranscoding.String()
 
@@ -98,6 +96,8 @@ func Start() {
 	go s.handleTranscodeTask(task)
 
 	handleExit()
+
+	return nil
 }
 
 func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
@@ -131,9 +131,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
 	args := buildCmd(workOrder.InputUrl, dir)
 
-	s.csyc.SyncDir(workOrder, dir360p)
-	s.csyc.SyncDir(workOrder, dir480p)
-	s.csyc.SyncDir(workOrder, dir720p)
+	go s.csyc.SyncDir(workOrder, "360p")
 
 	transcode(args, workOrder.InputUrl)
 
