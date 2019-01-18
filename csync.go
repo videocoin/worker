@@ -134,7 +134,7 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 	}
 
 	chunkLoc := path.Join(c.cfg.OutputDir, workOrder.StreamHash, job.ChunksDir, job.ChunkName)
-	chunkPath := path.Join(c.cfg.OutputDir, workOrder.StreamHash, job.ChunksDir)
+	uploadPath := path.Join(workOrder.StreamHash, job.ChunksDir)
 
 	duration, err := c.getDuration(chunkLoc)
 	if err != nil {
@@ -153,12 +153,12 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 	}
 
 	// Upload chunk
-	if err = c.Upload(path.Join(chunkPath, newChunkName), chunk); err != nil {
+	if err = c.Upload(path.Join(uploadPath, newChunkName), chunk); err != nil {
 		return err
 	}
 
 	// Upload playlist
-	if err = c.Upload(path.Join(chunkPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
+	if err = c.Upload(path.Join(uploadPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
 		return err
 	}
 
@@ -169,19 +169,12 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
 // VerifyChunk blahg
 func (c *CSync) VerifyChunk(workOrderID uint32, src string, res string) error {
-	client := &http.Client{}
-
 	form := url.Values{}
 	form.Add("source_chunk_url", src)
 	form.Add("result_chunk_url", res)
 	form.Add("job_id", fmt.Sprintf("%d", workOrderID))
 
-	request, err := http.NewRequest("POST", c.cfg.VerifierURL+"/api/v1/verify", strings.NewReader(form.Encode()))
-	if err != nil {
-		return err
-	}
-
-	resp, err := client.Do(request)
+	resp, err := http.PostForm(c.cfg.VerifierURL+"/api/v1/verify", form)
 	if err != nil {
 		return err
 	}
@@ -193,7 +186,7 @@ func (c *CSync) VerifyChunk(workOrderID uint32, src string, res string) error {
 
 // Upload uploads an object to gcs with publicread acl
 func (c *CSync) Upload(output string, r io.Reader) error {
-	c.log.Infof("uploading chunk: %s to %s: ", output[1:], c.cfg.Bucket)
+	c.log.Infof("uploading chunk: %s to %s: ", output, c.cfg.Bucket)
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
 		c.log.Errorf("failed to create client: %s", err.Error())
@@ -207,8 +200,8 @@ func (c *CSync) Upload(output string, r io.Reader) error {
 	}
 
 	object := &storage.Object{
-		Name:         output[1:],
-		CacheControl: "public, max-age=315360000",
+		Name:         output,
+		CacheControl: "public, max-age=0",
 	}
 
 	if _, err := svc.Objects.Insert(c.cfg.Bucket, object).Media(r).PredefinedAcl("publicread").Do(); err != nil {

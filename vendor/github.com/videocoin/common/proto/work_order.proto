@@ -48,9 +48,9 @@ message WorkOrder {
     string input_url = 6;
     string output_url =7;
     string status = 8;
-    bytes chunks = 9 [ (gogoproto.moretags) = "gorm:\"chunks;type:json;DEFAULT:NULL\"sql:\"type:json;DEFAULT:null\"" ];
-    string created_at = 10 [ (gogoproto.moretags) = "gorm:\"created_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
-    string updated_at = 11 [ (gogoproto.moretags) = "gorm:\"updated_at;type:DATETIME;DEFAULT:current_timestamp\" sql:\"type:DATETIME;DEFAULT:current_timestamp\"" ];
+    bytes chunks = 9 [ (gogoproto.moretags) = "gorm:\"chunks;type:json\"sql:\"type:json\"" ];
+    int64 created_at = 10;
+    int64 updated_at = 11;
     bytes worker = 12 [ (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" ];
 }
 
