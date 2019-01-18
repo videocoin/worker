@@ -128,7 +128,7 @@ func (c *CSync) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
 func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
-	var b = make([]byte, 32)
+	var b = make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
 		return err
 	}
