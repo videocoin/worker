@@ -27,6 +27,10 @@ deps:
 	@echo "==> Running go dep..."
 	go mod verify && go mod tidy
 
+proto-update:
+	env GO111MODULE=on go get -u github.com/videocoin/common@latest
+	env GO111MODULE=on go mod vendor
+
 build:
 	@echo "==> Building..."
 	go build -o bin/$(SERVICE_NAME) cmd/main.go
