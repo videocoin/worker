@@ -71,8 +71,8 @@ service ManagerService {
 
 message SetChunkVerificationRequest {
   uint32 job_id = 1;
-  string result_chunk = 2;
-  string source_chunk = 3; 
+  string source_chunk_id = 2;
+  string result_chunk_id = 3;
   uint32 hash_distance = 4;
 }
 
