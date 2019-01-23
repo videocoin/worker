@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	dirs = []string{"360p", "480p", "720p", "1080p"}
+	bitrates = []string{"2m", "4m", "8m"}
 )
 
 // New initialize and return a new Service object
@@ -219,19 +219,13 @@ func prepareDir(dir string) error {
 }
 
 func buildCmd(inputURL string, dir string) []string {
-	p360 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=640:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/360p/index.m3u8 %s/360p/%%d.ts", dir, dir)
-
-	// p480 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=842:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/480p/index.m3u8 %s/480p/%%d.ts", dir, dir)
-
-	// p720 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1280:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/720p/index.m3u8 %s/720p/%%d.ts", dir, dir)
-
-	//p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1920:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
-
 	cmd := []string{"-re", "-i", inputURL}
-	cmd = append(cmd, strings.Split(p360, " ")...)
-	// cmd = append(cmd, strings.Split(p480, " ")...)
-	// cmd = append(cmd, strings.Split(p720, " ")...)
-	//cmd = append(cmd, strings.Split(p1080, " ")...)
+
+	for _, b := range bitrates {
+		args := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -b:v %s -strict -2 -c:v h264 -profile:v main -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/%s/index.m3u8 %s/%s/%%d.ts", b, dir, b, dir, b)
+		cmd = append(cmd, strings.Split(args, " ")...)
+
+	}
 
 	return cmd
 
