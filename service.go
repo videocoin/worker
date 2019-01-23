@@ -12,15 +12,22 @@ import (
 	"strings"
 	"time"
 
-	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/videocoin/common/proto"
 	"google.golang.org/grpc"
 )
 
+// Byte constants
+const (
+	_  = iota
+	KB = 1 << (10 * iota)
+	MB
+	GB
+)
+
 var (
-	bitrates = []string{"2m", "4m", "8m"}
+	bitrates = []uint32{2 * MB, 4 * MB, 8 * MB}
 )
 
 // New initialize and return a new Service object
@@ -106,23 +113,14 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 	dir := path.Join(s.cfg.OutputDir, workOrder.StreamId)
 	m3u8 := path.Join(dir, "index.m3u8")
 
-	dir360p := path.Join(dir, "360p")
-	if err := prepareDir(dir360p); err != nil {
-		log.Error(err.Error())
+	for _, b := range bitrates {
+		fullDir := fmt.Sprintf("%s/%d", dir, b)
+		if err := prepareDir(fullDir); err != nil {
+			log.Error(err.Error())
+		}
+		log.Infof("monitoring chunks in %s", fullDir)
+		go s.monitorChunks(fullDir, workOrder)
 	}
-
-	dir480p := path.Join(dir, "480p")
-	if err := prepareDir(dir480p); err != nil {
-		log.Error(err.Error())
-	}
-
-	dir720p := path.Join(dir, "720p")
-	if err := prepareDir(dir720p); err != nil {
-		log.Error(err.Error())
-	}
-
-	log.Info("monitoring chunks")
-	go s.monitorChunks(path.Join(dir, "360p"), workOrder)
 
 	if err := generatePlaylist(m3u8); err != nil {
 		panic(err)
@@ -200,20 +198,6 @@ func waitForStreamReady(streamurl string) {
 	}
 }
 
-func makePublic(bucket string, object string) {
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		log.Errorf("failed to get storage client: %s", err.Error())
-		return
-	}
-	acl := client.Bucket(bucket).Object(object).ACL()
-	if err := acl.Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
-		log.Errorf("failed to make object public: %s", err.Error())
-	}
-
-}
-
 func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
@@ -222,7 +206,7 @@ func buildCmd(inputURL string, dir string) []string {
 	cmd := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
-		args := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -b:v %s -strict -2 -c:v h264 -profile:v main -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/%s/index.m3u8 %s/%s/%%d.ts", b, dir, b, dir, b)
+		args := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -b:v %d -strict -2 -c:v h264 -profile:v main -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/%d/index.m3u8 %s/%d/%%d.ts", b, dir, b, dir, b)
 		cmd = append(cmd, strings.Split(args, " ")...)
 
 	}
