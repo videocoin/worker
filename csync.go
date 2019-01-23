@@ -56,7 +56,7 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, chunkDir string) {
 	// upload chunk
 	// upload playlist
 
-	fullPath := path.Join(c.cfg.OutputDir, workOrder.StreamHash, chunkDir)
+	fullPath := path.Join(c.cfg.OutputDir, workOrder.StreamId, chunkDir)
 
 	var q = new(JobQueue)
 
@@ -123,8 +123,8 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	chunkLoc := path.Join(c.cfg.OutputDir, workOrder.StreamHash, job.ChunksDir, job.ChunkName)
-	uploadPath := path.Join(workOrder.StreamHash, job.ChunksDir)
+	chunkLoc := path.Join(c.cfg.OutputDir, workOrder.StreamId, job.ChunksDir, job.ChunkName)
+	uploadPath := path.Join(workOrder.StreamId, job.ChunksDir)
 	if job.ChunkName == "0.ts" {
 		duration, err := c.getDuration(chunkLoc)
 		if err != nil {
@@ -160,7 +160,7 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	c.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, workOrder.UserId, workOrder.ApplicationId, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", c.cfg.Bucket, workOrder.StreamHash, job.ChunksDir, newChunkName))
+	c.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, workOrder.UserId, workOrder.StreamId, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", c.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName))
 
 	return nil
 }

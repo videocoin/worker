@@ -1,4 +1,4 @@
-# cloud.google.com/go v0.35.0
+# cloud.google.com/go v0.35.1
 cloud.google.com/go/storage
 cloud.google.com/go/iam
 cloud.google.com/go/internal
@@ -32,10 +32,10 @@ github.com/golang/protobuf/protoc-gen-go/plugin
 github.com/googleapis/gax-go/v2
 # github.com/grafov/m3u8 v0.6.1
 github.com/grafov/m3u8
-# github.com/grpc-ecosystem/grpc-gateway v1.6.4
+# github.com/grpc-ecosystem/grpc-gateway v1.7.0
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
-github.com/grpc-ecosystem/grpc-gateway/runtime/internal
+github.com/grpc-ecosystem/grpc-gateway/internal
 # github.com/jinzhu/gorm v1.9.2
 github.com/jinzhu/gorm
 # github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a
@@ -59,9 +59,9 @@ github.com/nats-io/nkeys
 github.com/nats-io/nuid
 # github.com/sirupsen/logrus v1.3.0
 github.com/sirupsen/logrus
-# github.com/videocoin/common v0.1.38
+# github.com/videocoin/common v0.1.45
 github.com/videocoin/common/proto
-# go.opencensus.io v0.18.0
+# go.opencensus.io v0.19.0
 go.opencensus.io/trace
 go.opencensus.io/plugin/ochttp
 go.opencensus.io/exemplar
@@ -76,7 +76,7 @@ go.opencensus.io/trace/propagation
 go.opencensus.io
 go.opencensus.io/stats/internal
 go.opencensus.io/internal/tagencoding
-# golang.org/x/crypto v0.0.0-20190122013713-64072686203f
+# golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
 golang.org/x/crypto/ssh/terminal
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/ed25519/internal/edwards25519
@@ -95,7 +95,7 @@ golang.org/x/oauth2
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20190122071731-054c452bb702
+# golang.org/x/sys v0.0.0-20190123074212-c6b37f3e9285
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2
@@ -125,7 +125,7 @@ google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
-# google.golang.org/genproto v0.0.0-20190122204518-eef12c790cc0
+# google.golang.org/genproto v0.0.0-20190123001331-8819c946db44
 google.golang.org/genproto/googleapis/iam/v1
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/rpc/code

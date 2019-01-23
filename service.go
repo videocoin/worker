@@ -58,12 +58,12 @@ func New() (*Service, error) {
 
 }
 
-func (s *Service) reportStatus(userID string, applicationID string, status string) error {
+func (s *Service) reportStatus(userID string, streamID string, status string) error {
 	ctx := context.Background()
 	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
-		UserId:        userID,
-		ApplicationId: applicationID,
-		Status:        status,
+		UserId:   userID,
+		StreamId: streamID,
+		Status:   status,
 	})
 
 	if err != nil {
@@ -88,9 +88,9 @@ func Start() error {
 	task.Status = pb.WorkOrderStatusTranscoding.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
-		UserId:        task.UserId,
-		ApplicationId: task.ApplicationId,
-		Status:        task.Status,
+		UserId:   task.UserId,
+		StreamId: task.StreamId,
+		Status:   task.Status,
 	}); err != nil {
 		log.Errorf("failed to report status")
 	}
@@ -103,7 +103,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
 	log.Infof("starting transcode task: %d using input: %s", workOrder.Id, workOrder.InputUrl)
 
-	dir := path.Join(s.cfg.OutputDir, workOrder.StreamHash)
+	dir := path.Join(s.cfg.OutputDir, workOrder.StreamId)
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	dir360p := path.Join(dir, "360p")
@@ -155,9 +155,9 @@ func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 	task.Status = pb.WorkOrderStatusReady.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
-		UserId:        task.UserId,
-		ApplicationId: task.ApplicationId,
-		Status:        task.Status,
+		UserId:   task.UserId,
+		StreamId: task.StreamId,
+		Status:   task.Status,
 	}); err != nil {
 		log.Errorf("failed to report status")
 	}
