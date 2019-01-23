@@ -27,7 +27,11 @@ const (
 )
 
 var (
-	bitrates = []uint32{2 * MB, 4 * MB, 8 * MB}
+	bitrates = []uint32{
+		2 * MB,
+		4 * MB,
+		8 * MB,
+	}
 )
 
 // New initialize and return a new Service object
