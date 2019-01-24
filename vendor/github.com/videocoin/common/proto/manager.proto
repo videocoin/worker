@@ -26,13 +26,13 @@ option (gogoproto.messagename_all) = false;
 service ManagerService {
   rpc CreateStream(StreamRequest) returns (StreamResponse) {
     option (google.api.http) = {
-      post : "/api/v1/stream/create/{application_id}/{stream_id}"
+      post : "/api/v1/stream/create/{user_id}/{stream_id}"
     };
   };
 
   rpc StopStream(StreamRequest) returns (StreamResponse) {
     option (google.api.http) = {
-      post : "/api/v1/stream/stop/{application_id}/{stream_id}"
+      post : "/api/v1/stream/stop/{user_id}/{stream_id}"
     };
   };
 
@@ -50,45 +50,55 @@ service ManagerService {
 
   rpc GetStream(GetStreamRequest) returns (WorkOrder) {
     option (google.api.http) = {
-      get : "/api/v1/stream/{user_id}/{application_id}"
+      get : "/api/v1/stream/{user_id}/{stream_id}"
     };
   };
 
   rpc UpdateStreamStatus(UpdateStreamStatusRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post : "/api/v1/stream/{user_id}/{application_id}/{status}"
+      post : "/api/v1/stream/{user_id}/{stream_id}/{status}"
     };
   };
 
-  rpc SetChunkVerificationStatus(SetChunkVerificationRequest) returns (google.protobuf.Empty) {
+  rpc VerifyChunk(VerifyChunkRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post : "/api/v1/verify"
       body: "*"
     };
   };
 
+  rpc ChunkCreated(ChunkCreatedRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/chunk_created"
+      body: "*"
+    };
+  };
+
 }
 
-message SetChunkVerificationRequest {
+message VerifyChunkRequest {
   uint32 job_id = 1;
-  string result_chunk = 2;
-  string source_chunk = 3; 
+  string source_chunk_id = 2;
+  string result_chunk_id = 3;
   uint32 hash_distance = 4;
+  uint32 bitrate = 5;
 }
 
-message SetChunkVerificationResponse {
-  bool success = 1;
+message ChunkCreatedRequest {
+  uint32 job_id = 1;
+  string source_chunk_id = 2;
+  string result_chunk_id = 3;
+  uint32 bitrate = 4;
 }
 
 message StreamRequest {
-    string application_id  = 1;
     string stream_id = 2;
     string user_id = 3;
 }
 
 message UpdateStreamStatusRequest {
   string user_id = 1;
-  string application_id = 2;
+  string stream_id = 2;
   string status = 3;
 }
 
@@ -100,6 +110,6 @@ message StreamResponse {
 message GetJobRequest {}
 
 message GetStreamRequest {
-    string application_id = 1;
+    string stream_id = 1;
     string user_id =2;
 }

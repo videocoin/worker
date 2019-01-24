@@ -8,17 +8,30 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/signal"
 	"path"
 	"strings"
-	"syscall"
 	"time"
 
-	"cloud.google.com/go/storage"
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	pb "github.com/videocoin/common/proto"
 	"google.golang.org/grpc"
+)
+
+// Byte constants
+const (
+	_  = iota
+	KB = 1 << (10 * iota)
+	MB
+	GB
+)
+
+var (
+	bitrates = []uint32{
+		2 * MB,
+		4 * MB,
+		8 * MB,
+	}
 )
 
 // New initialize and return a new Service object
@@ -51,17 +64,17 @@ func New() (*Service, error) {
 		cfg:     cfg,
 		manager: manager,
 		ctx:     ctx,
-		csyc:    CSyncInit(cfg),
+		csyc:    CSyncInit(cfg, manager),
 	}, nil
 
 }
 
-func (s *Service) reportStatus(userID string, applicationID string, status string) error {
+func (s *Service) reportStatus(userID string, streamID string, status string) error {
 	ctx := context.Background()
 	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
-		UserId:        userID,
-		ApplicationId: applicationID,
-		Status:        status,
+		UserId:   userID,
+		StreamId: streamID,
+		Status:   status,
 	})
 
 	if err != nil {
@@ -86,44 +99,32 @@ func Start() error {
 	task.Status = pb.WorkOrderStatusTranscoding.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
-		UserId:        task.UserId,
-		ApplicationId: task.ApplicationId,
-		Status:        task.Status,
+		UserId:   task.UserId,
+		StreamId: task.StreamId,
+		Status:   task.Status,
 	}); err != nil {
 		log.Errorf("failed to report status")
 	}
 
-	go s.handleTranscodeTask(task)
+	return s.handleTranscodeTask(task)
 
-	handleExit()
-
-	return nil
 }
 
 func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
 	log.Infof("starting transcode task: %d using input: %s", workOrder.Id, workOrder.InputUrl)
 
-	dir := path.Join(s.cfg.OutputDir, workOrder.StreamHash)
+	dir := path.Join(s.cfg.OutputDir, workOrder.StreamId)
 	m3u8 := path.Join(dir, "index.m3u8")
 
-	dir360p := path.Join(dir, "360p")
-	if err := prepareDir(dir360p); err != nil {
-		log.Error(err.Error())
+	for _, b := range bitrates {
+		fullDir := fmt.Sprintf("%s/%d", dir, b)
+		if err := prepareDir(fullDir); err != nil {
+			log.Error(err.Error())
+		}
+		log.Infof("monitoring chunks in %s", fullDir)
+		go s.monitorChunks(fullDir, workOrder)
 	}
-
-	dir480p := path.Join(dir, "480p")
-	if err := prepareDir(dir480p); err != nil {
-		log.Error(err.Error())
-	}
-
-	dir720p := path.Join(dir, "720p")
-	if err := prepareDir(dir720p); err != nil {
-		log.Error(err.Error())
-	}
-
-	log.Info("monitoring chunks")
-	go s.monitorChunks(path.Join(dir, "360p"), workOrder)
 
 	if err := generatePlaylist(m3u8); err != nil {
 		panic(err)
@@ -156,9 +157,9 @@ func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 	task.Status = pb.WorkOrderStatusReady.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
-		UserId:        task.UserId,
-		ApplicationId: task.ApplicationId,
-		Status:        task.Status,
+		UserId:   task.UserId,
+		StreamId: task.StreamId,
+		Status:   task.Status,
 	}); err != nil {
 		log.Errorf("failed to report status")
 	}
@@ -201,52 +202,19 @@ func waitForStreamReady(streamurl string) {
 	}
 }
 
-func makePublic(bucket string, object string) {
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		log.Errorf("failed to get storage client: %s", err.Error())
-		return
-	}
-	acl := client.Bucket(bucket).Object(object).ACL()
-	if err := acl.Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
-		log.Errorf("failed to make object public: %s", err.Error())
-	}
-
-}
-
 func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
 
 func buildCmd(inputURL string, dir string) []string {
-	p360 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=640:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/360p/index.m3u8 %s/360p/%%d.ts", dir, dir)
-
-	p480 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=842:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/480p/index.m3u8 %s/480p/%%d.ts", dir, dir)
-
-	p720 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1280:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/720p/index.m3u8 %s/720p/%%d.ts", dir, dir)
-
-	//p1080 := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -vf scale=1920:-2:force_original_aspect_ratio=decrease -strict -2 -c:v h264 -profile:v main -pix_fmt yuv420p -crf 20 -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/1080p/index.m3u8 %s/1080p/%%03d.ts", dir, dir)
-
 	cmd := []string{"-re", "-i", inputURL}
-	cmd = append(cmd, strings.Split(p360, " ")...)
-	cmd = append(cmd, strings.Split(p480, " ")...)
-	cmd = append(cmd, strings.Split(p720, " ")...)
-	//cmd = append(cmd, strings.Split(p1080, " ")...)
+
+	for _, b := range bitrates {
+		args := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -b:v %d -strict -2 -c:v h264 -profile:v main -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/%d/index.m3u8 %s/%d/%%d.ts", b, dir, b, dir, b)
+		cmd = append(cmd, strings.Split(args, " ")...)
+
+	}
 
 	return cmd
 
-}
-
-var (
-	done  = make(chan bool)
-	errCh = make(chan error)
-)
-
-func handleExit() {
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
-
-	sig := signals
-	log.Infof("recieved os signal: %v", <-sig)
 }

@@ -28,8 +28,9 @@ deps:
 	go mod verify && go mod tidy
 
 proto-update:
-	env GO111MODULE=on go get -u github.com/videocoin/common@latest
+	env GO111MODULE=on go get github.com/videocoin/common@latest
 	env GO111MODULE=on go mod vendor
+	env GO111MODULE=on go mod tidy
 
 build:
 	@echo "==> Building..."

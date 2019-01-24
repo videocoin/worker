@@ -28,12 +28,13 @@ enum WorkOrderStatus {
 
     none = 0 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusNone" ];
     pending = 1 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusPending" ];
-    work_started = 2 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusWorkStarted" ];
-    transcoding = 3 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusTranscoding" ];
-    canceld = 4 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCanceled" ];
-    failed = 5 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusFailed" ];
-    completed = 6 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCompleted" ];
-    ready = 7 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusReady" ];
+    approved = 2 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusApproved" ];
+    work_started = 3 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusWorkStarted" ];
+    transcoding = 4 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusTranscoding" ];
+    canceld = 5 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCanceled" ];
+    failed = 6 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusFailed" ];
+    completed = 7 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusCompleted" ];
+    ready = 8 [ (gogoproto.enumvalue_customname) = "WorkOrderStatusReady" ];
   }
 
 
@@ -42,9 +43,8 @@ enum WorkOrderStatus {
 message WorkOrder {
     uint32 id = 1;
     string transcoder_id = 2;
-    string stream_hash = 3;
-    string user_id = 4;
-    string application_id = 5;
+    string stream_id = 4;
+    string user_id = 5;
     string input_url = 6;
     string output_url =7;
     string status = 8;
