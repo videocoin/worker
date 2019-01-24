@@ -60,16 +60,23 @@ service ManagerService {
     };
   };
 
-  rpc SetChunkVerificationStatus(SetChunkVerificationRequest) returns (google.protobuf.Empty) {
+  rpc VerifyChunk(VerifyChunkRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post : "/api/v1/verify"
       body: "*"
     };
   };
 
+  rpc ChunkCreated(ChunkCreatedRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/chunk_created"
+      body: "*"
+    };
+  };
+
 }
 
-message SetChunkVerificationRequest {
+message VerifyChunkRequest {
   uint32 job_id = 1;
   string source_chunk_id = 2;
   string result_chunk_id = 3;
@@ -77,8 +84,11 @@ message SetChunkVerificationRequest {
   uint32 bitrate = 5;
 }
 
-message SetChunkVerificationResponse {
-  bool success = 1;
+message ChunkCreatedRequest {
+  uint32 job_id = 1;
+  string source_chunk_id = 2;
+  string result_chunk_id = 3;
+  uint32 bitrate = 4;
 }
 
 message StreamRequest {

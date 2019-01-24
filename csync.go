@@ -26,10 +26,12 @@ import (
 // CSync syncer struct
 
 // CSyncInit Returns initialized csync object
-func CSyncInit(cfg *Config) *CSync {
+func CSyncInit(cfg *Config, manager pb.ManagerServiceClient) *CSync {
 	return &CSync{
-		log: log.WithField("name", "csync"),
-		cfg: cfg,
+		log:     log.WithField("name", "csync"),
+		cfg:     cfg,
+		manager: manager,
+		ctx:     context.Background(),
 	}
 }
 
@@ -110,6 +112,7 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, chunkDir string) {
 // This prevents accidently working a chunk that ffmpeg has not finished writing yet
 func (c *CSync) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
 	if jobs.Len() >= 3 {
+		c.manager.ChunkCreated(c.ctx, &pb.ChunkCreatedRequest{})
 		job := jobs.Pop()
 		c.DoTheDamnThing(workOrder, &job)
 	}

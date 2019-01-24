@@ -51,7 +51,7 @@ github.com/nats-io/nkeys
 github.com/nats-io/nuid
 # github.com/sirupsen/logrus v1.3.0
 github.com/sirupsen/logrus
-# github.com/videocoin/common v0.1.45
+# github.com/videocoin/common v0.1.46
 github.com/videocoin/common/proto
 # golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b
 golang.org/x/crypto/ssh/terminal

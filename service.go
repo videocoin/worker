@@ -64,7 +64,7 @@ func New() (*Service, error) {
 		cfg:     cfg,
 		manager: manager,
 		ctx:     ctx,
-		csyc:    CSyncInit(cfg),
+		csyc:    CSyncInit(cfg, manager),
 	}, nil
 
 }
