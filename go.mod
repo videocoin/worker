@@ -1,7 +1,7 @@
 module github.com/videocoin/transcode
 
 require (
-	cloud.google.com/go v0.35.1
+	cloud.google.com/go v0.35.1 // indirect
 	github.com/boltdb/bolt v1.3.1 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20190121005146-b04fd42d9952 // indirect
 	github.com/erikstmartin/go-testdb v0.0.0-20160219214506-8d10e4a1bae5 // indirect
@@ -29,7 +29,6 @@ require (
 	github.com/sirupsen/logrus v1.3.0
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/videocoin/common v0.1.45
-	go.opencensus.io v0.19.0 // indirect
 	golang.org/x/crypto v0.0.0-20190123085648-057139ce5d2b // indirect
 	golang.org/x/net v0.0.0-20190119204137-ed066c81e75e // indirect
 	golang.org/x/oauth2 v0.0.0-20190115181402-5dab4167f31c
