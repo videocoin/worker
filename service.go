@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
+	pb "github.com/VideoCoin/common/proto"
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
-	pb "github.com/videocoin/common/proto"
 	"google.golang.org/grpc"
 )
 
@@ -72,7 +72,6 @@ func New() (*Service, error) {
 func (s *Service) reportStatus(userID string, streamID string, status string) error {
 	ctx := context.Background()
 	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
-		UserId:   userID,
 		StreamId: streamID,
 		Status:   status,
 	})
@@ -99,7 +98,6 @@ func Start() error {
 	task.Status = pb.WorkOrderStatusTranscoding.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
-		UserId:   task.UserId,
 		StreamId: task.StreamId,
 		Status:   task.Status,
 	}); err != nil {
@@ -157,7 +155,6 @@ func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 	task.Status = pb.WorkOrderStatusReady.String()
 
 	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
-		UserId:   task.UserId,
 		StreamId: task.StreamId,
 		Status:   task.Status,
 	}); err != nil {

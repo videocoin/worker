@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 
+	pb "github.com/VideoCoin/common/proto"
 	"github.com/fsnotify/fsnotify"
 	log "github.com/sirupsen/logrus"
-	pb "github.com/videocoin/common/proto"
 	"golang.org/x/oauth2/google"
 
 	storage "google.golang.org/api/storage/v1"
@@ -163,7 +163,7 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	c.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, workOrder.UserId, workOrder.StreamId, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", c.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName))
+	c.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", c.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName))
 
 	return nil
 }

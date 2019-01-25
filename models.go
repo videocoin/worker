@@ -5,7 +5,7 @@ import (
 
 	"github.com/grafov/m3u8"
 	stan "github.com/nats-io/go-nats-streaming"
-	"github.com/videocoin/common/proto"
+	"github.com/VideoCoin/common/proto"
 
 	"github.com/sirupsen/logrus"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/videocoin/transcode"
+	"github.com/VideoCoin/transcode"
 )
 
 func main() {
