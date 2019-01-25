@@ -5,28 +5,21 @@ import (
 
 	"github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
+	"github.com/VideoCoin/go-videocoin/common"
+	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/VideoCoin/streamManager"
 	"github.com/grafov/m3u8"
-	stan "github.com/nats-io/go-nats-streaming"
-
-	"github.com/sirupsen/logrus"
 )
 
 type (
 	// CSync struct for handling sync logic
-	CSync struct {
-		manager proto.ManagerServiceClient
-		cfg     *Config
-		log     *logrus.Entry
-		ctx     context.Context
-	}
 
 	// Job used to queue up chunk work
 	Job struct {
 		ChunkName string
 		ChunksDir string
-		Playlist  *m3u8.MediaPlaylist
 		Bitrate   uint32
+		Playlist  *m3u8.MediaPlaylist
 	}
 
 	// JobQueue simple slice of jobs
@@ -36,12 +29,12 @@ type (
 
 	// Service primary reciever for service
 	Service struct {
-		cfg     *Config
-		sc      stan.Conn
-		manager proto.ManagerServiceClient
-		bcAuth  *bind.TransactOpts
-		sm      *streamManager.Manager
-		ctx     context.Context
-		csyc    *CSync
+		cfg      *Config
+		ctx      context.Context
+		manager  proto.ManagerServiceClient
+		sm       *streamManager.Manager
+		bcAuth   *bind.TransactOpts
+		bcClient *ethclient.Client
+		pkAddr   common.Address
 	}
 )

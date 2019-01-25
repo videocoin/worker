@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"log"
+
 	bc "github.com/VideoCoin/common/bcops"
 	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
@@ -19,7 +21,6 @@ import (
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/VideoCoin/streamManager"
 	"github.com/golang/protobuf/ptypes/empty"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -41,6 +42,8 @@ var (
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	cfg := LoadConfig()
 
 	// Generate unique connection name
@@ -83,7 +86,6 @@ func New() (*Service, error) {
 		cfg:     cfg,
 		manager: manager,
 		ctx:     ctx,
-		csyc:    CSyncInit(cfg, manager),
 	}, nil
 
 }
@@ -105,9 +107,8 @@ func (s *Service) reportStatus(userID string, streamID string, status string) er
 // Start creates new service and blocks until stop signal
 func Start() error {
 	s, err := New()
-	if err != nil {
-		return err
-	}
+
+	handle.Fatal(err)
 
 	task, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
 	if err != nil {
@@ -116,12 +117,12 @@ func Start() error {
 
 	task.Status = pb.WorkOrderStatusTranscoding.String()
 
-	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
+	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		StreamId: task.StreamId,
 		Status:   task.Status,
-	}); err != nil {
-		log.Errorf("failed to report status")
-	}
+	})
+
+	handle.Fatal(err)
 
 	return s.handleTranscodeTask(task)
 
@@ -129,19 +130,19 @@ func Start() error {
 
 func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
-	log.Infof("starting transcode task: %d using input: %s", workOrder.Id, workOrder.InputUrl)
+	log.Printf("starting transcode task: %d using input: %s", workOrder.Id, workOrder.InputUrl)
 
 	dir := path.Join(s.cfg.OutputDir, workOrder.StreamId)
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	for _, b := range bitrates {
 		fullDir := fmt.Sprintf("%s/%d", dir, b)
-		if err := prepareDir(fullDir); err != nil {
-			log.Error(err.Error())
-		}
-		log.Infof("monitoring chunks in %s", fullDir)
+		err := prepareDir(fullDir)
+		handle.Err(err)
+
+		log.Printf("monitoring chunks in %s", fullDir)
 		go s.monitorChunks(fullDir, workOrder)
-		go s.csyc.SyncDir(workOrder, fullDir, b)
+		go s.SyncDir(workOrder, fullDir, b)
 	}
 
 	if err := generatePlaylist(m3u8); err != nil {
@@ -160,7 +161,7 @@ func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 		time.Sleep(2 * time.Second)
 		files, err := ioutil.ReadDir(dir)
 		if err != nil {
-			log.Warnf("failed to read dir: %s", err.Error())
+			log.Printf("failed to read dir: %s", err.Error())
 		}
 
 		if len(files) < 2 {
@@ -172,23 +173,20 @@ func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 
 	task.Status = pb.WorkOrderStatusReady.String()
 
-	if _, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
+	_, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		StreamId: task.StreamId,
 		Status:   task.Status,
-	}); err != nil {
-		log.Errorf("failed to report status")
-	}
+	})
+
+	handle.Err(err)
 }
 
 func transcode(args []string, streamurl string) {
 	waitForStreamReady(streamurl)
-	log.Info("starting transcode")
+	log.Println("starting transcode")
 	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
-	if err != nil {
-		log.Errorf("failed to exec - output: %s", string(out))
-		panic(err)
-	}
-	log.Info("transcode complete")
+	handle.Fatalf(err, string(out))
+	log.Println("transcode complete")
 }
 
 func generatePlaylist(filename string) error {
@@ -212,7 +210,7 @@ func waitForStreamReady(streamurl string) {
 		if resp.StatusCode == 200 {
 			return
 		}
-		log.Infof("waiting for stream %s to become ready...", streamurl)
+		log.Printf("waiting for stream %s to become ready...", streamurl)
 		time.Sleep(30 * time.Second)
 	}
 }

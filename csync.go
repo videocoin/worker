@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"math/big"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,34 +14,22 @@ import (
 	"strconv"
 	"strings"
 
+	"log"
+
+	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
 	"github.com/fsnotify/fsnotify"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2/google"
-
 	storage "google.golang.org/api/storage/v1"
 
 	"github.com/grafov/m3u8"
 )
 
-// CSync syncer struct
-
-// CSyncInit Returns initialized csync object
-func CSyncInit(cfg *Config, manager pb.ManagerServiceClient) *CSync {
-	return &CSync{
-		log:     log.WithField("name", "csync"),
-		cfg:     cfg,
-		manager: manager,
-		ctx:     context.Background(),
-	}
-}
-
-func (c *CSync) getDuration(input string) (float64, error) {
-	c.log.Infof("using input %s", input)
+func (s *Service) getDuration(input string) (float64, error) {
+	log.Printf("using input %s", input)
 	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
 	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
 	if err != nil {
-		c.log.Warnf("ffprobe output: %s", string(stdout))
 		return 0.0, err
 	}
 
@@ -50,7 +39,7 @@ func (c *CSync) getDuration(input string) (float64, error) {
 }
 
 // SyncDir watches file system and processes chunks as they are written
-func (c *CSync) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
+func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 	//create playlist
 	// wait for chunk
 	// get chunk dir
@@ -62,14 +51,13 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 	playlist, err := m3u8.NewMediaPlaylist(10000, 10000)
 	if err != nil {
-		c.log.Errorf("failed to generate playlist: %s", err.Error())
+		handle.Err(err)
 		return
 	}
 
 	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Fatal(err)
-	}
+	handle.Fatal(err)
+
 	defer watcher.Close()
 
 	done := make(chan bool)
@@ -84,9 +72,9 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 				chunk := path.Base(event.Name)
 
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(chunk, "tmp") && !strings.Contains(chunk, ".m3u8") {
-					c.log.Println("created file:", chunk)
+					log.Println("created file:", chunk)
 					q.Push(Job{ChunkName: chunk, ChunksDir: dir, Playlist: playlist, Bitrate: bitrate})
-					c.Work(workOrder, q)
+					s.Work(workOrder, q)
 
 				}
 
@@ -94,7 +82,7 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 				if !ok {
 					return
 				}
-				c.log.Println("error:", err)
+				handle.Err(err)
 			}
 		}
 	}()
@@ -108,34 +96,32 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 // Work execute jobs only if at least two are in queue
 // This prevents accidently working a chunk that ffmpeg has not finished writing yet
-func (c *CSync) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
+func (s *Service) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
 	if jobs.Len() >= 3 {
-		c.manager.ChunkCreated(c.ctx, &pb.ChunkCreatedRequest{})
+		s.manager.ChunkCreated(s.ctx, &pb.ChunkCreatedRequest{})
 		job := jobs.Pop()
-		c.DoTheDamnThing(workOrder, &job)
+		s.DoTheDamnThing(workOrder, &job)
 	}
 }
 
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
-func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
+func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
 	var b = make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
 		return err
 	}
 
-	chunkLoc := path.Join(c.cfg.OutputDir, workOrder.StreamId, job.ChunksDir, job.ChunkName)
+	chunkLoc := path.Join(s.cfg.OutputDir, workOrder.StreamId, job.ChunksDir, job.ChunkName)
 	uploadPath := path.Join(workOrder.StreamId, job.ChunksDir)
 	if job.ChunkName == "0.ts" {
-		duration, err := c.getDuration(chunkLoc)
-		if err != nil {
-			c.log.Errorf("failed to get duration: %s from: %s ", err.Error(), chunkLoc)
-		}
+		duration, err := s.getDuration(chunkLoc)
+		handle.Err(err)
 
 		job.Playlist.TargetDuration = duration
 	}
 
-	duration, err := c.getDuration(chunkLoc)
+	duration, err := s.getDuration(chunkLoc)
 	if err != nil {
 		return err
 	}
@@ -148,53 +134,68 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
 	chunk, err := os.Open(chunkLoc)
 	if err != nil {
-		c.log.Errorf("failed to open chunk: %s", err.Error())
+		return err
 	}
 
 	// Upload chunk
-	if err = c.Upload(path.Join(uploadPath, newChunkName), chunk); err != nil {
+	if err = s.Upload(path.Join(uploadPath, newChunkName), chunk); err != nil {
 		return err
 	}
 
 	// Upload playlist
-	if err = c.Upload(path.Join(uploadPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
+	if err = s.Upload(path.Join(uploadPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
 		return err
 	}
 
-	c.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", c.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
+	convertedID, ok := new(big.Int).SetString(workOrder.StreamId, 16)
+	if !ok {
+		return fmt.Errorf("failed to convert streamid to bigint")
+	}
+
+	inputChunkID, ok := new(big.Int).SetString(strings.TrimSuffix(job.ChunkName, ".ts"), 16)
+	if !ok {
+		return fmt.Errorf("failed to convert chunk to bigint")
+	}
+
+	_, err = s.sm.AddInputChunkId(s.bcAuth, convertedID, inputChunkID)
+	handle.Err(err)
+
+	newNonce, err := s.bcClient.PendingNonceAt(context.Background(), s.pkAddr)
+
+	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
+	handle.Err(err)
+
+	s.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", s.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", s.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
 
 	return nil
 }
 
 // VerifyChunk blahg
-func (c *CSync) VerifyChunk(workOrderID uint32, src string, res string, bitrate uint32) error {
+func (s *Service) VerifyChunk(workOrderID uint32, src string, res string, bitrate uint32) error {
 	form := url.Values{}
 	form.Add("source_chunk_url", src)
 	form.Add("result_chunk_url", res)
 	form.Add("job_id", fmt.Sprintf("%d", workOrderID))
 
-	resp, err := http.PostForm(c.cfg.VerifierURL+"/api/v1/verify", form)
+	resp, err := http.PostForm(s.cfg.VerifierURL+"/api/v1/verify", form)
 	if err != nil {
 		return err
 	}
 
-	c.log.Infof("verifier response: code [ %d ]", resp.StatusCode)
+	log.Printf("verifier response: code [ %d ]", resp.StatusCode)
 
 	return nil
 }
 
 // Upload uploads an object to gcs with publicread acl
-func (c *CSync) Upload(output string, r io.Reader) error {
-	c.log.Infof("uploading chunk: %s to %s: ", output, c.cfg.Bucket)
+func (s *Service) Upload(output string, r io.Reader) error {
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
-		c.log.Errorf("failed to create client: %s", err.Error())
 		return err
 	}
 
 	svc, err := storage.New(client)
 	if err != nil {
-		c.log.Errorf("failed to create new service: %s", err.Error())
 		return err
 	}
 
@@ -203,8 +204,7 @@ func (c *CSync) Upload(output string, r io.Reader) error {
 		CacheControl: "public, max-age=0",
 	}
 
-	if _, err := svc.Objects.Insert(c.cfg.Bucket, object).Media(r).PredefinedAcl("publicread").Do(); err != nil {
-		c.log.Warnf("failed to upload object: %s", err.Error())
+	if _, err := svc.Objects.Insert(s.cfg.Bucket, object).Media(r).PredefinedAcl("publicread").Do(); err != nil {
 		return err
 	}
 
