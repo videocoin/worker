@@ -169,15 +169,17 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 
 	walletAddr := common.HexToAddress(workOrder.WalletAddress)
-	s.SubmitProof(walletAddr, job.Bitrate, inputChunkID, outputChunkID)
+	err = s.SubmitProof(walletAddr, job.Bitrate, inputChunkID, outputChunkID)
+	if err != nil {
+		return err
+	}
 
 	newNonce, err = s.bcClient.PendingNonceAt(context.Background(), s.pkAddr)
 	handle.Err(err)
 	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 
-	s.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", s.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", s.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
+	return s.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", s.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", s.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
 
-	return nil
 }
 
 // SubmitProof registers work (output chunk)
