@@ -50,15 +50,13 @@ func (c *CSync) getDuration(input string) (float64, error) {
 }
 
 // SyncDir watches file system and processes chunks as they are written
-func (c *CSync) SyncDir(workOrder *pb.WorkOrder, chunkDir string) {
+func (c *CSync) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 	//create playlist
 	// wait for chunk
 	// get chunk dir
 	// append to playlist
 	// upload chunk
 	// upload playlist
-
-	fullPath := path.Join(c.cfg.OutputDir, workOrder.StreamId, chunkDir)
 
 	var q = new(JobQueue)
 
@@ -87,7 +85,7 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, chunkDir string) {
 
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(chunk, "tmp") && !strings.Contains(chunk, ".m3u8") {
 					c.log.Println("created file:", chunk)
-					q.Push(Job{ChunkName: chunk, ChunksDir: chunkDir, Playlist: playlist})
+					q.Push(Job{ChunkName: chunk, ChunksDir: dir, Playlist: playlist, Bitrate: bitrate})
 					c.Work(workOrder, q)
 
 				}
@@ -101,7 +99,7 @@ func (c *CSync) SyncDir(workOrder *pb.WorkOrder, chunkDir string) {
 		}
 	}()
 
-	err = watcher.Add(fullPath)
+	err = watcher.Add(dir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -163,13 +161,13 @@ func (c *CSync) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	c.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", c.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName))
+	c.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", c.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", c.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
 
 	return nil
 }
 
 // VerifyChunk blahg
-func (c *CSync) VerifyChunk(workOrderID uint32, src string, res string) error {
+func (c *CSync) VerifyChunk(workOrderID uint32, src string, res string, bitrate uint32) error {
 	form := url.Values{}
 	form.Add("source_chunk_url", src)
 	form.Add("result_chunk_url", res)

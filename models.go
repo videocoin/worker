@@ -3,9 +3,9 @@ package transcode
 import (
 	"context"
 
+	"github.com/VideoCoin/common/proto"
 	"github.com/grafov/m3u8"
 	stan "github.com/nats-io/go-nats-streaming"
-	"github.com/VideoCoin/common/proto"
 
 	"github.com/sirupsen/logrus"
 )
@@ -24,6 +24,7 @@ type (
 		ChunkName string
 		ChunksDir string
 		Playlist  *m3u8.MediaPlaylist
+		Bitrate   uint32
 	}
 
 	// JobQueue simple slice of jobs

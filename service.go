@@ -122,6 +122,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		}
 		log.Infof("monitoring chunks in %s", fullDir)
 		go s.monitorChunks(fullDir, workOrder)
+		go s.csyc.SyncDir(workOrder, fullDir, b)
 	}
 
 	if err := generatePlaylist(m3u8); err != nil {
@@ -129,8 +130,6 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 	}
 
 	args := buildCmd(workOrder.InputUrl, dir)
-
-	go s.csyc.SyncDir(workOrder, "360p")
 
 	transcode(args, workOrder.InputUrl)
 
