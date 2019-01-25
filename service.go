@@ -81,11 +81,12 @@ func New() (*Service, error) {
 	handle.Fatal(err)
 
 	return &Service{
-		sm:      sm,
-		bcAuth:  bcAuth,
-		cfg:     cfg,
-		manager: manager,
-		ctx:     ctx,
+		sm:       sm,
+		bcAuth:   bcAuth,
+		bcClient: client,
+		cfg:      cfg,
+		manager:  manager,
+		ctx:      ctx,
 	}, nil
 
 }

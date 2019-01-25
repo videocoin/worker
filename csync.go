@@ -18,6 +18,8 @@ import (
 
 	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/go-videocoin/common"
+	"github.com/VideoCoin/stream"
 	"github.com/fsnotify/fsnotify"
 	"golang.org/x/oauth2/google"
 	storage "google.golang.org/api/storage/v1"
@@ -107,7 +109,7 @@ func (s *Service) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
-	var b = make([]byte, 16)
+	var b = make([]byte, 8)
 	if _, err := rand.Read(b); err != nil {
 		return err
 	}
@@ -157,15 +159,38 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return fmt.Errorf("failed to convert chunk to bigint")
 	}
 
+	outputChunkID := new(big.Int).SetBytes(b)
+
 	_, err = s.sm.AddInputChunkId(s.bcAuth, convertedID, inputChunkID)
 	handle.Err(err)
 
 	newNonce, err := s.bcClient.PendingNonceAt(context.Background(), s.pkAddr)
-
-	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 	handle.Err(err)
+	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
+
+	walletAddr := common.HexToAddress(workOrder.WalletAddress)
+	s.SubmitProof(walletAddr, job.Bitrate, inputChunkID, outputChunkID)
+
+	newNonce, err = s.bcClient.PendingNonceAt(context.Background(), s.pkAddr)
+	handle.Err(err)
+	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 
 	s.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", s.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", s.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
+
+	return nil
+}
+
+// SubmitProof registers work (output chunk)
+func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) error {
+	streamInstance, err := stream.NewStream(address, s.bcClient)
+	if err != nil {
+		return err
+	}
+
+	_, err = streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
