@@ -19,6 +19,8 @@ type Config struct {
 	NATsToken      string `required:"true" envconfig:"NATS_TOKEN"`
 	ManagerRPCADDR string `required:"true" envconfig:"MANAGER_RPC_ADDR" default:"manager:50051"`
 	Cluster        string `required:"true" envconfig:"NATS_CLUSTER"`
+	GanacheAddr    string `required:"true" envconfig:"GANACHE_URL" default:"http://localhost:8545"`
+	SMCA           string `required:"true" envconfig:"SMCA" default:"" description:"stream manager contract address"`
 }
 
 var cfg Config

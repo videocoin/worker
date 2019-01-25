@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
+	"github.com/VideoCoin/streamManager"
 	"github.com/grafov/m3u8"
 	stan "github.com/nats-io/go-nats-streaming"
 
@@ -37,6 +39,8 @@ type (
 		cfg     *Config
 		sc      stan.Conn
 		manager proto.ManagerServiceClient
+		bcAuth  *bind.TransactOpts
+		sm      *streamManager.Manager
 		ctx     context.Context
 		csyc    *CSync
 	}

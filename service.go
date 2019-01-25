@@ -12,7 +12,12 @@ import (
 	"strings"
 	"time"
 
+	bc "github.com/VideoCoin/common/bcops"
+	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/go-videocoin/common"
+	"github.com/VideoCoin/go-videocoin/ethclient"
+	"github.com/VideoCoin/streamManager"
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -47,9 +52,7 @@ func New() (*Service, error) {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR, opts...)
-	if err != nil {
-		return nil, err
-	}
+	handle.Fatal(err)
 
 	manager := pb.NewManagerServiceClient(managerConn)
 
@@ -60,7 +63,23 @@ func New() (*Service, error) {
 
 	ctx := context.Background()
 
+	client, err := ethclient.Dial(cfg.GanacheAddr)
+	handle.Fatal(err)
+
+	managerAddress := common.HexToAddress(cfg.SMCA)
+
+	sm, err := streamManager.NewManager(managerAddress, client)
+	handle.Fatal(err)
+
+	key, err := bc.LoadBcPrivKeys("./keys/local", "local")
+	handle.Fatal(err)
+
+	bcAuth, err := bc.GetBCAuth(client, key)
+	handle.Fatal(err)
+
 	return &Service{
+		sm:      sm,
+		bcAuth:  bcAuth,
 		cfg:     cfg,
 		manager: manager,
 		ctx:     ctx,
