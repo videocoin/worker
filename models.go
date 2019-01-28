@@ -4,11 +4,10 @@ import (
 	"context"
 
 	"github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
-	"github.com/VideoCoin/stream"
-	"github.com/VideoCoin/streamManager"
 	"github.com/grafov/m3u8"
 )
 
@@ -34,7 +33,6 @@ type (
 		ctx      context.Context
 		manager  proto.ManagerServiceClient
 		sm       *streamManager.Manager
-		stream   *stream.Stream
 		bcAuth   *bind.TransactOpts
 		bcClient *ethclient.Client
 		pkAddr   common.Address

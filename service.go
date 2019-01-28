@@ -17,9 +17,9 @@ import (
 	bc "github.com/VideoCoin/common/bcops"
 	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
-	"github.com/VideoCoin/streamManager"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 )

@@ -18,8 +18,8 @@ import (
 
 	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/go-videocoin/common"
-	"github.com/VideoCoin/stream"
 	"github.com/fsnotify/fsnotify"
 	"golang.org/x/oauth2/google"
 	storage "google.golang.org/api/storage/v1"
