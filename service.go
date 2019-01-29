@@ -66,7 +66,7 @@ func New() (*Service, error) {
 
 	ctx := context.Background()
 
-	client, err := ethclient.Dial(cfg.GanacheAddr)
+	client, err := ethclient.Dial(cfg.BlockchainURL)
 	handle.Fatal(err)
 
 	managerAddress := common.HexToAddress(cfg.SMCA)
@@ -74,7 +74,7 @@ func New() (*Service, error) {
 	sm, err := streamManager.NewManager(managerAddress, client)
 	handle.Fatal(err)
 
-	key, err := bc.LoadBcPrivKeys("./keys/local", "local")
+	key, err := bc.LoadBcPrivKeys("transcoder.key", "transcoder")
 	handle.Fatal(err)
 
 	bcAuth, err := bc.GetBCAuth(client, key)
