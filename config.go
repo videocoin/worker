@@ -21,6 +21,8 @@ type Config struct {
 	Cluster        string `required:"true" envconfig:"NATS_CLUSTER"`
 	BlockchainURL  string `required:"true" envconfig:"BLOCKCHAIN_URL" default:"http://localhost:8545"`
 	SMCA           string `required:"true" envconfig:"SMCA" default:"0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721" description:"stream manager contract address"`
+	KeyFile        string `required:"true" envconfig:"KEY_FILE" default:"/opt/transcoder.key"`
+	Password       string `required:"true" envconfig:"PASSWORD" default:"transcoder"`
 }
 
 var cfg Config

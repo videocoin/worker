@@ -74,7 +74,7 @@ func New() (*Service, error) {
 	sm, err := streamManager.NewManager(managerAddress, client)
 	handle.Fatal(err)
 
-	key, err := bc.LoadBcPrivKeys("transcoder.key", "transcoder")
+	key, err := bc.LoadBcPrivKeys(cfg.KeyFile, cfg.Password)
 	handle.Fatal(err)
 
 	bcAuth, err := bc.GetBCAuth(client, key)
