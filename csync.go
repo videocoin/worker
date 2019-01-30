@@ -183,7 +183,7 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
 // AddNonce increment nonce by one, required for every blockcain interaction
 func (s *Service) AddNonce() {
-	newNonce, err := s.bcClient.PendingNonceAt(context.Background(), s.pkAddr)
+	newNonce, err := s.bcClient.PendingNonceAt(s.ctx, s.pkAddr)
 	handle.Err(err)
 	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 }
