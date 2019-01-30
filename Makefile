@@ -16,7 +16,7 @@ LATEST=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):latest
 VERSION=$$(git rev-parse --short HEAD)
 
 
-main: package publish
+main: publish
 
 
 test:
@@ -46,15 +46,16 @@ docker:
 	docker build -t ${IMAGE_TAG} -t $(LATEST) . --squash
 
 package:
-	@echo "==> Building package..."
-	export GOOS=linux
-	export GOARCH=amd64
-	export CGO_ENABLED=0
-	go build -a -installsuffix cgo -ldflags="-w -s" -o release/$(SERVICE_NAME) cmd/main.go
-	cp keys/transcoder.key release
-	tar -C release -cvjf release/$(VERSION)_transcoder_linux_amd64.tar.bz2 transcoder transcoder.key
+	cd cmd && xgo --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
+	cp keys/$(SERVICE_NAME).key release
+	tar -C release -cvjf release/$(VERSION)_$(SERVICE_NAME)_linux_amd64.tar.bz2 $(SERVICE_NAME)-linux-amd64 $(SERVICE_NAME).key
 
-publish:
-	@echo "==> Pushing to storage..."
-	gsutil -m cp release/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/transcoder/
-	gsutil -m cp gs://${RELEASE_BUCKET}/transcoder/$(VERSION)_transcoder_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/transcoder/latest_transcoder_linux_amd64.tar.bz2
+store:
+	gsutil -m cp release/$(VERSION)_$(SERVICE_NAME)_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/$(SERVICE_NAME)/
+	gsutil -m cp gs://${RELEASE_BUCKET}/$(SERVICE_NAME)/$(VERSION)_$(SERVICE_NAME)_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/$(SERVICE_NAME)/latest_$(SERVICE_NAME)_linux_amd64.tar.bz2
+	
+clean:
+	rm -rf release/*
+
+	
+publish: package store clean
