@@ -53,12 +53,14 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 	playlist, err := m3u8.NewMediaPlaylist(10000, 10000)
 	if err != nil {
-		handle.Err(err)
+		s.log.Errorf("failed to generate new media playlist: %s", err.Error())
 		return
 	}
 
 	watcher, err := fsnotify.NewWatcher()
-	handle.Fatal(err)
+	if err != nil {
+		s.log.Errorf("failed to make watcher: %s", err.Error())
+	}
 
 	defer watcher.Close()
 
@@ -114,11 +116,14 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	chunkLoc := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId), job.ChunksDir, job.ChunkName)
-	uploadPath := path.Join(fmt.Sprintf("%d", workOrder.StreamId), job.ChunksDir)
+	chunkLoc := path.Join(job.ChunksDir, job.ChunkName)
+	uploadPath := fmt.Sprintf("%d/%d", workOrder.StreamId, job.Bitrate)
 	if job.ChunkName == "0.ts" {
 		duration, err := s.getDuration(chunkLoc)
-		handle.Err(err)
+		if err != nil {
+			s.log.Errorf("failed to get chunk duration: %s", err.Error())
+			duration = 10.0
+		}
 
 		job.Playlist.TargetDuration = duration
 	}
@@ -179,7 +184,10 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 // AddNonce increment nonce by one, required for every blockcain interaction
 func (s *Service) AddNonce() {
 	newNonce, err := s.bcClient.PendingNonceAt(s.ctx, s.pkAddr)
-	handle.Err(err)
+	if err != nil {
+		s.log.Errorf("failed to increase nonce: %s", err.Error())
+		return
+	}
 	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 }
 
@@ -210,13 +218,14 @@ func (s *Service) VerifyChunk(workOrderID uint32, src string, res string, bitrat
 		return err
 	}
 
-	log.Printf("verifier response: code [ %d ]", resp.StatusCode)
+	s.log.Infof("verifier response: code [ %d ]", resp.StatusCode)
 
 	return nil
 }
 
 // Upload uploads an object to gcs with publicread acl
 func (s *Service) Upload(output string, r io.Reader) error {
+	fmt.Println("OUTPUT: ", output)
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
 		return err

@@ -1,6 +1,7 @@
 package transcode
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"fmt"
@@ -11,6 +12,8 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"log"
 
@@ -55,10 +58,12 @@ func New() (*Service, error) {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR, opts...)
-	handle.Fatal(err)
+	if err != nil {
+		panic(err)
+	}
 
 	manager := pb.NewManagerServiceClient(managerConn)
-
+	fmt.Printf("%+v", manager)
 	status, err := manager.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
 		return nil, fmt.Errorf("failed to get healthy status: %v", err)
@@ -67,18 +72,26 @@ func New() (*Service, error) {
 	ctx := context.Background()
 
 	client, err := ethclient.Dial(cfg.BlockchainURL)
-	handle.Fatal(err)
+	if err != nil {
+		panic(err)
+	}
 
 	managerAddress := common.HexToAddress(cfg.SMCA)
 
 	sm, err := streamManager.NewManager(managerAddress, client)
-	handle.Fatal(err)
+	if err != nil {
+		panic(err)
+	}
 
 	key, err := bc.LoadBcPrivKeys(cfg.KeyFile, cfg.Password)
-	handle.Fatal(err)
+	if err != nil {
+		panic(err)
+	}
 
 	bcAuth, err := bc.GetBCAuth(client, key)
-	handle.Fatal(err)
+	if err != nil {
+		panic(err)
+	}
 
 	return &Service{
 		sm:       sm,
@@ -87,6 +100,7 @@ func New() (*Service, error) {
 		cfg:      cfg,
 		manager:  manager,
 		ctx:      ctx,
+		log:      logrus.WithField("name", "transcoder"),
 	}, nil
 
 }
@@ -108,8 +122,9 @@ func (s *Service) reportStatus(userID string, streamID int64, status string) err
 // Start creates new service and blocks until stop signal
 func Start() error {
 	s, err := New()
-
-	handle.Fatal(err)
+	if err != nil {
+		panic(err)
+	}
 
 	task, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
 	if err != nil {
@@ -148,7 +163,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		go s.SyncDir(workOrder, fullDir, b)
 	}
 
-	if err := generatePlaylist(m3u8); err != nil {
+	if err := s.generatePlaylist(workOrder.StreamId, m3u8); err != nil {
 		panic(err)
 	}
 
@@ -175,35 +190,56 @@ func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 	}
 
 	task.Status = pb.WorkOrderStatusReady.String()
-
-	_, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
+	update := &pb.UpdateStreamStatusRequest{
 		StreamId: task.StreamId,
 		Status:   task.Status,
-	})
+	}
+	_, err := s.manager.UpdateStreamStatus(s.ctx, update)
 
-	handle.Err(err)
+	if err != nil {
+		s.log.Errorf("failed to update stream status: %s", err.Error())
+	}
+	fmt.Println(task.Status, task.StreamId)
+
 }
 
-func transcode(args []string, streamurl string) {
+func (s *Service) transcode(args []string, streamurl string) {
 	waitForStreamReady(streamurl)
 	log.Println("starting transcode")
 	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
-	handle.Fatalf(err, string(out))
-	log.Println("transcode complete")
+	if err != nil {
+		s.log.Fatalf("failed to transcode: err : %s output: %s", err.Error(), string(out))
+	}
+
+	s.log.Info("transcode complete")
 }
 
-func generatePlaylist(filename string) error {
-	m3u8 := []byte(`#EXTM3U
+func (s *Service) generatePlaylist(streamID int64, filename string) error {
+	m3u8 := []byte(fmt.Sprintf(`#EXTM3U
 #EXT-X-VERSION:6
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
-360p/index.m3u8
+%d/index.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3145728,RESOLUTION=842x480,CODECS="avc1.42e00a,mp4a.40.2"
-480p/index.m3u8
+%d/index.m3u8
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=5242880,RESOLUTION=1280x720,CODECS="avc1.42e00a,mp4a.40.2"
-720p/index.m3u8
-`)
+%d/index.m3u8
+`, bitrates[0], bitrates[1], bitrates[2]))
 
-	return ioutil.WriteFile(filename, m3u8, 0755)
+	err := ioutil.WriteFile(filename, m3u8, 0755)
+	if err != nil {
+		s.log.Errorf("failed to write file: %s", err.Error())
+		return err
+	}
+
+	reader := bytes.NewReader(m3u8)
+
+	err = s.Upload(fmt.Sprintf("%d/%s", streamID, "index.m3u8"), reader)
+	if err != nil {
+		s.log.Errorf("failed to upload: %s", err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func waitForStreamReady(streamurl string) {

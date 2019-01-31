@@ -3,6 +3,8 @@ package transcode
 import (
 	"context"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
@@ -36,5 +38,6 @@ type (
 		bcAuth   *bind.TransactOpts
 		bcClient *ethclient.Client
 		pkAddr   common.Address
+		log      *logrus.Entry
 	}
 )
