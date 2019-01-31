@@ -172,7 +172,7 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
 	s.AddNonce()
 
-	return s.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%s-%s/%s", s.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%s/%s/%s", s.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
+	return s.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%d-%s/%s", s.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%d/%s/%s", s.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
 
 }
 
