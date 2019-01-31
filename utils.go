@@ -37,6 +37,7 @@ func (s *Service) Upload(output string, r io.Reader) error {
 	return nil
 }
 
+// RandomBigInt Generates a random big integer with max 64 bits so we can store as int64
 func RandomBigInt() *big.Int {
 	max := new(big.Int)
 	max.Exp(big.NewInt(2), big.NewInt(64), nil).Sub(max, big.NewInt(1))
@@ -44,6 +45,7 @@ func RandomBigInt() *big.Int {
 	return n
 }
 
+// ChunkNum strip .ts from input chunk and return as bigInt
 func ChunkNum(chunkName string) *big.Int {
 	chunkNum, err := strconv.ParseInt(strings.TrimSuffix(chunkName, ".ts"), 10, 64)
 	if err != nil {
@@ -52,6 +54,7 @@ func ChunkNum(chunkName string) *big.Int {
 	return big.NewInt(chunkNum)
 }
 
+// Duration use ffmpeg to find chunk duration
 func (s *Service) Duration(input string) (float64, error) {
 	s.log.Infof("using input %s", input)
 	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
