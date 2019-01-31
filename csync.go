@@ -1,10 +1,7 @@
 package transcode
 
 import (
-	"context"
-	"crypto/rand"
 	"fmt"
-	"io"
 	"math/big"
 	"net/http"
 	"net/url"
@@ -20,8 +17,6 @@ import (
 	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/fsnotify/fsnotify"
-	"golang.org/x/oauth2/google"
-	storage "google.golang.org/api/storage/v1"
 
 	"github.com/grafov/m3u8"
 )
@@ -41,14 +36,8 @@ func (s *Service) getDuration(input string) (float64, error) {
 
 // SyncDir watches file system and processes chunks as they are written
 func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
-	//create playlist
-	// wait for chunk
-	// get chunk dir
-	// append to playlist
-	// upload chunk
-	// upload playlist
-
-	var q = new(JobQueue)
+	var jobChan = make(chan Job, 10)
+	go s.process(jobChan)
 
 	playlist, err := m3u8.NewMediaPlaylist(10000, 10000)
 	if err != nil {
@@ -59,11 +48,15 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		s.log.Errorf("failed to make watcher: %s", err.Error())
+		return
 	}
 
 	defer watcher.Close()
 
 	done := make(chan bool)
+
+	walletHex := common.HexToAddress(workOrder.WalletAddress)
+
 	go func() {
 		for {
 			select {
@@ -74,10 +67,25 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 				chunk := path.Base(event.Name)
 
-				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(chunk, "tmp") && !strings.Contains(chunk, ".m3u8") {
-					s.log.Infof("created file: %s", chunk)
-					q.Push(Job{ChunkName: chunk, ChunksDir: dir, Playlist: playlist, Bitrate: bitrate})
-					s.Work(workOrder, q)
+				if (event.Op&fsnotify.Create == fsnotify.Create) &&
+					!strings.Contains(chunk, "tmp") &&
+					!strings.Contains(chunk, ".m3u8") {
+
+					randomID := randomBigInt()
+
+					s.log.Infof("created file: %s generated name: %d", chunk, randomID)
+
+					jobChan <- Job{
+						ChunksDir:       dir,
+						InputChunkName:  chunk,
+						Bitrate:         bitrate,
+						Playlist:        playlist,
+						OutputID:        randomID,
+						InputID:         getChunkNum(chunk),
+						OutputChunkName: fmt.Sprintf("%d.ts"),
+						Wallet:          walletHex,
+						StreamID:        big.NewInt(workOrder.StreamId),
+					}
 
 				}
 
@@ -99,33 +107,15 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 	<-done
 }
 
-// Work execute jobs only if at least two are in queue
-// This prevents accidently working a chunk that ffmpeg has not finished writing yet
-func (s *Service) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
-	if jobs.Len() >= 3 {
-		s.manager.ChunkCreated(s.ctx, &pb.ChunkCreatedRequest{})
-		job := jobs.Pop()
-		err := s.DoTheDamnThing(workOrder, &job)
-		if err != nil {
-			s.log.Errorf("failed to do the damn thing: %s", err.Error())
-		}
-	}
-}
-
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
-func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
+func (s *Service) handleChunk(job *Job) error {
 
-	var b = make([]byte, 8)
-	if _, err := rand.Read(b); err != nil {
-		return err
-	}
-
-	chunkLoc := path.Join(job.ChunksDir, job.ChunkName)
-	uploadPath := fmt.Sprintf("%d/%d", workOrder.StreamId, job.Bitrate)
-	if job.ChunkName == "0.ts" {
+	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
+	uploadPath := fmt.Sprintf("%d/%d", job.StreamID, job.Bitrate)
+	if job.InputChunkName == "0.ts" {
 		duration, err := s.getDuration(chunkLoc)
 		if err != nil {
-			s.log.Errorf("failed to get chunk duration: %s", err.Error())
+			s.log.Warnf("failed to get chunk duration: %s", err.Error())
 			duration = 10.0
 		}
 
@@ -137,9 +127,7 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	newChunkName := fmt.Sprintf("%x.ts", b)
-
-	if err = job.Playlist.Append(newChunkName, duration, ""); err != nil {
+	if err = job.Playlist.Append(job.OutputChunkName, duration, ""); err != nil {
 		return err
 	}
 
@@ -149,7 +137,7 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 	}
 
 	// Upload chunk
-	if err = s.Upload(path.Join(uploadPath, newChunkName), chunk); err != nil {
+	if err = s.Upload(path.Join(uploadPath, job.OutputChunkName), chunk); err != nil {
 		return err
 	}
 
@@ -158,41 +146,18 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	inputChunkID, ok := new(big.Int).SetString(strings.TrimSuffix(job.ChunkName, ".ts"), 16)
-	if !ok {
-		return fmt.Errorf("failed to convert chunk to bigint")
-	}
-
-	outputChunkID := new(big.Int).SetBytes(b)
-
-	_, err = s.sm.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), inputChunkID)
+	err = s.SubmitProof(job.Wallet, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
 		return err
 	}
 
-	s.AddNonce()
+	s.addNonce()
 
-	walletAddr := common.HexToAddress(workOrder.WalletAddress)
+	localFile := fmt.Sprintf("%s/%d-%s/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
+	outputURL := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%s/%s", s.cfg.Bucket, job.StreamID, job.ChunksDir, job.OutputChunkName)
 
-	err = s.SubmitProof(walletAddr, job.Bitrate, inputChunkID, outputChunkID)
-	if err != nil {
-		return err
-	}
+	return s.VerifyChunk(job.StreamID, localFile, outputURL, job.Bitrate)
 
-	s.AddNonce()
-
-	return s.VerifyChunk(workOrder.Id, fmt.Sprintf("%s/%d-%s/%s", s.cfg.BaseStreamURL, workOrder.StreamId, workOrder.WalletAddress, job.ChunkName), fmt.Sprintf("https://storage.googleapis.com/%s/%d/%s/%s", s.cfg.Bucket, workOrder.StreamId, job.ChunksDir, newChunkName), job.Bitrate)
-
-}
-
-// AddNonce increment nonce by one, required for every blockcain interaction
-func (s *Service) AddNonce() {
-	newNonce, err := s.bcClient.PendingNonceAt(s.ctx, s.pkAddr)
-	if err != nil {
-		s.log.Errorf("failed to increase nonce: %s", err.Error())
-		return
-	}
-	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 }
 
 // SubmitProof registers work (output chunk)
@@ -211,11 +176,11 @@ func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunk
 }
 
 // VerifyChunk blahg
-func (s *Service) VerifyChunk(workOrderID uint32, src string, res string, bitrate uint32) error {
+func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate uint32) error {
 	form := url.Values{}
 	form.Add("source_chunk_url", src)
 	form.Add("result_chunk_url", res)
-	form.Add("job_id", fmt.Sprintf("%d", workOrderID))
+	form.Add("stream_id", fmt.Sprintf("%d", streamID))
 
 	resp, err := http.PostForm(s.cfg.VerifierURL+"/api/v1/verify", form)
 	if err != nil {
@@ -227,48 +192,43 @@ func (s *Service) VerifyChunk(workOrderID uint32, src string, res string, bitrat
 	return nil
 }
 
-// Upload uploads an object to gcs with publicread acl
-func (s *Service) Upload(output string, r io.Reader) error {
-	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
+func (s *Service) process(jobChan chan Job) {
+	for len(jobChan) < 2 {
+		sleep()
+	}
+
+	for {
+		select {
+		case j := <-jobChan:
+
+			if err := s.chunkCreated(&j); err != nil {
+				s.log.Errorf("failed to report chunk created: %s", err.Error())
+			}
+
+			if err := s.handleChunk(&j); err != nil {
+				s.log.Errorf("failed to handle chunk: %s", err.Error())
+			}
+		}
+	}
+}
+
+func (s *Service) chunkCreated(j *Job) error {
+	_, err := s.manager.ChunkCreated(s.ctx, &pb.ChunkCreatedRequest{
+		StreamId:      j.StreamID.Int64(),
+		SourceChunkId: j.InputID.Int64(),
+		ResultChunkId: j.OutputID.Int64(),
+		Bitrate:       j.Bitrate,
+	})
+
+	return err
+}
+
+// AddNonce increment nonce by one, required for every blockcain interaction
+func (s *Service) addNonce() {
+	newNonce, err := s.bcClient.PendingNonceAt(s.ctx, s.pkAddr)
 	if err != nil {
-		return err
+		s.log.Errorf("failed to increase nonce: %s", err.Error())
+		return
 	}
-
-	svc, err := storage.New(client)
-	if err != nil {
-		return err
-	}
-
-	object := &storage.Object{
-		Name:         output,
-		CacheControl: "public, max-age=0",
-	}
-
-	if _, err := svc.Objects.Insert(s.cfg.Bucket, object).Media(r).PredefinedAcl("publicread").Do(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Pop returns item in FIFO
-func (q *JobQueue) Pop() (job Job) {
-	if len(q.Jobs) == 0 {
-		return Job{}
-	}
-
-	job, q.Jobs = q.Jobs[0], q.Jobs[1:]
-
-	return
-
-}
-
-// Push item to end of array
-func (q *JobQueue) Push(job Job) {
-	q.Jobs = append(q.Jobs, job)
-}
-
-// Len returns length of job queue
-func (q *JobQueue) Len() int {
-	return len(q.Jobs)
+	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
 }
