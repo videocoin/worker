@@ -123,7 +123,9 @@ func Start() error {
 		Status:   task.Status,
 	})
 
-	handle.Fatal(err)
+	if err != nil {
+		log.Printf("failed to update stream status: %s", err.Error())
+	}
 
 	return s.handleTranscodeTask(task)
 
