@@ -16,7 +16,6 @@ import (
 
 	"log"
 
-	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/go-videocoin/common"
@@ -76,7 +75,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 				chunk := path.Base(event.Name)
 
 				if (event.Op&fsnotify.Create == fsnotify.Create) && !strings.Contains(chunk, "tmp") && !strings.Contains(chunk, ".m3u8") {
-					log.Println("created file:", chunk)
+					s.log.Infof("created file: %s", chunk)
 					q.Push(Job{ChunkName: chunk, ChunksDir: dir, Playlist: playlist, Bitrate: bitrate})
 					s.Work(workOrder, q)
 
@@ -86,7 +85,9 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 				if !ok {
 					return
 				}
-				handle.Err(err)
+				if err != nil {
+					s.log.Errorf("event watcher error: %s", err.Error())
+				}
 			}
 		}
 	}()
@@ -104,7 +105,10 @@ func (s *Service) Work(workOrder *pb.WorkOrder, jobs *JobQueue) {
 	if jobs.Len() >= 3 {
 		s.manager.ChunkCreated(s.ctx, &pb.ChunkCreatedRequest{})
 		job := jobs.Pop()
-		s.DoTheDamnThing(workOrder, &job)
+		err := s.DoTheDamnThing(workOrder, &job)
+		if err != nil {
+			s.log.Errorf("failed to do the damn thing: %s", err.Error())
+		}
 	}
 }
 
@@ -225,7 +229,6 @@ func (s *Service) VerifyChunk(workOrderID uint32, src string, res string, bitrat
 
 // Upload uploads an object to gcs with publicread acl
 func (s *Service) Upload(output string, r io.Reader) error {
-	fmt.Println("OUTPUT: ", output)
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
 		return err
