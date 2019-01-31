@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"path"
-	"strconv"
 	"strings"
+	"time"
 
 	"log"
 
@@ -20,19 +19,6 @@ import (
 
 	"github.com/grafov/m3u8"
 )
-
-func (s *Service) getDuration(input string) (float64, error) {
-	s.log.Infof("using input %s", input)
-	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
-	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
-	if err != nil {
-		return 0.0, err
-	}
-
-	cleanOut := strings.TrimSpace(string(stdout))
-
-	return strconv.ParseFloat(cleanOut, 64)
-}
 
 // SyncDir watches file system and processes chunks as they are written
 func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
@@ -71,7 +57,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 					!strings.Contains(chunk, "tmp") &&
 					!strings.Contains(chunk, ".m3u8") {
 
-					randomID := randomBigInt()
+					randomID := RandomBigInt()
 
 					s.log.Infof("created file: %s generated name: %d", chunk, randomID)
 
@@ -81,7 +67,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 						Bitrate:         bitrate,
 						Playlist:        playlist,
 						OutputID:        randomID,
-						InputID:         getChunkNum(chunk),
+						InputID:         ChunkNum(chunk),
 						OutputChunkName: fmt.Sprintf("%d.ts"),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
@@ -102,18 +88,19 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 	err = watcher.Add(dir)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("water failure: %s", err.Error())
 	}
+
 	<-done
 }
 
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) handleChunk(job *Job) error {
-
 	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
 	uploadPath := fmt.Sprintf("%d/%d", job.StreamID, job.Bitrate)
+
 	if job.InputChunkName == "0.ts" {
-		duration, err := s.getDuration(chunkLoc)
+		duration, err := s.Duration(chunkLoc)
 		if err != nil {
 			s.log.Warnf("failed to get chunk duration: %s", err.Error())
 			duration = 10.0
@@ -122,7 +109,7 @@ func (s *Service) handleChunk(job *Job) error {
 		job.Playlist.TargetDuration = duration
 	}
 
-	duration, err := s.getDuration(chunkLoc)
+	duration, err := s.Duration(chunkLoc)
 	if err != nil {
 		return err
 	}
@@ -194,7 +181,7 @@ func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate
 
 func (s *Service) process(jobChan chan Job) {
 	for len(jobChan) < 2 {
-		sleep()
+		time.Sleep(1 * time.Second)
 	}
 
 	for {
