@@ -91,7 +91,7 @@ func New() (*Service, error) {
 
 }
 
-func (s *Service) reportStatus(userID string, streamID string, status string) error {
+func (s *Service) reportStatus(userID string, streamID int64, status string) error {
 	ctx := context.Background()
 	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
 		StreamId: streamID,
@@ -133,9 +133,9 @@ func Start() error {
 
 func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
-	log.Printf("starting transcode task: %d using input: %s", workOrder.Id, workOrder.InputUrl)
+	log.Printf("starting transcode task: %d using input: %s with stream_id: %d", workOrder.Id, workOrder.InputUrl, workOrder.StreamId)
 
-	dir := path.Join(s.cfg.OutputDir, workOrder.StreamId)
+	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	for _, b := range bitrates {

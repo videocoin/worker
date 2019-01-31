@@ -114,8 +114,8 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	chunkLoc := path.Join(s.cfg.OutputDir, workOrder.StreamId, job.ChunksDir, job.ChunkName)
-	uploadPath := path.Join(workOrder.StreamId, job.ChunksDir)
+	chunkLoc := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId), job.ChunksDir, job.ChunkName)
+	uploadPath := path.Join(fmt.Sprintf("%d", workOrder.StreamId), job.ChunksDir)
 	if job.ChunkName == "0.ts" {
 		duration, err := s.getDuration(chunkLoc)
 		handle.Err(err)
@@ -149,11 +149,6 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 		return err
 	}
 
-	convertedID, ok := new(big.Int).SetString(workOrder.StreamId, 16)
-	if !ok {
-		return fmt.Errorf("failed to convert streamid to bigint")
-	}
-
 	inputChunkID, ok := new(big.Int).SetString(strings.TrimSuffix(job.ChunkName, ".ts"), 16)
 	if !ok {
 		return fmt.Errorf("failed to convert chunk to bigint")
@@ -161,7 +156,7 @@ func (s *Service) DoTheDamnThing(workOrder *pb.WorkOrder, job *Job) error {
 
 	outputChunkID := new(big.Int).SetBytes(b)
 
-	_, err = s.sm.AddInputChunkId(s.bcAuth, convertedID, inputChunkID)
+	_, err = s.sm.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), inputChunkID)
 	if err != nil {
 		return err
 	}
