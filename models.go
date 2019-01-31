@@ -2,6 +2,7 @@ package transcode
 
 import (
 	"context"
+	"math/big"
 
 	"github.com/sirupsen/logrus"
 
@@ -34,15 +35,15 @@ type (
 
 	// Job used to queue up chunk work
 	Job struct {
-		ChunkName string
-		ChunksDir string
-		Bitrate   uint32
-		Playlist  *m3u8.MediaPlaylist
-	}
-
-	// JobQueue simple slice of jobs
-	JobQueue struct {
-		Jobs []Job
+		Bitrate         uint32
+		InputChunkName  string
+		OutputChunkName string
+		ChunksDir       string
+		StreamID        *big.Int
+		InputID         *big.Int
+		OutputID        *big.Int
+		Playlist        *m3u8.MediaPlaylist
+		Wallet          common.Address
 	}
 
 	// Service primary reciever for service
