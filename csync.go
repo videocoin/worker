@@ -27,7 +27,7 @@ import (
 )
 
 func (s *Service) getDuration(input string) (float64, error) {
-	log.Printf("using input %s", input)
+	s.log.Infof("using input %s", input)
 	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
 	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
 	if err != nil {
