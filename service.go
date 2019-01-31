@@ -18,29 +18,12 @@ import (
 	"log"
 
 	bc "github.com/VideoCoin/common/bcops"
-	"github.com/VideoCoin/common/handle"
 	pb "github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
-)
-
-// Byte constants
-const (
-	_  = iota
-	KB = 1 << (10 * iota)
-	MB
-	GB
-)
-
-var (
-	bitrates = []uint32{
-		2 * MB,
-		4 * MB,
-		8 * MB,
-	}
 )
 
 // New initialize and return a new Service object
@@ -139,7 +122,7 @@ func Start() error {
 	})
 
 	if err != nil {
-		log.Printf("failed to update stream status: %s", err.Error())
+		s.log.Errorf("failed to update stream status: %s", err.Error())
 	}
 
 	return s.handleTranscodeTask(task)
@@ -148,7 +131,7 @@ func Start() error {
 
 func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
-	log.Printf("starting transcode task: %d using input: %s with stream_id: %d", workOrder.Id, workOrder.InputUrl, workOrder.StreamId)
+	s.log.Infof("starting transcode task: %d using input: %s with stream_id: %d", workOrder.Id, workOrder.InputUrl, workOrder.StreamId)
 
 	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
@@ -156,20 +139,23 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 	for _, b := range bitrates {
 		fullDir := fmt.Sprintf("%s/%d", dir, b)
 		err := prepareDir(fullDir)
-		handle.Err(err)
+		if err != nil {
+			s.log.Errorf("failed to prepare directory [ %s ]: %s", fullDir, err.Error())
+		}
 
-		log.Printf("monitoring chunks in %s", fullDir)
+		s.log.Infof("monitoring chunks in %s", fullDir)
+
 		go s.monitorChunks(fullDir, workOrder)
 		go s.SyncDir(workOrder, fullDir, b)
 	}
 
 	if err := s.generatePlaylist(workOrder.StreamId, m3u8); err != nil {
-		panic(err)
+		s.log.Fatalf("failed to generate playlist: %s", err.Error())
 	}
 
 	args := buildCmd(workOrder.InputUrl, dir)
 
-	transcode(args, workOrder.InputUrl)
+	s.transcode(args, workOrder.InputUrl)
 
 	return nil
 }

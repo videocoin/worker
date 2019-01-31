@@ -13,6 +13,22 @@ import (
 	"github.com/grafov/m3u8"
 )
 
+// Byte constants
+const (
+	_  = iota
+	KB = 1 << (10 * iota)
+	MB
+	GB
+)
+
+var (
+	bitrates = []uint32{
+		2 * MB,
+		4 * MB,
+		8 * MB,
+	}
+)
+
 type (
 	// CSync struct for handling sync logic
 
