@@ -1,4 +1,4 @@
-package transcode
+package transcode_test
 
 import (
 	"testing"
@@ -31,7 +31,7 @@ func Test_generatePlaylist(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := (tt.args.filename); (err != nil) != tt.wantErr {
+			if err := s.GeneratePlaylist(0x555, tt.args.filename); (err != nil) != tt.wantErr {
 				t.Errorf("generatePlaylist() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
