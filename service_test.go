@@ -1,8 +1,18 @@
 package transcode
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/VideoCoin/transcode"
+)
 
 func Test_generatePlaylist(t *testing.T) {
+
+	s, err := transcode.New()
+	if err != nil {
+		t.Errorf("failed to make new transcod service: %s", err.Error())
+	}
+
 	type args struct {
 		filename string
 	}
@@ -21,7 +31,7 @@ func Test_generatePlaylist(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := generatePlaylist(tt.args.filename); (err != nil) != tt.wantErr {
+			if err := (tt.args.filename); (err != nil) != tt.wantErr {
 				t.Errorf("generatePlaylist() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

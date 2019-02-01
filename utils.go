@@ -1,9 +1,12 @@
 package transcode
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"math/big"
 	"os/exec"
 	"strconv"
@@ -66,4 +69,33 @@ func (s *Service) Duration(input string) (float64, error) {
 	cleanOut := strings.TrimSpace(string(stdout))
 
 	return strconv.ParseFloat(cleanOut, 64)
+}
+
+// GeneratePlaylist based on static bitrates
+func (s *Service) GeneratePlaylist(streamID int64, filename string) error {
+	m3u8 := []byte(fmt.Sprintf(`#EXTM3U
+#EXT-X-VERSION:6
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
+%d/index.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3145728,RESOLUTION=842x480,CODECS="avc1.42e00a,mp4a.40.2"
+%d/index.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=5242880,RESOLUTION=1280x720,CODECS="avc1.42e00a,mp4a.40.2"
+%d/index.m3u8
+`, bitrates[0], bitrates[1], bitrates[2]))
+
+	err := ioutil.WriteFile(filename, m3u8, 0755)
+	if err != nil {
+		s.log.Errorf("failed to write file: %s", err.Error())
+		return err
+	}
+
+	reader := bytes.NewReader(m3u8)
+
+	err = s.Upload(fmt.Sprintf("%d/%s", streamID, "index.m3u8"), reader)
+	if err != nil {
+		s.log.Errorf("failed to upload: %s", err.Error())
+		return err
+	}
+
+	return nil
 }
