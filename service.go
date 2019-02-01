@@ -87,20 +87,6 @@ func New() (*Service, error) {
 
 }
 
-func (s *Service) reportStatus(userID string, streamID int64, status string) error {
-	ctx := context.Background()
-	_, err := s.manager.UpdateStreamStatus(ctx, &pb.UpdateStreamStatusRequest{
-		StreamId: streamID,
-		Status:   status,
-	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Start creates new service and blocks until stop signal
 func Start() error {
 	s, err := New()
@@ -108,23 +94,12 @@ func Start() error {
 		panic(err)
 	}
 
-	task, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
+	workOrder, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
 	if err != nil {
 		return err
 	}
 
-	task.Status = pb.WorkOrderStatusTranscoding.String()
-
-	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
-		StreamId: task.StreamId,
-		Status:   task.Status,
-	})
-
-	if err != nil {
-		s.log.Errorf("failed to update stream status: %s", err.Error())
-	}
-
-	return s.handleTranscodeTask(task)
+	return s.handleTranscodeTask(workOrder)
 
 }
 

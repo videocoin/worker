@@ -23,7 +23,7 @@ import (
 // SyncDir watches file system and processes chunks as they are written
 func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 	var jobChan = make(chan Job, 10)
-	go s.process(jobChan)
+	go s.process(jobChan, workOrder)
 
 	playlist, err := m3u8.NewMediaPlaylist(10000, 10000)
 	if err != nil {
@@ -179,10 +179,15 @@ func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate
 	return nil
 }
 
-func (s *Service) process(jobChan chan Job) {
+func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
+
+	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusTranscoding.String())
+
 	for len(jobChan) < 2 {
 		time.Sleep(1 * time.Second)
 	}
+
+	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusReady.String())
 
 	for {
 		select {
@@ -196,6 +201,17 @@ func (s *Service) process(jobChan chan Job) {
 				s.log.Errorf("failed to handle chunk: %s", err.Error())
 			}
 		}
+	}
+}
+
+func (s *Service) updateStatus(streamID int64, status string) {
+	_, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
+		StreamId: streamID,
+		Status:   status,
+	})
+
+	if err != nil {
+		s.log.Errorf("failed to update stream status: %s", err.Error())
 	}
 }
 
