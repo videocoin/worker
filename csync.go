@@ -68,7 +68,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 						Playlist:        playlist,
 						OutputID:        randomID,
 						InputID:         ChunkNum(chunk),
-						OutputChunkName: fmt.Sprintf("%d.ts"),
+						OutputChunkName: fmt.Sprintf("%d.ts", randomID),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
 					}
