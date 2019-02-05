@@ -94,6 +94,8 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 // DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) handleChunk(job *Job) error {
+	s.addNonce()
+
 	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
 	uploadPath := fmt.Sprintf("%d/%d", job.StreamID, job.Bitrate)
 
@@ -141,8 +143,11 @@ func (s *Service) handleChunk(job *Job) error {
 	localFile := fmt.Sprintf("%s/%d-%s/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
 	outputURL := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%s/%s", s.cfg.Bucket, job.StreamID, job.ChunksDir, job.OutputChunkName)
 
-	return s.VerifyChunk(job.StreamID, localFile, outputURL, job.Bitrate)
-
+	if err = s.VerifyChunk(job.StreamID, localFile, outputURL, job.Bitrate); err != nil {
+		s.log.Errorf("failed to verify chunk: %s", err.Error())
+		return err
+	}
+	return nil
 }
 
 // SubmitProof registers work (output chunk)

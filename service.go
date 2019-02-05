@@ -111,6 +111,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	for _, b := range bitrates {
+
 		fullDir := fmt.Sprintf("%s/%d", dir, b)
 		err := prepareDir(fullDir)
 		if err != nil {
@@ -118,9 +119,10 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		}
 
 		s.log.Infof("monitoring chunks in %s", fullDir)
-
+		s.addNonce()
 		go s.monitorChunks(fullDir, workOrder)
 		go s.SyncDir(workOrder, fullDir, b)
+
 	}
 
 	if err := s.GeneratePlaylist(workOrder.StreamId, m3u8); err != nil {
