@@ -190,7 +190,7 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 	for {
 		select {
 		case j := <-jobChan:
-
+			s.addNonce()
 			if err := s.chunkCreated(&j); err != nil {
 				s.log.Errorf("failed to report chunk created: %s", err.Error())
 			}
