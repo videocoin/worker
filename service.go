@@ -76,13 +76,13 @@ func New() (*Service, error) {
 	}
 
 	return &Service{
-		sm:       sm,
-		bcAuth:   bcAuth,
-		bcClient: client,
-		cfg:      cfg,
-		manager:  manager,
-		ctx:      ctx,
-		log:      logrus.WithField("name", "xcode"),
+		streamManager: sm,
+		bcAuth:        bcAuth,
+		bcClient:      client,
+		cfg:           cfg,
+		manager:       manager,
+		ctx:           ctx,
+		log:           logrus.WithField("name", "xcode"),
 	}, nil
 
 }

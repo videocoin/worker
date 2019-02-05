@@ -47,13 +47,13 @@ type (
 
 	// Service primary reciever for service
 	Service struct {
-		cfg      *Config
-		ctx      context.Context
-		manager  proto.ManagerServiceClient
-		sm       *streamManager.Manager
-		bcAuth   *bind.TransactOpts
-		bcClient *ethclient.Client
-		pkAddr   common.Address
-		log      *logrus.Entry
+		cfg           *Config
+		ctx           context.Context
+		manager       proto.ManagerServiceClient
+		streamManager *streamManager.Manager
+		bcAuth        *bind.TransactOpts
+		bcClient      *ethclient.Client
+		pkAddr        common.Address
+		log           *logrus.Entry
 	}
 )
