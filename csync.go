@@ -10,8 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"log"
-
 	pb "github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/go-videocoin/common"
@@ -88,7 +86,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 	err = watcher.Add(dir)
 	if err != nil {
-		log.Fatalf("water failure: %s", err.Error())
+		s.log.Fatalf("water failure: %s", err.Error())
 	}
 
 	<-done
@@ -196,7 +194,7 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 			if err := s.chunkCreated(&j); err != nil {
 				s.log.Errorf("failed to report chunk created: %s", err.Error())
 			}
-
+			s.addNonce()
 			if err := s.handleChunk(&j); err != nil {
 				s.log.Errorf("failed to handle chunk: %s", err.Error())
 			}

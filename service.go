@@ -82,7 +82,7 @@ func New() (*Service, error) {
 		cfg:      cfg,
 		manager:  manager,
 		ctx:      ctx,
-		log:      logrus.WithField("name", "transcoder"),
+		log:      logrus.WithField("name", "xcode"),
 	}, nil
 
 }
@@ -171,7 +171,7 @@ func (s *Service) transcode(args []string, streamurl string) {
 		s.log.Fatalf("failed to transcode: err : %s output: %s", err.Error(), string(out))
 	}
 
-	s.log.Info("transcode complete")
+	s.log.Infof("transcode complete")
 }
 
 func waitForStreamReady(streamurl string) {

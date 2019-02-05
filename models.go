@@ -4,14 +4,13 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/grafov/m3u8"
+	"github.com/sirupsen/logrus"
 )
 
 // Byte constants
