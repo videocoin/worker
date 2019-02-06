@@ -162,6 +162,8 @@ func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunk
 		return err
 	}
 
+	s.log.Infof("submitting proof: addr: %x\nbitrate: %d\ninput_id: %d\noutput_id: %d", address.Hex(), bitrate, inputChunkID, outputChunkID)
+
 	for i := 0; i < 100; i++ {
 		time.Sleep(50 * time.Millisecond)
 		_, err = streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
