@@ -1,7 +1,6 @@
 package transcode
 
 import (
-	"context"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -58,7 +57,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 					!strings.Contains(chunk, ".m3u8") {
 
 					randomID := RandomBigInt()
-					s.addNonce()
+
 					s.log.Infof("created file: %s generated name: %d", chunk, randomID)
 
 					jobChan <- Job{
@@ -163,8 +162,6 @@ func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunk
 		return err
 	}
 
-	s.addNonce()
-
 	for i := 0; i < 100; i++ {
 		time.Sleep(50 * time.Millisecond)
 		_, err = streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
@@ -172,7 +169,7 @@ func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunk
 			s.log.Info("success")
 			break
 		} else if err.Error() == errNonceTooLow {
-			s.forceNonce()
+			s.log.Errorf("nonce too low")
 			continue
 		} else if err != nil {
 			s.log.Errorf("error on submit proof %s", err.Error())
@@ -185,14 +182,13 @@ func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunk
 
 // VerifyChunk blahg
 func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate uint32) error {
-	form := url.Values{}
+	resp, err := http.PostForm(s.cfg.VerifierURL+"/api/v1/verify", url.Values{
+		"source_chunk_url": {src},
+		"result_chunk_url": {res},
+		"stream_id":        {fmt.Sprintf("%d", streamID)},
+		"bitrate":          {fmt.Sprintf("%d", bitrate)},
+	})
 
-	form.Add("source_chunk_url", url.QueryEscape(src))
-	form.Add("result_chunk_url", url.QueryEscape(res))
-	form.Add("stream_id", fmt.Sprintf("%d", streamID))
-	form.Add("bitrate", fmt.Sprintf("%d", bitrate))
-
-	resp, err := http.PostForm(s.cfg.VerifierURL+"/api/v1/verify", form)
 	if err != nil {
 		return err
 	}
@@ -217,11 +213,10 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 	for {
 		select {
 		case j := <-jobChan:
-			s.addNonce()
 			if err := s.chunkCreated(&j); err != nil {
 				s.log.Errorf("failed to report chunk created: %s", err.Error())
 			}
-			s.addNonce()
+
 			if err := s.handleChunk(&j); err != nil {
 				s.log.Errorf("failed to handle chunk: %s", err.Error())
 			}
@@ -249,25 +244,4 @@ func (s *Service) chunkCreated(j *Job) error {
 	})
 
 	return err
-}
-
-// AddNonce increment nonce by one, required for every blockcain interaction
-func (s *Service) addNonce() {
-	newNonce, err := s.bcClient.PendingNonceAt(context.Background(), s.pkAddr)
-	if err != nil {
-		s.log.Errorf("failed to increase nonce: %s", err.Error())
-		return
-	}
-
-	s.bcAuth.Nonce = big.NewInt(int64(newNonce))
-}
-
-func (s *Service) forceNonce() {
-	newNonce, err := s.bcClient.PendingNonceAt(context.Background(), s.pkAddr)
-	if err != nil {
-		s.log.Errorf("failed to get pending nonce: %s", err.Error())
-	}
-	s.log.Infof("forcing nonce update: current [ %d ] pending [ %d ]", s.bcAuth.Nonce, newNonce)
-
-	s.bcAuth.Nonce = s.bcAuth.Nonce.Add(s.bcAuth.Nonce, big.NewInt(1))
 }
