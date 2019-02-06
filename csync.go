@@ -147,7 +147,7 @@ func (s *Service) handleChunk(job *Job) error {
 	localFile := fmt.Sprintf("%s/%d-%s/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
 	outputURL := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
-	if err = s.VerifyChunk(job.StreamID, localFile, outputURL, job.Bitrate); err != nil {
+	if err = s.VerifyChunk(job.StreamID, localFile, outputURL, job.Bitrate, job.InputID, job.OutputID); err != nil {
 		s.log.Errorf("failed to verify chunk: %s", err.Error())
 		return err
 	}
@@ -181,12 +181,15 @@ func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunk
 }
 
 // VerifyChunk blahg
-func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate uint32) error {
+func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate uint32, inputID *big.Int, resultID *big.Int) error {
+	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", src, res, inputID, resultID, streamID, bitrate)
 	resp, err := http.PostForm(s.cfg.VerifierURL+"/api/v1/verify", url.Values{
 		"source_chunk_url": {src},
 		"result_chunk_url": {res},
 		"stream_id":        {fmt.Sprintf("%d", streamID)},
 		"bitrate":          {fmt.Sprintf("%d", bitrate)},
+		"input_id":         {fmt.Sprintf("%d", inputID)},
+		"result_id":        {fmt.Sprintf("%d", resultID)},
 	})
 
 	if err != nil {
