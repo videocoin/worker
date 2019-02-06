@@ -119,7 +119,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		}
 
 		s.log.Infof("monitoring chunks in %s", fullDir)
-		s.addNonce()
+
 		go s.monitorChunks(fullDir, workOrder)
 		go s.SyncDir(workOrder, fullDir, b)
 

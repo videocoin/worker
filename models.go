@@ -27,6 +27,8 @@ var (
 		4 * MB,
 		8 * MB,
 	}
+
+	errNonceTooLow = "nonce too low"
 )
 
 type (
