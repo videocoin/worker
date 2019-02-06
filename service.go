@@ -50,13 +50,16 @@ func New() (*Service, error) {
 	}
 
 	manager := pb.NewManagerServiceClient(managerConn)
-	fmt.Printf("%+v", manager)
 	status, err := manager.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
-		return nil, fmt.Errorf("failed to get healthy status: %v", err)
+		return nil, fmt.Errorf("failed to get healthy status from manager: %v", err)
 	}
 
 	verifier := pb.NewVerifierServiceClient(verifierConn)
+	status, err = verifier.Health(context.Background(), &empty.Empty{})
+	if status.GetStatus() != "healthy" || err != nil {
+		return nil, fmt.Errorf("failed to get healthy status from verifier: %v", err)
+	}
 
 	ctx := context.Background()
 
