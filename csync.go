@@ -1,11 +1,9 @@
 package transcode
 
 import (
+	"context"
 	"fmt"
-	"io/ioutil"
 	"math/big"
-	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -185,22 +183,19 @@ func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunk
 // VerifyChunk blahg
 func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate uint32, inputID *big.Int, resultID *big.Int) error {
 	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", src, res, inputID, resultID, streamID, bitrate)
-	resp, err := http.PostForm(s.cfg.VerifierURL+"/api/v1/verify", url.Values{
-		"source_chunk_url": {src},
-		"result_chunk_url": {res},
-		"stream_id":        {fmt.Sprintf("%d", streamID)},
-		"bitrate":          {fmt.Sprintf("%d", bitrate)},
-		"input_id":         {fmt.Sprintf("%d", inputID)},
-		"result_id":        {fmt.Sprintf("%d", resultID)},
+
+	_, err := s.verifier.Verify(context.Background(), &pb.VerifyRequest{
+		StreamId:       streamID.Int64(),
+		Bitrate:        bitrate,
+		InputId:        inputID.Int64(),
+		OutputId:       resultID.Int64(),
+		SourceChunkUrl: src,
+		ResultChunkUrl: res,
 	})
 
 	if err != nil {
-		return err
+		s.log.Errorf("failed to call verify: %s", err.Error())
 	}
-
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	s.log.Infof("verifier response: code [ %d ] msg [ %s ]", resp.StatusCode, string(body))
 
 	return nil
 }

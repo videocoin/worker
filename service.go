@@ -44,12 +44,19 @@ func New() (*Service, error) {
 		panic(err)
 	}
 
+	verifierConn, err := grpc.Dial(cfg.VerifierRPCADDR, opts...)
+	if err != nil {
+		panic(err)
+	}
+
 	manager := pb.NewManagerServiceClient(managerConn)
 	fmt.Printf("%+v", manager)
 	status, err := manager.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
 		return nil, fmt.Errorf("failed to get healthy status: %v", err)
 	}
+
+	verifier := pb.NewVerifierServiceClient(verifierConn)
 
 	ctx := context.Background()
 
@@ -81,6 +88,7 @@ func New() (*Service, error) {
 		bcClient:      client,
 		cfg:           cfg,
 		manager:       manager,
+		verifier:      verifier,
 		ctx:           ctx,
 		log:           logrus.WithField("name", "xcode"),
 	}, nil

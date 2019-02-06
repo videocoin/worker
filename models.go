@@ -52,6 +52,7 @@ type (
 		cfg           *Config
 		ctx           context.Context
 		manager       proto.ManagerServiceClient
+		verifier      proto.VerifierServiceClient
 		streamManager *streamManager.Manager
 		bcAuth        *bind.TransactOpts
 		bcClient      *ethclient.Client
