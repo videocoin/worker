@@ -18,7 +18,7 @@ type Config struct {
 	ManagerRPCADDR  string `required:"true" envconfig:"MANAGER_RPC_ADDR" default:"manager:50051"`
 	BlockchainURL   string `required:"true" envconfig:"BLOCKCHAIN_URL" default:"http://localhost:8545"`
 	SMCA            string `required:"true" envconfig:"SMCA" default:"0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721" description:"stream manager contract address"`
-	KeyFile         string `required:"true" envconfig:"KEY_FILE" default:"/opt/transcoder.key"`
+	KeyFile         string `required:"true" envconfig:"KEY_FILE" default:"keys/transcoder.key"`
 	Password        string `required:"true" envconfig:"PASSWORD" default:"transcoder"`
 }
 

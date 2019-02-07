@@ -7,7 +7,7 @@ RUN apt install ffmpeg imagemagick curl git -y
 
 WORKDIR /go/src/github.com/VideoCoin/transcoder
 
-ADD keys ./
+ADD keys keys
 ADD release/transcoder-linux-amd64 ./
 
 EXPOSE 50051 50052 50053 50054 50055
