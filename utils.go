@@ -49,7 +49,7 @@ func RandomBigInt() *big.Int {
 }
 
 // ChunkNum strip .ts from input chunk and return as bigInt
-func ChunkNum(chunkName string) *big.Int {
+func getChunkNum(chunkName string) *big.Int {
 	chunkNum, err := strconv.ParseInt(strings.TrimSuffix(chunkName, ".ts"), 10, 64)
 	if err != nil {
 		return nil

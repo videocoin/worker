@@ -59,7 +59,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 					!written[chunk] {
 
 					written[chunk] = true
-					chunkNum := ChunkNum(chunk)
+					chunkNum := getChunkNum(chunk)
 
 					_, err := s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), chunkNum)
 					if err != nil {
@@ -76,7 +76,7 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 						Bitrate:         bitrate,
 						Playlist:        playlist,
 						OutputID:        randomID,
-						InputID:         ChunkNum,
+						InputID:         chunkNum,
 						OutputChunkName: fmt.Sprintf("%d.ts", randomID),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
