@@ -1,6 +1,6 @@
 .NOTPARALLEL:
 .EXPORT_ALL_VARIABLES:
-.DEFAULT_GOAL := main
+.DEFAULT_GOAL := docker
 
 GOOS = linux
 GOARCH = amd64
