@@ -27,8 +27,6 @@ import (
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
 	cfg := LoadConfig()
 
 	// Generate unique connection name
@@ -55,8 +53,8 @@ func New() (*Service, error) {
 		return nil, fmt.Errorf("failed to get healthy status from manager: %v", err)
 	}
 
-	verifier := pb.NewVerifierServiceClient(verifierConn)
-	status, err = verifier.Health(context.Background(), &empty.Empty{})
+	v := pb.NewVerifierServiceClient(verifierConn)
+	status, err = v.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
 		return nil, fmt.Errorf("failed to get healthy status from verifier: %v", err)
 	}
@@ -91,7 +89,7 @@ func New() (*Service, error) {
 		bcClient:      client,
 		cfg:           cfg,
 		manager:       manager,
-		verifier:      verifier,
+		verifier:      v,
 		ctx:           ctx,
 		log:           logrus.WithField("name", "xcode"),
 	}, nil

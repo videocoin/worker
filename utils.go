@@ -77,11 +77,7 @@ func (s *Service) GeneratePlaylist(streamID int64, filename string) error {
 #EXT-X-VERSION:6
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
 %d/index.m3u8
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=3145728,RESOLUTION=842x480,CODECS="avc1.42e00a,mp4a.40.2"
-%d/index.m3u8
-#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=5242880,RESOLUTION=1280x720,CODECS="avc1.42e00a,mp4a.40.2"
-%d/index.m3u8
-`, bitrates[0], bitrates[1], bitrates[2]))
+`, bitrates[0]))
 
 	err := ioutil.WriteFile(filename, m3u8, 0755)
 	if err != nil {
