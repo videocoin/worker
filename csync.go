@@ -12,6 +12,7 @@ import (
 	pb "github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/go-videocoin/common"
+	"github.com/VideoCoin/go-videocoin/core/types"
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/grafov/m3u8"
@@ -40,6 +41,8 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 	walletHex := common.HexToAddress(workOrder.WalletAddress)
 
+	written := make(map[string]bool)
+
 	go func() {
 		for {
 			select {
@@ -52,7 +55,12 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 				if (event.Op&fsnotify.Create == fsnotify.Create) &&
 					!strings.Contains(chunk, "tmp") &&
-					!strings.Contains(chunk, ".m3u8") {
+					!strings.Contains(chunk, ".m3u8") &&
+					!written[chunk] {
+
+					written[chunk] = true
+
+					s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), ChunkNum(chunk))
 
 					randomID := RandomBigInt()
 
@@ -136,7 +144,7 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	err = s.SubmitProof(job.Wallet, job.Bitrate, job.InputID, job.OutputID)
+	tx, err := s.SubmitProof(job.Wallet, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
 		s.log.Errorf("failed to submit proof: %s", err.Error())
 		return err
@@ -145,7 +153,7 @@ func (s *Service) handleChunk(job *Job) error {
 	localFile := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
 	outputURL := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
-	if err = s.VerifyChunk(job.StreamID, localFile, outputURL, job.Bitrate, job.InputID, job.OutputID); err != nil {
+	if err = s.VerifyChunk(tx, job.StreamID, localFile, outputURL, job.Bitrate, job.InputID, job.OutputID); err != nil {
 		s.log.Errorf("failed to verify chunk: %s", err.Error())
 		return err
 	}
@@ -153,38 +161,30 @@ func (s *Service) handleChunk(job *Job) error {
 }
 
 // SubmitProof registers work (output chunk)
-func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) error {
+func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
 	streamInstance, err := stream.NewStream(address, s.bcClient)
 	if err != nil {
 		s.log.Errorf("failed to create stream instance: %s", err.Error())
-		return err
+		return nil, err
 	}
 
 	s.log.Infof("submitting proof: addr: %x\nbitrate: %d\ninput_id: %d\noutput_id: %d", address.Hex(), bitrate, inputChunkID, outputChunkID)
 
-	for i := 0; i < 100; i++ {
-		time.Sleep(50 * time.Millisecond)
-		_, err = streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
-		if err == nil {
-			s.log.Info("success")
-			break
-		} else if err.Error() == errNonceTooLow {
-			s.log.Errorf("nonce too low")
-			continue
-		} else if err != nil {
-			s.log.Errorf("error on submit proof %s", err.Error())
-			break
-		}
+	tx, err := streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
+	if err != nil {
+		s.log.Errorf("error on submit proof %s", err.Error())
+		return nil, err
 	}
 
-	return nil
+	return tx, nil
 }
 
 // VerifyChunk blahg
-func (s *Service) VerifyChunk(streamID *big.Int, src string, res string, bitrate uint32, inputID *big.Int, resultID *big.Int) error {
+func (s *Service) VerifyChunk(tx *types.Transaction, streamID *big.Int, src string, res string, bitrate uint32, inputID *big.Int, resultID *big.Int) error {
 	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", src, res, inputID, resultID, streamID, bitrate)
 
 	_, err := s.verifier.Verify(context.Background(), &pb.VerifyRequest{
+		TxHash:         tx.Hash().Hex(),
 		StreamId:       streamID.Int64(),
 		Bitrate:        bitrate,
 		InputId:        inputID.Int64(),
@@ -213,10 +213,6 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 	for {
 		select {
 		case j := <-jobChan:
-			if err := s.chunkCreated(&j); err != nil {
-				s.log.Errorf("failed to report chunk created: %s", err.Error())
-			}
-
 			if err := s.handleChunk(&j); err != nil {
 				s.log.Errorf("failed to handle chunk: %s", err.Error())
 			}
