@@ -1,22 +1,15 @@
-FROM golang:1.11.1-alpine AS builder
+FROM ubuntu:latest AS release
 
-RUN apk update && apk add --update build-base alpine-sdk musl-dev musl
+LABEL maintainer="Videocoin" description="transcoding client streams"
 
-WORKDIR /go/src/github.com/VideoCoin/transcode
+RUN apt update  && apt upgrade -y
+RUN apt install ffmpeg imagemagick curl git -y
 
-ADD . ./
+WORKDIR /go/src/github.com/VideoCoin/transcoder
 
+ADD keys ./
+ADD release/transcoder-linux-amd64 ./
 
-ENV GO111MODULE off
-RUN make build-alpine
+EXPOSE 50051 50052 50053 50054 50055
 
-
-
-FROM alpine:latest AS release
-
-RUN apk update
-
-COPY --from=builder /go/src/github.com/VideoCoin/transcode/bin/transcoder ./
-
-
-ENTRYPOINT './transcoder'
+ENTRYPOINT [ "./transcoder-linux-amd64" ]
