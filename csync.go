@@ -60,7 +60,10 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 					written[chunk] = true
 
-					s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), ChunkNum(chunk))
+					_, err := s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), ChunkNum(chunk))
+					if err != nil {
+						s.log.Errorf("failed to add input chunk: %s", err.Error())
+					}
 
 					randomID := RandomBigInt()
 
