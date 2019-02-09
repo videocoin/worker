@@ -2,8 +2,8 @@ FROM ubuntu:latest AS release
 
 LABEL maintainer="Videocoin" description="transcoding client streams"
 
-RUN apt update  && apt upgrade -y
-RUN apt install ffmpeg imagemagick curl git ca-certificates build-essential -y
+RUN apt update && apt upgrade -y
+RUN apt install ffmpeg build-essential ca-certificates -y
 
 WORKDIR /go/src/github.com/VideoCoin/transcoder
 

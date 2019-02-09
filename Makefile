@@ -43,7 +43,7 @@ build-alpine:
 
 docker:
 	@echo "==> Docker building..."
-	cd cmd && xgo --ldflags '-w -linkmode external -extldflags "-static"' --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
+	cd cmd && xgo -x --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
 	docker build -t $(IMAGE_TAG) -t $(LATEST) . --squash
 	docker push $(IMAGE_TAG)
 	docker push $(LATEST)
