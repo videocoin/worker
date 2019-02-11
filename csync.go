@@ -58,10 +58,18 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 					!strings.Contains(chunk, ".m3u8") &&
 					!written[chunk] {
 
+					balance, err := s.manager.CheckBalance(context.Background(), &pb.CheckBalanceRequest{ContractAddress: workOrder.ContractAddress})
+					if err != nil {
+						s.log.Warnf("failed to check balance, allowing work")
+					}
+					if balance.Balance <= 0 {
+						return
+					}
+
 					written[chunk] = true
 					chunkNum := getChunkNum(chunk)
 
-					_, err := s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), chunkNum)
+					_, err = s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), chunkNum)
 					if err != nil {
 						s.log.Errorf("failed to add input chunk: [ %d ] bitrate: [ %d ] err: [ %s ]", chunkNum, bitrate, err.Error())
 					}
