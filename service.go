@@ -138,11 +138,27 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		s.log.Fatalf("failed to generate playlist: %s", err.Error())
 	}
 
-	args := buildCmd(workOrder.InputUrl, dir)
+	cmd := buildCmd(workOrder.InputUrl, dir)
 
-	s.transcode(args, workOrder.InputUrl)
+	go s.monitorBalance(cmd, workOrder.ContractAddress)
+
+	s.transcode(cmd, workOrder.InputUrl)
 
 	return nil
+}
+
+func (s *Service) monitorBalance(cmd *exec.Cmd, addr string) {
+	for {
+		time.Sleep(10 * time.Second)
+		balance, err := s.manager.CheckBalance(context.Background(), &pb.CheckBalanceRequest{ContractAddress: addr})
+		if err != nil {
+			s.log.Warnf("failed to check balance, allowing work")
+		}
+
+		if balance.Balance <= 0 {
+			cmd.Process.Kill()
+		}
+	}
 }
 
 func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
@@ -174,10 +190,10 @@ func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
 
 }
 
-func (s *Service) transcode(args []string, streamurl string) {
+func (s *Service) transcode(cmd *exec.Cmd, streamurl string) {
 	waitForStreamReady(streamurl)
 	log.Println("starting transcode")
-	out, err := exec.Command("ffmpeg", args...).CombinedOutput()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
 		s.log.Fatalf("failed to transcode: err : %s output: %s", err.Error(), string(out))
 	}
@@ -201,14 +217,16 @@ func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
 
-func buildCmd(inputURL string, dir string) []string {
-	cmd := []string{"-re", "-i", inputURL}
+func buildCmd(inputURL string, dir string) *exec.Cmd {
+	process := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
 		args := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -b:v %d -strict -2 -c:v h264 -profile:v main -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/%d/index.m3u8 %s/%d/%%d.ts", b, dir, b, dir, b)
-		cmd = append(cmd, strings.Split(args, " ")...)
+		process = append(process, strings.Split(args, " ")...)
 
 	}
+
+	cmd := exec.Command("ffmpeg", process...)
 
 	return cmd
 
