@@ -42,9 +42,11 @@ func (s *Service) Upload(output string, r io.Reader) error {
 
 // RandomBigInt Generates a random big integer with max 64 bits so we can store as int64
 func RandomBigInt() *big.Int {
-	max := new(big.Int)
-	max.Exp(big.NewInt(2), big.NewInt(64), nil).Sub(max, big.NewInt(1))
-	n, _ := rand.Int(rand.Reader, max)
+	b := make([]byte, 8)
+	rand.Read(b)
+	n := big.NewInt(0)
+	n = n.SetBytes(b)
+
 	return n
 }
 
