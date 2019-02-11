@@ -16,7 +16,7 @@ LATEST=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):latest
 VERSION=$$(git rev-parse --short HEAD)
 
 
-main: publish
+main: docker
 
 
 test:

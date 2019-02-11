@@ -91,6 +91,7 @@ func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, b
 				if err != nil {
 					s.log.Errorf("event watcher error: %s", err.Error())
 				}
+
 			case abort := <-stop:
 				if abort {
 					watcher.Close()
