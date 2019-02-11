@@ -19,7 +19,7 @@ import (
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
+func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
 
@@ -90,6 +90,11 @@ func (s *Service) SyncDir(workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 				}
 				if err != nil {
 					s.log.Errorf("event watcher error: %s", err.Error())
+				}
+			case abort := <-stop:
+				if abort {
+					watcher.Close()
+					watcher.Remove(dir)
 				}
 			}
 		}

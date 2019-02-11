@@ -118,7 +118,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
 	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
-
+	var stopChan = make(chan bool)
 	for _, b := range bitrates {
 
 		fullDir := fmt.Sprintf("%s/%d", dir, b)
@@ -130,7 +130,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		s.log.Infof("monitoring chunks in %s", fullDir)
 
 		go s.monitorChunks(fullDir, workOrder)
-		go s.SyncDir(workOrder, fullDir, b)
+		go s.SyncDir(stopChan, workOrder, fullDir, b)
 
 	}
 
@@ -140,14 +140,14 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
 	cmd := buildCmd(workOrder.InputUrl, dir)
 
-	go s.monitorBalance(cmd, workOrder.ContractAddress)
+	go s.monitorBalance(cmd, stopChan, workOrder.ContractAddress)
 
 	s.transcode(cmd, workOrder.InputUrl)
 
 	return nil
 }
 
-func (s *Service) monitorBalance(cmd *exec.Cmd, addr string) {
+func (s *Service) monitorBalance(cmd *exec.Cmd, stop chan bool, addr string) {
 	for {
 		time.Sleep(10 * time.Second)
 		balance, err := s.manager.CheckBalance(context.Background(), &pb.CheckBalanceRequest{ContractAddress: addr})
@@ -157,6 +157,7 @@ func (s *Service) monitorBalance(cmd *exec.Cmd, addr string) {
 
 		if balance.Balance <= 0 {
 			cmd.Process.Kill()
+			stop <- true
 		}
 	}
 }
