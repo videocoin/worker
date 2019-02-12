@@ -25,8 +25,6 @@ var (
 	bitrates = []uint32{
 		8 * MB,
 	}
-
-	errNonceTooLow = "nonce too low"
 )
 
 type (
