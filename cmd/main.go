@@ -11,7 +11,7 @@ func main() {
 
 	for {
 		if err := transcode.Start(); err != nil {
-			log.Printf("failed to start, retrying...: %s", err.Error())
+			log.Printf("no jobs found")
 		}
 		time.Sleep(1 * time.Minute)
 	}
