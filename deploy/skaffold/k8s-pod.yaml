@@ -1,0 +1,92 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2019-02-12T00:58:38Z"
+  generation: 1
+  labels:
+    app: xcode
+    chart: xcode-0.0.1
+    heritage: Tiller
+  name: xcode
+  namespace: default
+  resourceVersion: "30181"
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/xcode
+  uid: 554a030c-2e61-11e9-9dae-42010a8a0fcf
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: xcode
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: xcode
+      name: xcode
+    spec:
+      containers:
+      - env:
+        - name: BASE_STREAM_URL
+          value: http://ingest.videocoin.io:8080/hls
+        - name: VERIFIER_URL
+          value: http://verify.videocoin.io:8100
+        - name: VERIFIER_RPC_ADDR
+          value: verify.videocoin.io:50055
+        - name: BASE_STORAGE_URL
+          value: https://storage.googleapis.com/vc-test-fuse
+        - name: FUSE_BUCKET
+          value: vc-test-fuse
+        - name: OUTPUT_DIR
+          value: /opt/mnt/
+        - name: MANAGER_RPC_ADDR
+          value: api.videocoin.io:50051
+        - name: BLOCKCHAIN_URL
+          value: http://admin:LivePlanetS3cr3t@35.247.112.164
+        - name: SMCA
+          value: 0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721
+        - name: KEY_FILE
+          value: keys/transcoder.key
+        - name: PASSWORD
+          value: transcoder
+        image: us.gcr.io/videocoin-183500/transcoder:latest
+        imagePullPolicy: Always
+        name: xcoders
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2019-02-12T00:58:38Z"
+    lastUpdateTime: "2019-02-12T00:58:38Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2019-02-12T00:58:38Z"
+    lastUpdateTime: "2019-02-12T00:58:40Z"
+    message: ReplicaSet "xcode-d668ccd4c" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
