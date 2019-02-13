@@ -222,7 +222,7 @@ func buildCmd(inputURL string, dir string) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
-		args := fmt.Sprintf("-hls_allow_cache 0 -hls_flags append_list -f ssegment -b:v %d -strict -2 -c:v h264 -profile:v main -segment_list_flags live -segment_time 10 -segment_format mpegts -an -segment_list %s/%d/index.m3u8 %s/%d/%%d.ts", b, dir, b, dir, b)
+		args := fmt.Sprintf("-live_start_index 0 -codec copy -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", dir, b, dir, b)
 		process = append(process, strings.Split(args, " ")...)
 
 	}
@@ -230,5 +230,4 @@ func buildCmd(inputURL string, dir string) *exec.Cmd {
 	cmd := exec.Command("ffmpeg", process...)
 
 	return cmd
-
 }

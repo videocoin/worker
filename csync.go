@@ -221,6 +221,9 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusReady.String())
 
 	for {
+		for len(jobChan) < 2 {
+			time.Sleep(1 * time.Second)
+		}
 		select {
 		case j := <-jobChan:
 			if err := s.handleChunk(&j); err != nil {

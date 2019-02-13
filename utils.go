@@ -64,11 +64,11 @@ func (s *Service) Duration(input string) (float64, error) {
 	s.log.Infof("using input %s", input)
 	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
 	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
-	if err != nil {
-		return 0.0, err
-	}
-
 	cleanOut := strings.TrimSpace(string(stdout))
+	if err != nil {
+		s.log.Warnf("failed to get duraton: %s", cleanOut)
+		return 10.00, nil
+	}
 
 	return strconv.ParseFloat(cleanOut, 64)
 }

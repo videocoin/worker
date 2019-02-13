@@ -28,8 +28,6 @@ var (
 )
 
 type (
-	// CSync struct for handling sync logic
-
 	// Job used to queue up chunk work
 	Job struct {
 		Bitrate         uint32
