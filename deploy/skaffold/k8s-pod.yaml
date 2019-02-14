@@ -15,20 +15,16 @@ metadata:
   selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/xcode
   uid: 554a030c-2e61-11e9-9dae-42010a8a0fcf
 spec:
-  progressDeadlineSeconds: 600
-  replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: xcode
   strategy:
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+      maxSurge: 2
+      maxUnavailable: 0
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: xcode
       name: xcode
