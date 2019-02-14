@@ -33,14 +33,16 @@ spec:
         app: xcode
       name: xcode
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: transcoder-pool
       containers:
       - env:
         - name: BASE_STREAM_URL
-          value: http://ingest.videocoin.io:8080/hls
+          value: http://ingester:8080/hls
         - name: VERIFIER_URL
-          value: http://verify.videocoin.io:8100
+          value: http://verifier:8100
         - name: VERIFIER_RPC_ADDR
-          value: verify.videocoin.io:50055
+          value: verifier:50055
         - name: BASE_STORAGE_URL
           value: https://storage.googleapis.com/vc-test-fuse
         - name: FUSE_BUCKET
@@ -48,11 +50,11 @@ spec:
         - name: OUTPUT_DIR
           value: /opt/mnt/
         - name: MANAGER_RPC_ADDR
-          value: api.videocoin.io:50051
+          value: manager:50051
         - name: BLOCKCHAIN_URL
           value: http://admin:LivePlanetS3cr3t@35.247.112.164
         - name: SMCA
-          value: 0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721
+          value: '0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721'
         - name: KEY_FILE
           value: keys/transcoder.key
         - name: PASSWORD
@@ -64,29 +66,3 @@ spec:
         - containerPort: 80
           protocol: TCP
         resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2019-02-12T00:58:38Z"
-    lastUpdateTime: "2019-02-12T00:58:38Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2019-02-12T00:58:38Z"
-    lastUpdateTime: "2019-02-12T00:58:40Z"
-    message: ReplicaSet "xcode-d668ccd4c" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 1
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
