@@ -3,7 +3,7 @@ FROM debian:jessie-slim AS release
 LABEL maintainer="Videocoin" description="transcoding client streams"
 
 RUN apt update && apt upgrade -y
-RUN apt install ca-certificates wget build-essential -y
+RUN apt install ca-certificates wget tar bzip2 xz-utils -y
 
 WORKDIR /opt/
 
@@ -16,7 +16,6 @@ RUN rm -rf ffmpeg*
 
 ADD keys keys
 ADD release/transcoder-linux-amd64 ./
-
 
 EXPOSE 50051 50052 50053 50054 50055
 
