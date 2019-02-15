@@ -195,10 +195,10 @@ func (s *Service) VerifyChunk(tx *types.Transaction, streamID *big.Int, src stri
 
 	_, err := s.verifier.Verify(context.Background(), &pb.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
-		StreamId:       streamID.Int64(),
+		StreamId:       streamID.Uint64(),
 		Bitrate:        bitrate,
-		InputId:        inputID.Int64(),
-		OutputId:       resultID.Int64(),
+		InputId:        inputID.Uint64(),
+		OutputId:       resultID.Uint64(),
 		SourceChunkUrl: src,
 		ResultChunkUrl: res,
 	})

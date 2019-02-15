@@ -155,6 +155,8 @@ func (s *Service) monitorBalance(cmd *exec.Cmd, stop chan bool, addr string) {
 			s.log.Warnf("failed to check balance, allowing work")
 		}
 
+		s.log.Infof("current balance at address %s is %d", addr, balance.Balance)
+
 		if balance.Balance <= 0 {
 			cmd.Process.Kill()
 			stop <- true

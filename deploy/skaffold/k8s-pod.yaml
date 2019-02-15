@@ -34,9 +34,9 @@ spec:
       containers:
       - env:
         - name: BASE_STREAM_URL
-          value: http://ingester:8080/hls
+          value: http://ingest.videocoin.io:8080/hls
         - name: VERIFIER_URL
-          value: http://verifier:8100
+          value: http://verify.videocoin.io:8100
         - name: VERIFIER_RPC_ADDR
           value: verifier:50055
         - name: BASE_STORAGE_URL
