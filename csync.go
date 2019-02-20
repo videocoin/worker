@@ -53,7 +53,7 @@ func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, b
 
 				chunk := path.Base(event.Name)
 
-				if (event.Op&fsnotify.Create == fsnotify.Create) &&
+				if event.Op&fsnotify.Create == fsnotify.Create &&
 					!strings.Contains(chunk, "tmp") &&
 					!strings.Contains(chunk, ".m3u8") &&
 					!written[chunk] {
@@ -68,8 +68,7 @@ func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, b
 
 					randomID := RandomBigInt()
 
-					s.log.Infof("created file: %s generated name: %d", chunk, randomID)
-
+					// Add job to the job channel to be worked on later
 					jobChan <- Job{
 						ChunksDir:       dir,
 						InputChunkName:  chunk,
@@ -109,16 +108,14 @@ func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, b
 	<-done
 }
 
-// DoTheDamnThing Appends to playlist, generates chunk id, calls verifier, uploads result
+// handleChunk Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) handleChunk(job *Job) error {
-
 	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
 	uploadPath := fmt.Sprintf("%d/%d", job.StreamID, job.Bitrate)
 
 	if job.InputChunkName == "0.ts" {
 		duration, err := s.Duration(chunkLoc)
 		if err != nil {
-			s.log.Warnf("failed to get chunk duration: %s", err.Error())
 			duration = 10.0
 		}
 
@@ -127,36 +124,30 @@ func (s *Service) handleChunk(job *Job) error {
 
 	duration, err := s.Duration(chunkLoc)
 	if err != nil {
-		s.log.Errorf("failed to get chunk duration: %s", err.Error())
 		return err
 	}
 
 	if err = job.Playlist.Append(job.OutputChunkName, duration, ""); err != nil {
-		s.log.Errorf("failed to append to playlist: %s", err.Error())
 		return err
 	}
 
 	chunk, err := os.Open(chunkLoc)
 	if err != nil {
-		s.log.Errorf("failed to open chunk: %s", err.Error())
 		return err
 	}
 
 	// Upload chunk
 	if err = s.Upload(path.Join(uploadPath, job.OutputChunkName), chunk); err != nil {
-		s.log.Errorf("failed to upload chunk: %s", err.Error())
 		return err
 	}
 
 	// Upload playlist
 	if err = s.Upload(path.Join(uploadPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
-		s.log.Errorf("failed to upload playlist: %s", err.Error())
 		return err
 	}
 
-	tx, err := s.SubmitProof(job.Wallet, job.Bitrate, job.InputID, job.OutputID)
+	tx, err := s.submitProof(job.Wallet, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
-		s.log.Errorf("failed to submit proof: %s", err.Error())
 		return err
 	}
 
@@ -164,25 +155,20 @@ func (s *Service) handleChunk(job *Job) error {
 	outputURL := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
 	if err = s.VerifyChunk(tx, job.StreamID, localFile, outputURL, job.Bitrate, job.InputID, job.OutputID); err != nil {
-		s.log.Errorf("failed to verify chunk: %s", err.Error())
 		return err
 	}
 	return nil
 }
 
 // SubmitProof registers work (output chunk)
-func (s *Service) SubmitProof(address common.Address, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
+func (s *Service) submitProof(address common.Address, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
 	streamInstance, err := stream.NewStream(address, s.bcClient)
 	if err != nil {
-		s.log.Errorf("failed to create stream instance: %s", err.Error())
 		return nil, err
 	}
 
-	s.log.Infof("submitting proof: addr: %x\nbitrate: %d\ninput_id: %d\noutput_id: %d", address.Hex(), bitrate, inputChunkID, outputChunkID)
-
 	tx, err := streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
 	if err != nil {
-		s.log.Errorf("error on submit proof %s", err.Error())
 		return nil, err
 	}
 
@@ -203,15 +189,10 @@ func (s *Service) VerifyChunk(tx *types.Transaction, streamID *big.Int, src stri
 		ResultChunkUrl: res,
 	})
 
-	if err != nil {
-		s.log.Errorf("failed to call verify: %s", err.Error())
-	}
-
-	return nil
+	return err
 }
 
 func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
-
 	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusTranscoding.String())
 
 	for len(jobChan) < 2 {
