@@ -108,8 +108,12 @@ func Start() error {
 		return err
 	}
 
-	return s.handleTranscodeTask(workOrder)
+	if err = s.handleTranscodeTask(workOrder); err != nil {
+		s.log.Errorf("failed to handle transcode task: %s", err.Error())
+		return err
+	}
 
+	return nil
 }
 
 func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
@@ -118,16 +122,16 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 
 	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
+
 	var stopChan = make(chan bool)
 	for _, b := range bitrates {
 
 		fullDir := fmt.Sprintf("%s/%d", dir, b)
 		err := prepareDir(fullDir)
-		if err != nil {
-			s.log.Errorf("failed to prepare directory [ %s ]: %s", fullDir, err.Error())
-		}
 
-		s.log.Infof("monitoring chunks in %s", fullDir)
+		if err != nil {
+			return err
+		}
 
 		go s.monitorChunks(fullDir, workOrder)
 		go s.SyncDir(stopChan, workOrder, fullDir, b)
@@ -135,7 +139,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 	}
 
 	if err := s.GeneratePlaylist(workOrder.StreamId, m3u8); err != nil {
-		s.log.Fatalf("failed to generate playlist: %s", err.Error())
+		return err
 	}
 
 	cmd := buildCmd(workOrder.InputUrl, dir)
