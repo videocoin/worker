@@ -76,7 +76,7 @@ func (s *Service) Duration(input string) (float64, error) {
 // GeneratePlaylist based on static bitrates
 func (s *Service) GeneratePlaylist(streamID int64, filename string) error {
 	m3u8 := []byte(fmt.Sprintf(`#EXTM3U
-#EXT-X-VERSION:6
+#EXT-X-VERSION:4
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
 %d/index.m3u8
 `, bitrates[0]))
