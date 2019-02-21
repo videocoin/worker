@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -13,8 +12,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-
-	"log"
 
 	bc "github.com/VideoCoin/common/bcops"
 	pb "github.com/VideoCoin/common/proto"
@@ -132,8 +129,6 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		if err != nil {
 			return err
 		}
-
-		go s.monitorChunks(fullDir, workOrder)
 		go s.SyncDir(stopChan, workOrder, fullDir, b)
 
 	}
@@ -168,38 +163,9 @@ func (s *Service) monitorBalance(cmd *exec.Cmd, stop chan bool, addr string) {
 	}
 }
 
-func (s *Service) monitorChunks(dir string, task *pb.WorkOrder) {
-	for {
-		time.Sleep(2 * time.Second)
-		files, err := ioutil.ReadDir(dir)
-		if err != nil {
-			log.Printf("failed to read dir: %s", err.Error())
-		}
-
-		if len(files) < 2 {
-			continue
-		}
-
-		break
-	}
-
-	task.Status = pb.WorkOrderStatusReady.String()
-	update := &pb.UpdateStreamStatusRequest{
-		StreamId: task.StreamId,
-		Status:   task.Status,
-	}
-	_, err := s.manager.UpdateStreamStatus(s.ctx, update)
-
-	if err != nil {
-		s.log.Errorf("failed to update stream status: %s", err.Error())
-	}
-	fmt.Println(task.Status, task.StreamId)
-
-}
-
 func (s *Service) transcode(cmd *exec.Cmd, streamurl string) {
-	waitForStreamReady(streamurl)
-	log.Println("starting transcode")
+	s.waitForStreamReady(streamurl)
+	s.log.Info("starting transcode")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		s.log.Fatalf("failed to transcode: err : %s output: %s", err.Error(), string(out))
@@ -208,14 +174,14 @@ func (s *Service) transcode(cmd *exec.Cmd, streamurl string) {
 	s.log.Infof("transcode complete")
 }
 
-func waitForStreamReady(streamurl string) {
+func (s *Service) waitForStreamReady(streamurl string) {
 	maxretry := 10
 	for i := 0; i < maxretry; i++ {
 		resp, _ := http.Head(streamurl)
 		if resp.StatusCode == 200 {
 			return
 		}
-		log.Printf("waiting for stream %s to become ready...", streamurl)
+		s.log.Infof("waiting for stream %s to become ready...", streamurl)
 		time.Sleep(30 * time.Second)
 	}
 }
