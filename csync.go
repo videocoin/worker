@@ -23,7 +23,7 @@ func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, b
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
 
-	playlist, err := m3u8.NewMediaPlaylist(10000, 10000)
+	playlist, err := m3u8.NewMediaPlaylist(100, 200)
 	if err != nil {
 		s.log.Errorf("failed to generate new media playlist: %s", err.Error())
 		return
@@ -124,6 +124,7 @@ func (s *Service) handleChunk(job *Job) error {
 
 	duration, err := s.Duration(chunkLoc)
 	if err != nil {
+		s.log.Warnf("failed to get duration: %s location: %s", err.Error(), chunkLoc)
 		return err
 	}
 
