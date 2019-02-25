@@ -66,7 +66,7 @@ func (s *Service) Duration(input string) (float64, error) {
 	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
 	cleanOut := strings.TrimSpace(string(stdout))
 	if err != nil {
-		s.log.Warnf("failed to get duraton: %s", cleanOut)
+		s.log.Warnf("failed to get duraton: %s from: %s", cleanOut, input)
 		return 10.00, nil
 	}
 

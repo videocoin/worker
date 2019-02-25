@@ -34,7 +34,9 @@ spec:
       containers:
         - env:
             - name: TERM
-              value: xterm-256color
+              value: xterm-color
+            - name: CLICOLOR
+              value: "1"
             - name: BASE_STREAM_URL
               value: http://ingest.videocoin.io:8080/hls
             - name: VERIFIER_URL

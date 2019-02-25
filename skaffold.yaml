@@ -1,4 +1,4 @@
-apiVersion: skaffold/v1beta4
+apiVersion: skaffold/v1beta5
 kind: Config
 deploy:
   # helm:
@@ -10,15 +10,14 @@ deploy:
 
   kubectl:
     manifests:
-    - deploy/skaffold/k8s-*
+      - deploy/skaffold/k8s-*
 build:
-    artifacts:
+  artifacts:
     - image: us.gcr.io/videocoin-183500/transcoder
-    tagPolicy:
-      gitCommit: {}
-    # Use local Docker daemon to build artifacts
-    local:
-        push: true
-        useDockerCLI: false
-        useBuildkit: false
-  
+  tagPolicy:
+    gitCommit: {}
+  # Use local Docker daemon to build artifacts
+  local:
+    push: true
+    useDockerCLI: true
+    useBuildkit: true
