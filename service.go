@@ -15,6 +15,7 @@ import (
 
 	bc "github.com/VideoCoin/common/bcops"
 	pb "github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
@@ -110,6 +111,13 @@ func Start() error {
 		return err
 	}
 
+	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.WalletAddress), s.bcClient)
+	if err != nil {
+		return err
+	}
+
+	s.streamInstance = streamInstance
+
 	if err = s.handleTranscodeTask(workOrder, profile); err != nil {
 		s.log.Errorf("failed to handle transcode task: %s", err.Error())
 		return err
@@ -146,7 +154,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 
 	go s.monitorBalance(cmd, stopChan, workOrder.ContractAddress)
 
-	s.transcode(cmd, workOrder.InputUrl)
+	s.transcode(cmd, stopChan, workOrder.InputUrl)
 
 	return nil
 }
@@ -168,15 +176,20 @@ func (s *Service) monitorBalance(cmd *exec.Cmd, stop chan bool, addr string) {
 	}
 }
 
-func (s *Service) transcode(cmd *exec.Cmd, streamurl string) {
+func (s *Service) transcode(cmd *exec.Cmd, stop chan bool, streamurl string) {
 	s.waitForStreamReady(streamurl)
 	s.log.Info("starting transcode")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		s.log.Fatalf("failed to transcode: err : %s output: %s", err.Error(), string(out))
+		s.log.Errorf("failed to transcode: err : %s output: %s", err.Error(), string(out))
 	}
 
-	s.log.Infof("transcode complete")
+	stop <- true
+	if err := s.refund(); err != nil {
+		s.log.Errorf("failed to refund:%s", err.Error())
+	}
+
+	s.log.Info("transcode complete")
 }
 
 func (s *Service) waitForStreamReady(streamurl string) {
@@ -207,4 +220,12 @@ func buildCmd(inputURL string, dir string, profile *pb.Profile) *exec.Cmd {
 	cmd := exec.Command("ffmpeg", process...)
 
 	return cmd
+}
+
+func (s *Service) refund() error {
+	_, err := s.streamInstance.Refund(s.bcAuth)
+	if err != nil {
+		return err
+	}
+	return nil
 }

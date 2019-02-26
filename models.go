@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
@@ -43,14 +44,15 @@ type (
 
 	// Service primary reciever for service
 	Service struct {
-		cfg           *Config
-		ctx           context.Context
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
-		streamManager *streamManager.Manager
-		bcAuth        *bind.TransactOpts
-		bcClient      *ethclient.Client
-		pkAddr        common.Address
-		log           *logrus.Entry
+		cfg            *Config
+		ctx            context.Context
+		manager        proto.ManagerServiceClient
+		verifier       proto.VerifierServiceClient
+		streamManager  *streamManager.Manager
+		streamInstance *stream.Stream
+		bcAuth         *bind.TransactOpts
+		bcClient       *ethclient.Client
+		pkAddr         common.Address
+		log            *logrus.Entry
 	}
 )
