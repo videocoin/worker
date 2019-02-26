@@ -25,6 +25,9 @@ import (
 
 // New initialize and return a new Service object
 func New() (*Service, error) {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	log := logrus.WithField("service", "transcode")
+
 	cfg := LoadConfig()
 
 	// Generate unique connection name
@@ -37,12 +40,12 @@ func New() (*Service, error) {
 
 	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR, opts...)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to dial manager: %s", err.Error())
 	}
 
 	verifierConn, err := grpc.Dial(cfg.VerifierRPCADDR, opts...)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to dial verifier: %s", err.Error())
 	}
 
 	manager := pb.NewManagerServiceClient(managerConn)
@@ -61,24 +64,24 @@ func New() (*Service, error) {
 
 	client, err := ethclient.Dial(cfg.BlockchainURL)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to dial blockchain: %s", err.Error())
 	}
 
 	managerAddress := common.HexToAddress(cfg.SMCA)
 
 	sm, err := streamManager.NewManager(managerAddress, client)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to make new stream manager: %s", err.Error())
 	}
 
 	key, err := bc.LoadBcPrivKeys(cfg.KeyFile, cfg.Password)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to load private keys: %s", err.Error())
 	}
 
 	bcAuth, err := bc.GetBCAuth(client, key)
 	if err != nil {
-		panic(err)
+		log.Fatalf("failed to get blockchain auth: %s", err.Error())
 	}
 
 	return &Service{
@@ -89,7 +92,7 @@ func New() (*Service, error) {
 		manager:       manager,
 		verifier:      v,
 		ctx:           ctx,
-		log:           logrus.WithField("name", "xcode"),
+		log:           log,
 	}, nil
 
 }
@@ -212,7 +215,7 @@ func buildCmd(inputURL string, dir string, profile *pb.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
-		args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -r %f -codec copy -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, profile.Fps, dir, b, dir, b)
+		args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -r %f -c:v libx264 -c:a aac -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, profile.Fps, dir, b, dir, b)
 		process = append(process, strings.Split(args, " ")...)
 
 	}
