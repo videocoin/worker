@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"time"
 
 	"github.com/VideoCoin/transcode"
@@ -10,9 +9,7 @@ import (
 func main() {
 
 	for {
-		if err := transcode.Start(); err != nil {
-			log.Printf("no jobs found..")
-		}
+		transcode.Start()
 		time.Sleep(1 * time.Minute)
 	}
 

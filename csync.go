@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"time"
@@ -18,7 +19,8 @@ import (
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
+func (s *Service) SyncDir(stop chan bool, cmd *exec.Cmd, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
+
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
 
@@ -78,6 +80,9 @@ func (s *Service) SyncDir(stop chan bool, workOrder *pb.WorkOrder, dir string, b
 						OutputChunkName: fmt.Sprintf("%d.ts", randomID),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
+						ContractAddr:    workOrder.ContractAddress,
+						cmd:             cmd,
+						stopChan:        stop,
 					}
 
 				}
@@ -154,7 +159,7 @@ func (s *Service) handleChunk(job *Job) error {
 	localFile := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
 	outputURL := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
-	if err = s.VerifyChunk(tx, job.StreamID, localFile, outputURL, job.Bitrate, job.InputID, job.OutputID); err != nil {
+	if err = s.VerifyChunk(tx, job, localFile, outputURL); err != nil {
 		return err
 	}
 	return nil
@@ -171,18 +176,38 @@ func (s *Service) submitProof(bitrate uint32, inputChunkID *big.Int, outputChunk
 }
 
 // VerifyChunk blahg
-func (s *Service) VerifyChunk(tx *types.Transaction, streamID *big.Int, src string, res string, bitrate uint32, inputID *big.Int, resultID *big.Int) error {
-	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", src, res, inputID, resultID, streamID, bitrate)
+func (s *Service) VerifyChunk(
+
+	tx *types.Transaction,
+	job *Job,
+	localFile string,
+	outputURL string,
+
+) error {
+
+	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", localFile, outputURL, job.InputID, job.OutputID, job.StreamID, job.Bitrate)
 
 	_, err := s.verifier.Verify(context.Background(), &pb.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
-		StreamId:       streamID.Uint64(),
-		Bitrate:        bitrate,
-		InputId:        inputID.Uint64(),
-		OutputId:       resultID.Uint64(),
-		SourceChunkUrl: src,
-		ResultChunkUrl: res,
+		StreamId:       job.StreamID.Uint64(),
+		Bitrate:        job.Bitrate,
+		InputId:        job.InputID.Uint64(),
+		OutputId:       job.OutputID.Uint64(),
+		SourceChunkUrl: localFile,
+		ResultChunkUrl: outputURL,
 	})
+
+	balance, err := s.manager.CheckBalance(context.Background(), &pb.CheckBalanceRequest{ContractAddress: job.ContractAddr})
+	if err != nil {
+		s.log.Warnf("failed to check balance, allowing work")
+	}
+
+	s.log.Infof("current balance at address %s is %d", job.ContractAddr, balance.Balance)
+
+	if balance.Balance <= 0 {
+		job.cmd.Process.Kill()
+		job.stopChan <- true
+	}
 
 	return err
 }

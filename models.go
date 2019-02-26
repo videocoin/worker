@@ -3,6 +3,7 @@ package transcode
 import (
 	"context"
 	"math/big"
+	"os/exec"
 
 	"github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/stream"
@@ -35,11 +36,14 @@ type (
 		InputChunkName  string
 		OutputChunkName string
 		ChunksDir       string
+		ContractAddr    string
 		StreamID        *big.Int
 		InputID         *big.Int
 		OutputID        *big.Int
 		Playlist        *m3u8.MediaPlaylist
 		Wallet          common.Address
+		cmd             *exec.Cmd
+		stopChan        chan bool
 	}
 
 	// Service primary reciever for service

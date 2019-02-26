@@ -114,7 +114,7 @@ func Start() error {
 		return err
 	}
 
-	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.WalletAddress), s.bcClient)
+	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.ContractAddress), s.bcClient)
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,9 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
 
+	cmd := buildCmd(workOrder.InputUrl, dir, profile)
 	var stopChan = make(chan bool)
+
 	for _, b := range bitrates {
 
 		fullDir := fmt.Sprintf("%s/%d", dir, b)
@@ -145,7 +147,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 		if err != nil {
 			return err
 		}
-		go s.SyncDir(stopChan, workOrder, fullDir, b)
+		go s.SyncDir(stopChan, cmd, workOrder, fullDir, b)
 
 	}
 
@@ -153,30 +155,9 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 		return err
 	}
 
-	cmd := buildCmd(workOrder.InputUrl, dir, profile)
-
-	go s.monitorBalance(cmd, stopChan, workOrder.ContractAddress)
-
 	s.transcode(cmd, stopChan, workOrder.InputUrl)
 
 	return nil
-}
-
-func (s *Service) monitorBalance(cmd *exec.Cmd, stop chan bool, addr string) {
-	for {
-		time.Sleep(10 * time.Second)
-		balance, err := s.manager.CheckBalance(context.Background(), &pb.CheckBalanceRequest{ContractAddress: addr})
-		if err != nil {
-			s.log.Warnf("failed to check balance, allowing work")
-		}
-
-		s.log.Infof("current balance at address %s is %d", addr, balance.Balance)
-
-		if balance.Balance <= 0 {
-			cmd.Process.Kill()
-			stop <- true
-		}
-	}
 }
 
 func (s *Service) transcode(cmd *exec.Cmd, stop chan bool, streamurl string) {
@@ -188,6 +169,7 @@ func (s *Service) transcode(cmd *exec.Cmd, stop chan bool, streamurl string) {
 	}
 
 	stop <- true
+	s.log.Info("calling refund")
 	if err := s.refund(); err != nil {
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
