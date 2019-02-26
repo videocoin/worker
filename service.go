@@ -105,7 +105,12 @@ func Start() error {
 		return err
 	}
 
-	if err = s.handleTranscodeTask(workOrder); err != nil {
+	profile, err := s.manager.GetProfile(s.ctx, &pb.GetProfileRequest{ProfileId: workOrder.Profile})
+	if err != nil {
+		return err
+	}
+
+	if err = s.handleTranscodeTask(workOrder, profile); err != nil {
 		s.log.Errorf("failed to handle transcode task: %s", err.Error())
 		return err
 	}
@@ -113,7 +118,7 @@ func Start() error {
 	return nil
 }
 
-func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
+func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profile) error {
 
 	s.log.Infof("starting transcode task: %d using input: %s with stream_id: %d", workOrder.Id, workOrder.InputUrl, workOrder.StreamId)
 
@@ -137,7 +142,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder) error {
 		return err
 	}
 
-	cmd := buildCmd(workOrder.InputUrl, dir)
+	cmd := buildCmd(workOrder.InputUrl, dir, profile)
 
 	go s.monitorBalance(cmd, stopChan, workOrder.ContractAddress)
 
@@ -190,11 +195,11 @@ func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
 
-func buildCmd(inputURL string, dir string) *exec.Cmd {
+func buildCmd(inputURL string, dir string, profile *pb.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
-		args := fmt.Sprintf("-live_start_index 0 -codec copy -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", dir, b, dir, b)
+		args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -r %f -codec copy -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, profile.Fps, dir, b, dir, b)
 		process = append(process, strings.Split(args, " ")...)
 
 	}
