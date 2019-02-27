@@ -189,7 +189,7 @@ func (s *Service) VerifyChunk(
 
 	_, err := s.verifier.Verify(context.Background(), &pb.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
-		StreamId:       job.StreamID.Uint64(),
+		StreamId:       job.StreamID.Int64(),
 		Bitrate:        job.Bitrate,
 		InputId:        job.InputID.Uint64(),
 		OutputId:       job.OutputID.Uint64(),
