@@ -156,10 +156,10 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	localFile := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
-	outputURL := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
+	inputChunk := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
+	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
-	if err = s.VerifyChunk(tx, job, localFile, outputURL); err != nil {
+	if err = s.VerifyChunk(tx, job, inputChunk, outputChunk); err != nil {
 		return err
 	}
 	return nil
