@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/mem"
 	"github.com/sirupsen/logrus"
 
 	bc "github.com/VideoCoin/common/bcops"
@@ -127,6 +129,19 @@ func Start() error {
 	}
 
 	return nil
+}
+
+func (s *Service) register() {
+	info, _ := cpu.Info()
+	memInfo, _ := mem.VirtualMemory()
+	hostname, _ := os.Hostname()
+
+	s.manager.RegisterTranscoder(context.Background(), &pb.Transcoder{
+		Id:          hostname,
+		CpuCores:    info[0].Cores,
+		CpuMhz:      info[0].Mhz,
+		TotalMemory: memInfo.Total,
+	})
 }
 
 func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profile) error {
