@@ -29,9 +29,10 @@ import (
 func New() (*Service, error) {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	log := logrus.WithField("service", "transcode")
-
 	cfg := LoadConfig()
 
+	level, _ := logrus.ParseLevel(cfg.LogLevel)
+	logrus.SetLevel(level)
 	// Generate unique connection name
 	b := make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {

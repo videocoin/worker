@@ -20,6 +20,7 @@ type Config struct {
 	SMCA            string `required:"true" envconfig:"SMCA" default:"0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721" description:"stream manager contract address"`
 	KeyFile         string `required:"true" envconfig:"KEY_FILE" default:"keys/transcoder.key"`
 	Password        string `required:"true" envconfig:"PASSWORD" default:"transcoder"`
+	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
 }
 
 var cfg Config

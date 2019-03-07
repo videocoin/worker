@@ -59,6 +59,8 @@ spec:
               value: keys/transcoder.key
             - name: PASSWORD
               value: transcoder
+            - name: LOG_LEVEL
+              value: ERROR
           image: us.gcr.io/videocoin-183500/transcoder:latest
           imagePullPolicy: Always
           name: xcoders
