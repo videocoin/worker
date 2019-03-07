@@ -170,12 +170,12 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 		return err
 	}
 
-	s.transcode(cmd, stopChan, workOrder.InputUrl)
+	s.transcode(cmd, stopChan, workOrder.InputUrl, workOrder.StreamId)
 
 	return nil
 }
 
-func (s *Service) transcode(cmd *exec.Cmd, stop chan struct{}, streamurl string) {
+func (s *Service) transcode(cmd *exec.Cmd, stop chan struct{}, streamurl string, streamID int64) {
 	s.waitForStreamReady(streamurl)
 	s.log.Info("starting transcode")
 	out, err := cmd.CombinedOutput()
@@ -185,7 +185,7 @@ func (s *Service) transcode(cmd *exec.Cmd, stop chan struct{}, streamurl string)
 
 	stop <- struct{}{}
 	s.log.Info("calling refund")
-	if err := s.refund(); err != nil {
+	if err := s.refund(streamID); err != nil {
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
 
@@ -222,10 +222,16 @@ func buildCmd(inputURL string, dir string, profile *pb.Profile) *exec.Cmd {
 	return cmd
 }
 
-func (s *Service) refund() error {
+func (s *Service) refund(streamID int64) error {
 	_, err := s.streamInstance.Refund(s.bcAuth)
 	if err != nil {
 		return err
 	}
+
+	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{StreamId: streamID, Status: pb.WorkOrderStatusCompleted.String()})
+	if err != nil {
+		s.log.Warnf("failed to update stream status: %s", err.Error())
+	}
+
 	return nil
 }
