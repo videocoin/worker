@@ -229,7 +229,7 @@ func (s *Service) refund(streamID int64) error {
 		return err
 	}
 
-	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{StreamId: streamID, Status: pb.WorkOrderStatusCompleted.String()})
+	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{StreamId: streamID, Status: pb.WorkOrderStatusCompleted.String(), Refunded: true})
 	if err != nil {
 		s.log.Warnf("failed to update stream status: %s", err.Error())
 	}
