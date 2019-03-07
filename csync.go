@@ -200,7 +200,7 @@ func (s *Service) VerifyChunk(
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	s.log.Infof("current balance at address %s is %d", job.ContractAddr, balance.Balance)
+	s.log.Infof("current balance at address %s is %f", job.ContractAddr, balance.Balance)
 
 	if balance.Balance <= 0 {
 		job.cmd.Process.Kill()
