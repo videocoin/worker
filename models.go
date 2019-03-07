@@ -43,7 +43,7 @@ type (
 		Playlist        *m3u8.MediaPlaylist
 		Wallet          common.Address
 		cmd             *exec.Cmd
-		stopChan        chan bool
+		stopChan        chan struct{}
 	}
 
 	// Service primary reciever for service

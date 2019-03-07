@@ -19,7 +19,7 @@ import (
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) SyncDir(stop chan bool, cmd *exec.Cmd, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
+func (s *Service) SyncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
@@ -38,7 +38,7 @@ func (s *Service) SyncDir(stop chan bool, cmd *exec.Cmd, workOrder *pb.WorkOrder
 
 	defer watcher.Close()
 
-	done := make(chan bool)
+	done := make(chan struct{})
 
 	walletHex := common.HexToAddress(workOrder.WalletAddress)
 
@@ -95,11 +95,9 @@ func (s *Service) SyncDir(stop chan bool, cmd *exec.Cmd, workOrder *pb.WorkOrder
 					s.log.Errorf("event watcher error: %s", err.Error())
 				}
 
-			case abort := <-stop:
-				if abort {
-					watcher.Close()
-					watcher.Remove(dir)
-				}
+			case <-stop:
+				watcher.Close()
+				watcher.Remove(dir)
 			}
 		}
 	}()
@@ -206,7 +204,7 @@ func (s *Service) VerifyChunk(
 
 	if balance.Balance <= 0 {
 		job.cmd.Process.Kill()
-		job.stopChan <- true
+		job.stopChan <- struct{}{}
 	}
 
 	return err

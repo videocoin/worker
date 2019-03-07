@@ -152,7 +152,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	cmd := buildCmd(workOrder.InputUrl, dir, profile)
-	var stopChan = make(chan bool)
+	var stopChan = make(chan struct{})
 
 	for _, b := range bitrates {
 
@@ -175,7 +175,7 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 	return nil
 }
 
-func (s *Service) transcode(cmd *exec.Cmd, stop chan bool, streamurl string) {
+func (s *Service) transcode(cmd *exec.Cmd, stop chan struct{}, streamurl string) {
 	s.waitForStreamReady(streamurl)
 	s.log.Info("starting transcode")
 	out, err := cmd.CombinedOutput()
@@ -183,7 +183,7 @@ func (s *Service) transcode(cmd *exec.Cmd, stop chan bool, streamurl string) {
 		s.log.Errorf("failed to transcode: err : %s output: %s", err.Error(), string(out))
 	}
 
-	stop <- true
+	stop <- struct{}{}
 	s.log.Info("calling refund")
 	if err := s.refund(); err != nil {
 		s.log.Errorf("failed to refund:%s", err.Error())
