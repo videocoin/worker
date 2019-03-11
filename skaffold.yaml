@@ -1,13 +1,6 @@
 apiVersion: skaffold/v1beta5
 kind: Config
 deploy:
-  # helm:
-  #   releases:
-  #     - name: xcode
-  #       chartPath: deploy/helm/xcode
-  #       values:
-  #         image: us.gcr.io/videocoin-183500/transcoder
-
   kubectl:
     manifests:
       - deploy/skaffold/k8s-*

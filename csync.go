@@ -221,7 +221,7 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 
 	for {
 		for len(jobChan) < 2 {
-			time.Sleep(1 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 		}
 		select {
 		case j := <-jobChan:
