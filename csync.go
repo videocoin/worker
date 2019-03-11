@@ -126,7 +126,6 @@ func (s *Service) handleChunk(job *Job) error {
 
 	duration, err := s.Duration(chunkLoc)
 	if err != nil {
-		s.log.Warnf("failed to get duration: %s location: %s", err.Error(), chunkLoc)
 		return err
 	}
 

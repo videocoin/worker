@@ -192,6 +192,10 @@ func (s *Service) transcode(cmd *exec.Cmd, stop chan struct{}, streamurl string,
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
 
+	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{Status: pb.WorkOrderStatusCompleted.String(), StreamId: streamID})
+	if err != nil {
+		s.log.Errorf("failed to update stream status: %s", err.Error())
+	}
 	s.log.Info("transcode complete")
 }
 
