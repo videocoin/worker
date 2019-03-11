@@ -137,7 +137,6 @@ func Start() error {
 func (s *Service) register() {
 	info, _ := cpu.Info()
 	memInfo, _ := mem.VirtualMemory()
-
 	machineID, _ := machineid.ProtectedID(s.cfg.HashKey)
 
 	s.manager.RegisterTranscoder(context.Background(), &pb.Transcoder{
