@@ -21,6 +21,7 @@ type Config struct {
 	KeyFile         string `required:"true" envconfig:"KEY_FILE" default:"keys/transcoder.key"`
 	Password        string `required:"true" envconfig:"PASSWORD" default:"transcoder"`
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
+	HashKey         string `required:"true" envconfig:"HASH_KEY" default:"BEEFFEED"`
 }
 
 var cfg Config

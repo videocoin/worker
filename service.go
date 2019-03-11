@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/denisbrodbeck/machineid"
+
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/sirupsen/logrus"
@@ -135,10 +137,11 @@ func Start() error {
 func (s *Service) register() {
 	info, _ := cpu.Info()
 	memInfo, _ := mem.VirtualMemory()
-	hostname, _ := os.Hostname()
+
+	machineID, _ := machineid.ProtectedID(s.cfg.HashKey)
 
 	s.manager.RegisterTranscoder(context.Background(), &pb.Transcoder{
-		Id:          hostname,
+		Id:          machineID,
 		CpuCores:    info[0].Cores,
 		CpuMhz:      info[0].Mhz,
 		TotalMemory: memInfo.Total,
