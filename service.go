@@ -106,21 +106,25 @@ func New() (*Service, error) {
 func Start() error {
 	s, err := New()
 	if err != nil {
-		panic(err)
+		s.log.Errorf("failed to create service: %s", err.Error())
+		return err
 	}
 
 	workOrder, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
 	if err != nil {
+		s.log.Debugf("failed to get job: %s", err.Error())
 		return err
 	}
 
 	profile, err := s.manager.GetProfile(s.ctx, &pb.GetProfileRequest{ProfileId: workOrder.Profile})
 	if err != nil {
+		s.log.Debugf("failed to get profile: %s", err.Error())
 		return err
 	}
 
 	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.ContractAddress), s.bcClient)
 	if err != nil {
+		s.log.Errorf("failed to create new stream: %s", err.Error())
 		return err
 	}
 
@@ -192,10 +196,6 @@ func (s *Service) transcode(cmd *exec.Cmd, stop chan struct{}, streamurl string,
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
 
-	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{Status: pb.WorkOrderStatusCompleted.String(), StreamId: streamID})
-	if err != nil {
-		s.log.Errorf("failed to update stream status: %s", err.Error())
-	}
 	s.log.Info("transcode complete")
 }
 
@@ -207,7 +207,7 @@ func (s *Service) waitForStreamReady(streamurl string) {
 			return
 		}
 		s.log.Infof("waiting for stream %s to become ready...", streamurl)
-		time.Sleep(30 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 }
 
