@@ -19,7 +19,13 @@ import (
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) SyncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
+func (s *Service) syncDir(
+	stop chan struct{},
+	cmd *exec.Cmd,
+	workOrder *pb.WorkOrder,
+	dir string,
+	bitrate uint32,
+) {
 
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
@@ -163,7 +169,11 @@ func (s *Service) handleChunk(job *Job) error {
 }
 
 // SubmitProof registers work (output chunk)
-func (s *Service) submitProof(bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
+func (s *Service) submitProof(
+	bitrate uint32,
+	inputChunkID *big.Int,
+	outputChunkID *big.Int,
+) (*types.Transaction, error) {
 	tx, err := s.streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
 	if err != nil {
 		return nil, err
@@ -174,12 +184,10 @@ func (s *Service) submitProof(bitrate uint32, inputChunkID *big.Int, outputChunk
 
 // VerifyChunk blahg
 func (s *Service) VerifyChunk(
-
 	tx *types.Transaction,
 	job *Job,
 	localFile string,
 	outputURL string,
-
 ) error {
 
 	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", localFile, outputURL, job.InputID, job.OutputID, job.StreamID, job.Bitrate)
@@ -209,7 +217,10 @@ func (s *Service) VerifyChunk(
 	return err
 }
 
-func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
+func (s *Service) process(
+	jobChan chan Job,
+	workOrder *pb.WorkOrder,
+) {
 	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusTranscoding.String())
 
 	for len(jobChan) < 2 {
@@ -231,7 +242,10 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 	}
 }
 
-func (s *Service) updateStatus(streamID int64, status string) {
+func (s *Service) updateStatus(
+	streamID int64,
+	status string,
+) {
 	_, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		StreamId: streamID,
 		Status:   status,

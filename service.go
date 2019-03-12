@@ -28,7 +28,8 @@ import (
 )
 
 // New initialize and return a new Service object
-func New() (*Service, error) {
+func newService() (*Service, error) {
+
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	log := logrus.WithField("service", "transcode")
 	cfg := LoadConfig()
@@ -37,9 +38,7 @@ func New() (*Service, error) {
 	logrus.SetLevel(level)
 	// Generate unique connection name
 	b := make([]byte, 16)
-	if _, err := rand.Read(b); err != nil {
-		return nil, err
-	}
+	rand.Read(b)
 
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
@@ -104,9 +103,9 @@ func New() (*Service, error) {
 
 // Start creates new service and blocks until stop signal
 func Start() error {
-	s, err := New()
+
+	s, err := newService()
 	if err != nil {
-		s.log.Errorf("failed to create service: %s", err.Error())
 		return err
 	}
 
@@ -139,6 +138,7 @@ func Start() error {
 }
 
 func (s *Service) register() {
+
 	info, _ := cpu.Info()
 	memInfo, _ := mem.VirtualMemory()
 	machineID, _ := machineid.ProtectedID(s.cfg.HashKey)
@@ -151,7 +151,10 @@ func (s *Service) register() {
 	})
 }
 
-func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profile) error {
+func (s *Service) handleTranscodeTask(
+	workOrder *pb.WorkOrder,
+	profile *pb.Profile,
+) error {
 
 	s.log.Infof("starting transcode task: %d using input: %s with stream_id: %d", workOrder.Id, workOrder.InputUrl, workOrder.StreamId)
 
@@ -169,11 +172,11 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 		if err != nil {
 			return err
 		}
-		go s.SyncDir(stopChan, cmd, workOrder, fullDir, b)
+		go s.syncDir(stopChan, cmd, workOrder, fullDir, b)
 
 	}
 
-	if err := s.GeneratePlaylist(workOrder.StreamId, m3u8); err != nil {
+	if err := s.generatePlaylist(workOrder.StreamId, m3u8); err != nil {
 		return err
 	}
 
@@ -182,7 +185,13 @@ func (s *Service) handleTranscodeTask(workOrder *pb.WorkOrder, profile *pb.Profi
 	return nil
 }
 
-func (s *Service) transcode(cmd *exec.Cmd, stop chan struct{}, streamurl string, streamID int64) {
+func (s *Service) transcode(
+	cmd *exec.Cmd,
+	stop chan struct{},
+	streamurl string,
+	streamID int64,
+) {
+
 	s.waitForStreamReady(streamurl)
 	s.log.Info("starting transcode")
 	out, err := cmd.CombinedOutput()
@@ -215,7 +224,12 @@ func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
 
-func buildCmd(inputURL string, dir string, profile *pb.Profile) *exec.Cmd {
+func buildCmd(
+	inputURL string,
+	dir string,
+	profile *pb.Profile,
+) *exec.Cmd {
+
 	process := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
