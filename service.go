@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/denisbrodbeck/machineid"
-
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/sirupsen/logrus"
@@ -141,10 +139,9 @@ func (s *Service) register() {
 
 	info, _ := cpu.Info()
 	memInfo, _ := mem.VirtualMemory()
-	machineID, _ := machineid.ProtectedID(s.cfg.HashKey)
 
 	s.manager.RegisterTranscoder(context.Background(), &pb.Transcoder{
-		Id:          machineID,
+		Id:          s.cfg.UID,
 		CpuCores:    info[0].Cores,
 		CpuMhz:      info[0].Mhz,
 		TotalMemory: memInfo.Total,
