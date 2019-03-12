@@ -5,6 +5,8 @@ import (
 	"math/big"
 	"os/exec"
 
+	stan "github.com/nats-io/go-nats-streaming"
+
 	"github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/common/streamManager"
@@ -58,5 +60,6 @@ type (
 		bcClient       *ethclient.Client
 		pkAddr         common.Address
 		log            *logrus.Entry
+		sc             stan.Conn
 	}
 )
