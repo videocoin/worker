@@ -3,7 +3,6 @@ package transcode
 import (
 	"sync"
 
-	"github.com/denisbrodbeck/machineid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 )
@@ -23,7 +22,7 @@ type Config struct {
 	Password        string `required:"true" envconfig:"PASSWORD" default:"transcoder"`
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
 	HashKey         string `required:"true" envconfig:"HASH_KEY" default:"BEEFFEED"`
-	UID             string
+	ClusterID       string `required:"true" envconfig:"CLUSTER_ID" default:"test-cluster"`
 }
 
 var cfg Config
@@ -36,9 +35,8 @@ func LoadConfig() *Config {
 		if err != nil {
 			logrus.Fatalf("failed to load config: %s", err.Error())
 		}
-		uid, _ := machineid.ProtectedID(cfg.HashKey)
 
-		cfg.UID = uid
+		// cfg.UID = uid
 
 	})
 	return &cfg

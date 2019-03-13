@@ -53,13 +53,18 @@ type (
 		cfg            *Config
 		ctx            context.Context
 		manager        proto.ManagerServiceClient
+		log            *logrus.Entry
 		verifier       proto.VerifierServiceClient
 		streamManager  *streamManager.Manager
 		streamInstance *stream.Stream
 		bcAuth         *bind.TransactOpts
 		bcClient       *ethclient.Client
 		pkAddr         common.Address
-		log            *logrus.Entry
-		sc             stan.Conn
+	}
+
+	// NATs handles pubsub tasks
+	NATs struct {
+		log *logrus.Entry
+		sc  stan.Conn
 	}
 )

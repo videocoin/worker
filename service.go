@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/denisbrodbeck/machineid"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/sirupsen/logrus"
@@ -119,6 +120,19 @@ func Start() error {
 		return err
 	}
 
+	uid, err := machineid.ProtectedID(cfg.HashKey)
+	if err != nil {
+		s.log.Warnf("failed to calculate machine id: %s", err.Error())
+	}
+
+	s.register(uid)
+
+	err = subscribe(cfg.ClusterID, uid)
+	if err != nil {
+		s.log.Errorf("failed to configure nats: %s", err.Error())
+		return err
+	}
+
 	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.ContractAddress), s.bcClient)
 	if err != nil {
 		s.log.Errorf("failed to create new stream: %s", err.Error())
@@ -135,13 +149,12 @@ func Start() error {
 	return nil
 }
 
-func (s *Service) register() {
-
+func (s *Service) register(uid string) {
 	info, _ := cpu.Info()
 	memInfo, _ := mem.VirtualMemory()
 
 	s.manager.RegisterTranscoder(context.Background(), &pb.Transcoder{
-		Id:          s.cfg.UID,
+		Id:          uid,
 		CpuCores:    info[0].Cores,
 		CpuMhz:      info[0].Mhz,
 		TotalMemory: memInfo.Total,
@@ -180,6 +193,7 @@ func (s *Service) handleTranscodeTask(
 	s.transcode(cmd, stopChan, workOrder.InputUrl, workOrder.StreamId)
 
 	return nil
+
 }
 
 func (s *Service) transcode(
@@ -203,9 +217,11 @@ func (s *Service) transcode(
 	}
 
 	s.log.Info("transcode complete")
+
 }
 
 func (s *Service) waitForStreamReady(streamurl string) {
+
 	maxretry := 10
 	for i := 0; i < maxretry; i++ {
 		resp, _ := http.Head(streamurl)
@@ -215,10 +231,13 @@ func (s *Service) waitForStreamReady(streamurl string) {
 		s.log.Infof("waiting for stream %s to become ready...", streamurl)
 		time.Sleep(10 * time.Second)
 	}
+
 }
 
 func prepareDir(dir string) error {
+
 	return os.MkdirAll(dir, 0777)
+
 }
 
 func buildCmd(
@@ -238,9 +257,11 @@ func buildCmd(
 	cmd := exec.Command("ffmpeg", process...)
 
 	return cmd
+
 }
 
 func (s *Service) refund(streamID int64) error {
+
 	_, err := s.streamInstance.Refund(s.bcAuth)
 	if err != nil {
 		return err
@@ -252,4 +273,5 @@ func (s *Service) refund(streamID int64) error {
 	}
 
 	return nil
+
 }
