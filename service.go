@@ -143,6 +143,24 @@ func Start() error {
 	return nil
 }
 
+// AssignWork endpoint that recieves new work from manager
+func (s *Service) AssignWork(ctx context.Context, in *pb.Assignment) (*empty.Empty, error) {
+	streamInstance, err := stream.NewStream(common.HexToAddress(in.Workorder.ContractAddress), s.bcClient)
+	if err != nil {
+		s.log.Errorf("failed to create new stream instance: %s", err.Error())
+		return new(empty.Empty), err
+	}
+	s.streamInstance = streamInstance
+
+	err = s.handleTranscodeTask(in.Workorder, in.Profile)
+	if err != nil {
+		s.log.Errorf("failed to run transcode: %s", err.Error())
+		return new(empty.Empty), err
+	}
+
+	return new(empty.Empty), nil
+}
+
 func (s *Service) register(uid string) {
 	info, _ := cpu.Info()
 	memInfo, _ := mem.VirtualMemory()
@@ -184,7 +202,7 @@ func (s *Service) handleTranscodeTask(
 		return err
 	}
 
-	s.transcode(cmd, stopChan, workOrder.InputUrl, workOrder.StreamId)
+	go s.transcode(cmd, stopChan, workOrder.InputUrl, workOrder.StreamId)
 
 	return nil
 
