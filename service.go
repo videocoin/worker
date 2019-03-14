@@ -102,24 +102,17 @@ func newService() (*Service, error) {
 
 // Start creates new service and blocks until stop signal
 func Start() error {
-
 	s, err := newService()
 	if err != nil {
 		return err
 	}
 
-	workOrder, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
-	if err != nil {
-		s.log.Debugf("failed to get job: %s", err.Error())
-		return err
-	}
+	s.prepare()
 
-	profile, err := s.manager.GetProfile(s.ctx, &pb.GetProfileRequest{ProfileId: workOrder.Profile})
-	if err != nil {
-		s.log.Debugf("failed to get profile: %s", err.Error())
-		return err
-	}
+	return nil
+}
 
+func (s *Service) prepare() error {
 	uid, err := machineid.ProtectedID(cfg.HashKey)
 	if err != nil {
 		s.log.Warnf("failed to calculate machine id: %s", err.Error())
@@ -127,24 +120,23 @@ func Start() error {
 
 	s.register(uid)
 
-	err = subscribe(cfg.ClusterID, uid)
+	s.sc, err = connectNats(cfg.ClusterID)
 	if err != nil {
-		s.log.Errorf("failed to configure nats: %s", err.Error())
 		return err
 	}
 
-	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.ContractAddress), s.bcClient)
+	s.subscribe()
+
+	return nil
+}
+
+func (s *Service) newStream(contractAddr string) error {
+	si, err := stream.NewStream(common.HexToAddress(contractAddr), s.bcClient)
 	if err != nil {
-		s.log.Errorf("failed to create new stream: %s", err.Error())
 		return err
 	}
 
-	s.streamInstance = streamInstance
-
-	if err = s.handleTranscodeTask(workOrder, profile); err != nil {
-		s.log.Errorf("failed to handle transcode task: %s", err.Error())
-		return err
-	}
+	s.streamInstance = si
 
 	return nil
 }

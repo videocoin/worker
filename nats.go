@@ -7,14 +7,12 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/sirupsen/logrus"
-
 	pb "github.com/VideoCoin/common/proto"
 	stan "github.com/nats-io/go-nats-streaming"
 )
 
-func connect(clusterID string) (
-	*NATs,
+func connectNats(clusterID string) (
+	stan.Conn,
 	error,
 ) {
 
@@ -24,39 +22,37 @@ func connect(clusterID string) (
 		return nil, err
 	}
 
-	return &NATs{
-		sc:  con,
-		log: logrus.WithField("name", "nats"),
-	}, nil
+	return con, nil
 
 }
 
-func subscribe(
-	clusterID string,
-	uid string,
-) error {
-	n, err := connect(clusterID)
-	if err != nil {
-		return err
-	}
-	n.work(uid)
-
-	return nil
+func (s *Service) subscribe() {
+	s.work()
 }
 
-func (n *NATs) work(uid string) {
+func (s *Service) work() {
 
 	var workOrder = new(pb.WorkOrder)
 
-	_, err := n.sc.Subscribe(uid, func(m *stan.Msg) {
+	_, err := s.sc.Subscribe(s.cfg.UID, func(m *stan.Msg) {
 		err := json.Unmarshal(m.Data, &workOrder)
 		if err != nil {
-			n.log.Errorf("failed to unmarshal work order: %s", err.Error())
+			s.log.Errorf("failed to unmarshal work order: %s", err.Error())
 		}
+
+		profile, err := s.manager.GetProfile(s.ctx, &pb.GetProfileRequest{ProfileId: workOrder.Profile})
+		if err != nil {
+			s.log.Debugf("failed to get profile: %s", err.Error())
+		}
+
+		s.newStream(workOrder.ContractAddress)
+
+		s.handleTranscodeTask(workOrder, profile)
+
 	})
 
 	if err != nil {
-		n.sc.Close()
+		s.sc.Close()
 	}
 
 	var sigChan = make(chan os.Signal, 1)
@@ -65,7 +61,7 @@ func (n *NATs) work(uid string) {
 
 	go func() {
 		for range sigChan {
-			n.sc.Close()
+			s.sc.Close()
 		}
 	}()
 }

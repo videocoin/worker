@@ -60,11 +60,6 @@ type (
 		bcAuth         *bind.TransactOpts
 		bcClient       *ethclient.Client
 		pkAddr         common.Address
-	}
-
-	// NATs handles pubsub tasks
-	NATs struct {
-		log *logrus.Entry
-		sc  stan.Conn
+		sc             stan.Conn
 	}
 )
