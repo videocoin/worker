@@ -127,12 +127,6 @@ func Start() error {
 
 	s.register(uid)
 
-	err = subscribe(cfg.ClusterID, uid)
-	if err != nil {
-		s.log.Errorf("failed to configure nats: %s", err.Error())
-		return err
-	}
-
 	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.ContractAddress), s.bcClient)
 	if err != nil {
 		s.log.Errorf("failed to create new stream: %s", err.Error())
