@@ -11,6 +11,7 @@ import (
 	"time"
 
 	pb "github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/core/types"
 	"github.com/fsnotify/fsnotify"
@@ -154,7 +155,7 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	tx, err := s.submitProof(job.Bitrate, job.InputID, job.OutputID)
+	tx, err := s.submitProof(job.ContractAddr, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
 		return err
 	}
@@ -170,11 +171,18 @@ func (s *Service) handleChunk(job *Job) error {
 
 // SubmitProof registers work (output chunk)
 func (s *Service) submitProof(
+	contractAddress string,
 	bitrate uint32,
 	inputChunkID *big.Int,
 	outputChunkID *big.Int,
 ) (*types.Transaction, error) {
-	tx, err := s.streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
+	streamInstance, err := stream.NewStream(common.HexToAddress(contractAddress), s.bcClient)
+	if err != nil {
+		s.log.Errorf("failed to create new stream instance: %s", err.Error())
+		return nil, err
+	}
+
+	tx, err := streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
 	if err != nil {
 		return nil, err
 	}

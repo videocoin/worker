@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/VideoCoin/common/stream"
+
 	"github.com/denisbrodbeck/machineid"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
@@ -18,7 +20,6 @@ import (
 
 	bc "github.com/VideoCoin/common/bcops"
 	pb "github.com/VideoCoin/common/proto"
-	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
@@ -127,14 +128,6 @@ func Start() error {
 
 	s.register(uid)
 
-	streamInstance, err := stream.NewStream(common.HexToAddress(workOrder.ContractAddress), s.bcClient)
-	if err != nil {
-		s.log.Errorf("failed to create new stream: %s", err.Error())
-		return err
-	}
-
-	s.streamInstance = streamInstance
-
 	if err = s.handleTranscodeTask(workOrder, profile); err != nil {
 		s.log.Errorf("failed to handle transcode task: %s", err.Error())
 		return err
@@ -145,14 +138,7 @@ func Start() error {
 
 // AssignWork endpoint that recieves new work from manager
 func (s *Service) AssignWork(ctx context.Context, in *pb.Assignment) (*empty.Empty, error) {
-	streamInstance, err := stream.NewStream(common.HexToAddress(in.Workorder.ContractAddress), s.bcClient)
-	if err != nil {
-		s.log.Errorf("failed to create new stream instance: %s", err.Error())
-		return new(empty.Empty), err
-	}
-	s.streamInstance = streamInstance
-
-	err = s.handleTranscodeTask(in.Workorder, in.Profile)
+	err := s.handleTranscodeTask(in.Workorder, in.Profile)
 	if err != nil {
 		s.log.Errorf("failed to run transcode: %s", err.Error())
 		return new(empty.Empty), err
@@ -202,7 +188,7 @@ func (s *Service) handleTranscodeTask(
 		return err
 	}
 
-	go s.transcode(cmd, stopChan, workOrder.InputUrl, workOrder.StreamId)
+	go s.transcode(cmd, stopChan, workOrder.InputUrl, workOrder.StreamId, workOrder.ContractAddress)
 
 	return nil
 
@@ -213,6 +199,7 @@ func (s *Service) transcode(
 	stop chan struct{},
 	streamurl string,
 	streamID int64,
+	contractAddr string,
 ) {
 
 	s.waitForStreamReady(streamurl)
@@ -224,7 +211,7 @@ func (s *Service) transcode(
 
 	stop <- struct{}{}
 	s.log.Info("calling refund")
-	if err := s.refund(streamID); err != nil {
+	if err := s.refund(streamID, contractAddr); err != nil {
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
 
@@ -272,9 +259,13 @@ func buildCmd(
 
 }
 
-func (s *Service) refund(streamID int64) error {
+func (s *Service) refund(streamID int64, addr string) error {
+	streamInstance, err := s.createStreamInstance(addr)
+	if err != nil {
+		return err
+	}
 
-	_, err := s.streamInstance.Refund(s.bcAuth)
+	_, err = streamInstance.Refund(s.bcAuth)
 	if err != nil {
 		return err
 	}
@@ -286,4 +277,14 @@ func (s *Service) refund(streamID int64) error {
 
 	return nil
 
+}
+
+func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
+	streamInstance, err := stream.NewStream(common.HexToAddress(addr), s.bcClient)
+	if err != nil {
+		s.log.Errorf("failed to create new stream instance: %s", err.Error())
+		return nil, err
+	}
+
+	return streamInstance, nil
 }
