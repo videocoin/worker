@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -234,9 +235,7 @@ func (s *Service) waitForStreamReady(streamurl string) {
 }
 
 func prepareDir(dir string) error {
-
 	return os.MkdirAll(dir, 0777)
-
 }
 
 func buildCmd(
@@ -287,4 +286,18 @@ func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
 	}
 
 	return streamInstance, nil
+}
+
+func (s *Service) listen() error {
+	lis, err := net.Listen("tcp", s.cfg.Port)
+	if err != nil {
+		return err
+	}
+
+	s.log.Infof("listening on port: %s", s.cfg.Port)
+
+	rpcSrv := grpc.NewServer()
+	pb.RegisterTranscodersServer(rpcSrv, new(Service))
+
+	return rpcSrv.Serve(lis)
 }

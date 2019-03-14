@@ -23,6 +23,7 @@ type Config struct {
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
 	HashKey         string `required:"true" envconfig:"HASH_KEY" default:"BEEFFEED"`
 	ClusterID       string `required:"true" envconfig:"CLUSTER_ID" default:"test-cluster"`
+	Port            string `required:"true" envconfig:"PORT" default:":50056" description:"listens for new work from manager"`
 }
 
 var cfg Config
