@@ -36,8 +36,6 @@ func LoadConfig() *Config {
 			logrus.Fatalf("failed to load config: %s", err.Error())
 		}
 
-		// cfg.UID = uid
-
 	})
 	return &cfg
 }

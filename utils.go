@@ -17,7 +17,7 @@ import (
 )
 
 // Upload uploads an object to gcs with publicread acl
-func (s *Service) Upload(output string, r io.Reader) error {
+func (s *Service) upload(output string, r io.Reader) error {
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
 		return err
@@ -41,12 +41,11 @@ func (s *Service) Upload(output string, r io.Reader) error {
 }
 
 // RandomBigInt Generates a random big integer with max 64 bits so we can store as int64
-func RandomBigInt() *big.Int {
-	b := make([]byte, 8)
+func randomBigInt(len int) *big.Int {
+	b := make([]byte, len)
 	rand.Read(b)
 	n := big.NewInt(0)
 	n = n.SetBytes(b)
-
 	return n
 }
 
@@ -60,7 +59,7 @@ func getChunkNum(chunkName string) *big.Int {
 }
 
 // Duration use ffmpeg to find chunk duration
-func (s *Service) Duration(input string) (float64, error) {
+func (s *Service) duration(input string) (float64, error) {
 	s.log.Infof("using input %s", input)
 	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
 	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
@@ -89,7 +88,7 @@ func (s *Service) generatePlaylist(streamID int64, filename string) error {
 
 	reader := bytes.NewReader(m3u8)
 
-	err = s.Upload(fmt.Sprintf("%d/%s", streamID, "index.m3u8"), reader)
+	err = s.upload(fmt.Sprintf("%d/%s", streamID, "index.m3u8"), reader)
 	if err != nil {
 		s.log.Errorf("failed to upload: %s", err.Error())
 		return err

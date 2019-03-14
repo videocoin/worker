@@ -73,7 +73,7 @@ func (s *Service) syncDir(
 						s.log.Errorf("failed to add input chunk: [ %d ] bitrate: [ %d ] err: [ %s ]", chunkNum, bitrate, err.Error())
 					}
 
-					randomID := RandomBigInt()
+					randomID := randomBigInt(8)
 
 					// Add job to the job channel to be worked on later
 					jobChan <- Job{
@@ -122,7 +122,7 @@ func (s *Service) handleChunk(job *Job) error {
 	uploadPath := fmt.Sprintf("%d/%d", job.StreamID, job.Bitrate)
 
 	if job.InputChunkName == "0.ts" {
-		duration, err := s.Duration(chunkLoc)
+		duration, err := s.duration(chunkLoc)
 		if err != nil {
 			duration = 10.0
 		}
@@ -130,7 +130,7 @@ func (s *Service) handleChunk(job *Job) error {
 		job.Playlist.TargetDuration = duration
 	}
 
-	duration, err := s.Duration(chunkLoc)
+	duration, err := s.duration(chunkLoc)
 	if err != nil {
 		return err
 	}
@@ -145,12 +145,12 @@ func (s *Service) handleChunk(job *Job) error {
 	}
 
 	// Upload chunk
-	if err = s.Upload(path.Join(uploadPath, job.OutputChunkName), chunk); err != nil {
+	if err = s.upload(path.Join(uploadPath, job.OutputChunkName), chunk); err != nil {
 		return err
 	}
 
 	// Upload playlist
-	if err = s.Upload(path.Join(uploadPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
+	if err = s.upload(path.Join(uploadPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
 		return err
 	}
 
@@ -162,7 +162,7 @@ func (s *Service) handleChunk(job *Job) error {
 	inputChunk := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
-	if err = s.VerifyChunk(tx, job, inputChunk, outputChunk); err != nil {
+	if err = s.verify(tx, job, inputChunk, outputChunk); err != nil {
 		return err
 	}
 	return nil
@@ -182,8 +182,8 @@ func (s *Service) submitProof(
 	return tx, nil
 }
 
-// VerifyChunk blahg
-func (s *Service) VerifyChunk(
+// verifyChunk calls verifier with input and output chunk urls
+func (s *Service) verify(
 	tx *types.Transaction,
 	job *Job,
 	localFile string,
