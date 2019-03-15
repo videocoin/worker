@@ -30,7 +30,6 @@ import (
 
 // New initialize and return a new Service object
 func newService() (*Service, error) {
-
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 	log := logrus.WithField("service", "transcode")
 	cfg := LoadConfig()
@@ -56,13 +55,13 @@ func newService() (*Service, error) {
 	manager := pb.NewManagerServiceClient(managerConn)
 	status, err := manager.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
-		return nil, fmt.Errorf("failed to get healthy status from manager: %v", err)
+		return nil, fmt.Errorf("failed to get healthy status from manager")
 	}
 
 	v := pb.NewVerifierServiceClient(verifierConn)
 	status, err = v.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
-		return nil, fmt.Errorf("failed to get healthy status from verifier: %v", err)
+		return nil, fmt.Errorf("failed to get healthy status from verifier")
 	}
 
 	ctx := context.Background()
@@ -104,7 +103,6 @@ func newService() (*Service, error) {
 
 // Start creates new service and blocks until stop signal
 func Start() error {
-
 	s, err := newService()
 	if err != nil {
 		return err
@@ -126,11 +124,8 @@ func Start() error {
 }
 
 // AssignWork endpoint that recieves new work from manager
-func (s *Service) AssignWork(
-	ctx context.Context,
-	in *pb.Assignment,
-) (*empty.Empty, error) {
-	err := s.handleTranscodeTask(in.Workorder, in.Profile)
+func (s *Service) AssignWork(ctx context.Context, in *pb.Assignment) (*empty.Empty, error) {
+	err := s.handleTranscode(in.Workorder, in.Profile)
 	if err != nil {
 		s.log.Errorf("failed to run transcode: %s", err.Error())
 		return new(empty.Empty), err
@@ -151,12 +146,8 @@ func (s *Service) register(uid string) {
 	})
 }
 
-func (s *Service) handleTranscodeTask(
-	workOrder *pb.WorkOrder,
-	profile *pb.Profile,
-) error {
-
-	s.log.Infof("starting transcode task: %d using input: %s with stream_id: %d",
+func (s *Service) handleTranscode(workOrder *pb.WorkOrder, profile *pb.Profile) error {
+	s.log.Infof("starting transcode: %d using input: %s with stream_id: %d",
 		workOrder.Id, workOrder.InputUrl, workOrder.StreamId,
 	)
 
@@ -200,7 +191,6 @@ func (s *Service) transcode(
 	streamID int64,
 	contractAddr string,
 ) {
-
 	s.waitForStreamReady(streamurl)
 	s.log.Info("starting transcode")
 	out, err := cmd.CombinedOutput()
@@ -221,7 +211,6 @@ func (s *Service) transcode(
 }
 
 func (s *Service) waitForStreamReady(streamurl string) {
-
 	maxretry := 10
 	for i := 0; i < maxretry; i++ {
 		resp, _ := http.Head(streamurl)
@@ -238,12 +227,7 @@ func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
 
-func buildCmd(
-	inputURL string,
-	dir string,
-	profile *pb.Profile,
-) *exec.Cmd {
-
+func buildCmd(inputURL string, dir string, profile *pb.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
@@ -293,6 +277,7 @@ func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
 }
 
 func (s *Service) listen() error {
+
 	lis, err := net.Listen("tcp", s.cfg.Port)
 	if err != nil {
 		return err
