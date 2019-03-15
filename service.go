@@ -116,7 +116,10 @@ func Start() error {
 		return err
 	}
 
-	profile, err := s.manager.GetProfile(s.ctx, &pb.GetProfileRequest{ProfileId: workOrder.Profile})
+	profile, err := s.manager.GetProfile(s.ctx, &pb.GetProfileRequest{
+		ProfileId: workOrder.Profile,
+	})
+
 	if err != nil {
 		s.log.Debugf("failed to get profile: %s", err.Error())
 		return err
@@ -138,7 +141,10 @@ func Start() error {
 }
 
 // AssignWork endpoint that recieves new work from manager
-func (s *Service) AssignWork(ctx context.Context, in *pb.Assignment) (*empty.Empty, error) {
+func (s *Service) AssignWork(
+	ctx context.Context,
+	in *pb.Assignment,
+) (*empty.Empty, error) {
 	err := s.handleTranscodeTask(in.Workorder, in.Profile)
 	if err != nil {
 		s.log.Errorf("failed to run transcode: %s", err.Error())
@@ -165,7 +171,9 @@ func (s *Service) handleTranscodeTask(
 	profile *pb.Profile,
 ) error {
 
-	s.log.Infof("starting transcode task: %d using input: %s with stream_id: %d", workOrder.Id, workOrder.InputUrl, workOrder.StreamId)
+	s.log.Infof("starting transcode task: %d using input: %s with stream_id: %d",
+		workOrder.Id, workOrder.InputUrl, workOrder.StreamId,
+	)
 
 	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
@@ -189,7 +197,12 @@ func (s *Service) handleTranscodeTask(
 		return err
 	}
 
-	go s.transcode(cmd, stopChan, workOrder.InputUrl, workOrder.StreamId, workOrder.ContractAddress)
+	go s.transcode(cmd,
+		stopChan,
+		workOrder.InputUrl,
+		workOrder.StreamId,
+		workOrder.ContractAddress,
+	)
 
 	return nil
 
@@ -207,7 +220,9 @@ func (s *Service) transcode(
 	s.log.Info("starting transcode")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		s.log.Errorf("failed to transcode: err : %s output: %s", err.Error(), string(out))
+		s.log.Errorf("failed to transcode: err : %s output: %s",
+			err.Error(), string(out),
+		)
 	}
 
 	stop <- struct{}{}
@@ -249,7 +264,6 @@ func buildCmd(
 	for _, b := range bitrates {
 		args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -c:v libx264 -c:a aac -r %f -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, profile.Fps, dir, b, dir, b)
 		process = append(process, strings.Split(args, " ")...)
-
 	}
 
 	cmd := exec.Command("ffmpeg", process...)
@@ -269,7 +283,12 @@ func (s *Service) refund(streamID int64, addr string) error {
 		return err
 	}
 
-	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{StreamId: streamID, Status: pb.WorkOrderStatusCompleted.String(), Refunded: true})
+	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
+		StreamId: streamID,
+		Status:   pb.WorkOrderStatusCompleted.String(),
+		Refunded: true,
+	})
+
 	if err != nil {
 		s.log.Warnf("failed to update stream status: %s", err.Error())
 	}

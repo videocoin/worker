@@ -11,7 +11,6 @@ import (
 	"time"
 
 	pb "github.com/VideoCoin/common/proto"
-	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/core/types"
 	"github.com/fsnotify/fsnotify"
@@ -20,13 +19,7 @@ import (
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) syncDir(
-	stop chan struct{},
-	cmd *exec.Cmd,
-	workOrder *pb.WorkOrder,
-	dir string,
-	bitrate uint32,
-) {
+func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
 
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
@@ -170,15 +163,10 @@ func (s *Service) handleChunk(job *Job) error {
 }
 
 // SubmitProof registers work (output chunk)
-func (s *Service) submitProof(
-	contractAddress string,
-	bitrate uint32,
-	inputChunkID *big.Int,
-	outputChunkID *big.Int,
-) (*types.Transaction, error) {
-	streamInstance, err := stream.NewStream(common.HexToAddress(contractAddress), s.bcClient)
+func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
+
+	streamInstance, err := s.createStreamInstance(contractAddress)
 	if err != nil {
-		s.log.Errorf("failed to create new stream instance: %s", err.Error())
 		return nil, err
 	}
 
@@ -191,12 +179,7 @@ func (s *Service) submitProof(
 }
 
 // verifyChunk calls verifier with input and output chunk urls
-func (s *Service) verify(
-	tx *types.Transaction,
-	job *Job,
-	localFile string,
-	outputURL string,
-) error {
+func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL string) error {
 
 	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", localFile, outputURL, job.InputID, job.OutputID, job.StreamID, job.Bitrate)
 
@@ -225,10 +208,7 @@ func (s *Service) verify(
 	return err
 }
 
-func (s *Service) process(
-	jobChan chan Job,
-	workOrder *pb.WorkOrder,
-) {
+func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusTranscoding.String())
 
 	for len(jobChan) < 2 {
@@ -250,10 +230,7 @@ func (s *Service) process(
 	}
 }
 
-func (s *Service) updateStatus(
-	streamID int64,
-	status string,
-) {
+func (s *Service) updateStatus(streamID int64, status string) {
 	_, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
 		StreamId: streamID,
 		Status:   status,
