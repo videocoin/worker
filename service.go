@@ -110,30 +110,15 @@ func Start() error {
 		return err
 	}
 
-	workOrder, err := s.manager.GetJob(s.ctx, &pb.GetJobRequest{})
-	if err != nil {
-		s.log.Debugf("failed to get job: %s", err.Error())
-		return err
-	}
-
-	profile, err := s.manager.GetProfile(s.ctx, &pb.GetProfileRequest{
-		ProfileId: workOrder.Profile,
-	})
-
-	if err != nil {
-		s.log.Debugf("failed to get profile: %s", err.Error())
-		return err
-	}
-
 	uid, err := machineid.ProtectedID(cfg.HashKey)
 	if err != nil {
 		s.log.Warnf("failed to calculate machine id: %s", err.Error())
 	}
-
 	s.register(uid)
 
-	if err = s.handleTranscodeTask(workOrder, profile); err != nil {
-		s.log.Errorf("failed to handle transcode task: %s", err.Error())
+	err = s.listen()
+	if err != nil {
+		s.log.Errorf("failed to start server: %s", err.Error())
 		return err
 	}
 
