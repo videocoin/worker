@@ -33,28 +33,39 @@ spec:
         cloud.google.com/gke-nodepool: transcode
       containers:
         - env:
-            - name: TERM
-              value: xterm-color
-            - name: CLICOLOR
-              value: "1"
+            - name: BASE_STORAGE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: base_storage_url
+                  name: config
             - name: BASE_STREAM_URL
-              value: http://ingest.videocoin.io:8080/hls
+              valueFrom:
+                configMapKeyRef:
+                  key: base_stream_url
+                  name: config
+            - name: BLOCKCHAIN_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: blockchain_url
+                  name: config
+            - name: SMCA
+              valueFrom:
+                configMapKeyRef:
+                  key: smca
+                  name: config
             - name: VERIFIER_URL
-              value: http://verify.videocoin.io:8100
+              valueFrom:
+                configMapKeyRef:
+                  key: verifier_url
+                  name: config
             - name: VERIFIER_RPC_ADDR
               value: verifier:50055
-            - name: BASE_STORAGE_URL
-              value: https://storage.googleapis.com/vc-test-fuse
             - name: FUSE_BUCKET
               value: vc-test-fuse
             - name: OUTPUT_DIR
               value: /opt/mnt/
             - name: MANAGER_RPC_ADDR
               value: manager:50051
-            - name: BLOCKCHAIN_URL
-              value: http://admin:LivePlanetS3cr3t@35.247.112.164
-            - name: SMCA
-              value: "0x8bFEF9CaB41460dB146b1E701B782edBa7883bC9"
             - name: KEY_FILE
               value: keys/transcoder.key
             - name: PASSWORD
