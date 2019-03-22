@@ -58,10 +58,13 @@ spec:
                 configMapKeyRef:
                   key: verifier_url
                   name: config
+            - name: FUSE_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  key: fuse_bucket
+                  name: config
             - name: VERIFIER_RPC_ADDR
               value: verifier:50055
-            - name: FUSE_BUCKET
-              value: vc-test-fuse
             - name: OUTPUT_DIR
               value: /opt/mnt/
             - name: MANAGER_RPC_ADDR
