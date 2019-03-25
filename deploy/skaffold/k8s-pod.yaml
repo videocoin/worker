@@ -63,6 +63,16 @@ spec:
                 configMapKeyRef:
                   key: fuse_bucket
                   name: config
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: transcode-password
+                  key: password
+            - name: HASH_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secrethash
+                  key: hash
             - name: VERIFIER_RPC_ADDR
               value: verifier:50055
             - name: OUTPUT_DIR
@@ -71,15 +81,8 @@ spec:
               value: manager:50051
             - name: KEY_FILE
               value: keys/transcoder.key
-            - name: PASSWORD
-              value: transcoder
             - name: LOG_LEVEL
               value: ERROR
-            - name: HASH_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: secrethash
-                  key: hash
           image: us.gcr.io/videocoin-183500/transcoder:latest
           imagePullPolicy: Always
           name: xcoders
