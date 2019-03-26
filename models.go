@@ -11,6 +11,7 @@ import (
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/grafov/m3u8"
+	stan "github.com/nats-io/go-nats-streaming"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,22 +40,23 @@ type (
 		StreamID        *big.Int
 		InputID         *big.Int
 		OutputID        *big.Int
-		Playlist        *m3u8.MediaPlaylist
-		Wallet          common.Address
 		cmd             *exec.Cmd
 		stopChan        chan struct{}
+		Wallet          common.Address
+		Playlist        *m3u8.MediaPlaylist
 	}
 
 	// Service primary reciever for service
 	Service struct {
 		cfg           *Config
-		ctx           context.Context
-		manager       proto.ManagerServiceClient
+		sc            stan.Conn
 		log           *logrus.Entry
-		verifier      proto.VerifierServiceClient
-		streamManager *streamManager.Manager
-		bcAuth        *bind.TransactOpts
-		bcClient      *ethclient.Client
 		pkAddr        common.Address
+		ctx           context.Context
+		bcClient      *ethclient.Client
+		bcAuth        *bind.TransactOpts
+		streamManager *streamManager.Manager
+		manager       proto.ManagerServiceClient
+		verifier      proto.VerifierServiceClient
 	}
 )
