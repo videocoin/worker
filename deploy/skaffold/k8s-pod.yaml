@@ -63,6 +63,16 @@ spec:
                 configMapKeyRef:
                   key: fuse_bucket
                   name: config
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: nats_url
+                  name: config
+            - name: CLUSTER_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: cluster_id
+                  name: config
             - name: PASSWORD
               valueFrom:
                 secretKeyRef:
