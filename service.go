@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -88,6 +87,11 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to get blockchain auth: %s", err.Error())
 	}
 
+	sc, err := connectNats(cfg.NatsURL, cfg.ClusterID, cfg.ClientID)
+	if err != nil {
+		log.Fatalf("failed to connect to nats cluster: %s", err.Error())
+	}
+
 	return &Service{
 		streamManager: sm,
 		bcAuth:        bcAuth,
@@ -95,6 +99,7 @@ func newService() (*Service, error) {
 		cfg:           cfg,
 		manager:       manager,
 		verifier:      v,
+		sc:            sc,
 		ctx:           ctx,
 		log:           log,
 	}, nil
@@ -112,26 +117,13 @@ func Start() error {
 	if err != nil {
 		s.log.Warnf("failed to calculate machine id: %s", err.Error())
 	}
-	s.register(uid)
 
-	err = s.listen()
-	if err != nil {
-		s.log.Errorf("failed to start server: %s", err.Error())
-		return err
+	{
+		s.register(uid)
+		s.subscribe(uid)
 	}
 
 	return nil
-}
-
-// AssignWork endpoint that recieves new work from manager
-func (s *Service) AssignWork(ctx context.Context, in *pb.Assignment) (*empty.Empty, error) {
-	err := s.handleTranscode(in.Workorder, in.Profile)
-	if err != nil {
-		s.log.Errorf("failed to run transcode: %s", err.Error())
-		return new(empty.Empty), err
-	}
-
-	return new(empty.Empty), nil
 }
 
 func (s *Service) register(uid string) {
@@ -274,19 +266,4 @@ func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
 	}
 
 	return streamInstance, nil
-}
-
-func (s *Service) listen() error {
-
-	lis, err := net.Listen("tcp", s.cfg.Port)
-	if err != nil {
-		return err
-	}
-
-	s.log.Infof("listening on port: %s", s.cfg.Port)
-
-	rpcSrv := grpc.NewServer()
-	pb.RegisterTranscodersServer(rpcSrv, new(Service))
-
-	return rpcSrv.Serve(lis)
 }

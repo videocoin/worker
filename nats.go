@@ -27,7 +27,7 @@ func connectNats(natsURL, clusterID, clientID string) (stan.Conn, error) {
 }
 
 func (s *Service) subscribe(uid string) {
-
+	s.listenForAssignment(uid)
 }
 
 func (s *Service) listenForAssignment(uid string) {
