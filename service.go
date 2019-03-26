@@ -87,7 +87,7 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to get blockchain auth: %s", err.Error())
 	}
 
-	sc, err := connectNats(cfg.NatsURL, cfg.ClusterID, cfg.ClientID)
+	sc, err := connectNats(cfg.NatsURL, cfg.ClusterID, fmt.Sprintf("%x", b))
 	if err != nil {
 		log.Fatalf("failed to connect to nats cluster: %s", err.Error())
 	}

@@ -23,9 +23,8 @@ type Config struct {
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
 	HashKey         string `required:"true" envconfig:"HASH_KEY" default:"BEEFFEED"`
 	Port            string `required:"true" envconfig:"PORT" default:":50056" description:"listens for new work from manager"`
-	NatsURL         string
-	ClusterID       string `required:"true" envconfig:"CLUSTER_ID" default:"test-cluster"`
-	ClientID        string
+	ClusterID       string `required:"true" envconfig:"CLUSTER_ID"`
+	NatsURL         string `required:"true" envconfig:"NATS_URL"`
 }
 
 var cfg Config
