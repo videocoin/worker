@@ -25,6 +25,7 @@ type Config struct {
 	Port            string `required:"true" envconfig:"PORT" default:":50056" description:"listens for new work from manager"`
 	ClusterID       string `required:"true" envconfig:"CLUSTER_ID"`
 	NatsURL         string `required:"true" envconfig:"NATS_URL"`
+	NatsToken       string `required:"true" envconfig:"NATS_TOKEN"`
 }
 
 var cfg Config

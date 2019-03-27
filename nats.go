@@ -12,8 +12,8 @@ const (
 	queueGroup = "transcoder"
 )
 
-func connectNats(natsURL, clusterID, clientID string) (stan.Conn, error) {
-	nc, err := nats.Connect(natsURL)
+func connectNats(natsURL, clusterID, clientID, token string) (stan.Conn, error) {
+	nc, err := nats.Connect(natsURL, nats.Token(token))
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,6 @@ func (s *Service) subscribe(uid string) {
 }
 
 func (s *Service) listenForAssignment(uid string) {
-
 	qcb := func(m *stan.Msg) {
 		var assignment = new(pb.Assignment)
 

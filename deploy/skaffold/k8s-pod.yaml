@@ -83,6 +83,11 @@ spec:
                 secretKeyRef:
                   name: secrethash
                   key: hash
+            - name: NATS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: nats-token
+                  key: token
             - name: VERIFIER_RPC_ADDR
               value: verifier:50055
             - name: OUTPUT_DIR
