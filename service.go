@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/VideoCoin/common/msg"
+
 	"github.com/VideoCoin/common/stream"
 
 	"github.com/denisbrodbeck/machineid"
@@ -87,7 +89,7 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to get blockchain auth: %s", err.Error())
 	}
 
-	sc, err := connectNats(cfg.NatsURL, cfg.ClusterID, fmt.Sprintf("%x", b), cfg.NatsToken)
+	sc, err := msg.ConnectStanWithToken(cfg.NatsURL, cfg.ClusterID, fmt.Sprintf("%x", b), cfg.NatsToken)
 	if err != nil {
 		log.Fatalf("failed to connect to nats cluster: %s", err.Error())
 	}
