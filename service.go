@@ -137,6 +137,7 @@ func (s *Service) register(uid string) {
 		CpuCores:    info[0].Cores,
 		CpuMhz:      info[0].Mhz,
 		TotalMemory: memInfo.Total,
+		Status:      pb.TranscoderStatusAvailable.String(),
 	})
 }
 
