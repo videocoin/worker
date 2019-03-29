@@ -73,6 +73,11 @@ spec:
                 configMapKeyRef:
                   key: cluster_id
                   name: config
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  key: log_level
+                  name: config
             - name: PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -96,8 +101,6 @@ spec:
               value: manager:50051
             - name: KEY_FILE
               value: keys/transcoder.key
-            - name: LOG_LEVEL
-              value: INFO
           image: us.gcr.io/videocoin-183500/transcoder:latest
           imagePullPolicy: Always
           name: xcoders

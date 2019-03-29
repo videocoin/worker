@@ -17,7 +17,8 @@ var (
 func (s *Service) subscribe(uid string) {
 	{
 		s.ec.BindRecvChan(uid, assignmentCh)
-		go s.listenForAssignment(uid)
+		s.listenForAssignment(uid)
+		s.heartBeat(uid)
 	}
 }
 

@@ -127,8 +127,9 @@ func Start() error {
 	}
 
 	{
+
+		go s.subscribe(uid)
 		s.register(uid)
-		s.subscribe(uid)
 	}
 
 	return nil
