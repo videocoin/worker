@@ -5,13 +5,14 @@ import (
 	"math/big"
 	"os/exec"
 
+	"github.com/nats-io/go-nats"
+
 	"github.com/VideoCoin/common/proto"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/grafov/m3u8"
-	stan "github.com/nats-io/go-nats-streaming"
 	"github.com/sirupsen/logrus"
 )
 
@@ -49,7 +50,8 @@ type (
 	// Service primary reciever for service
 	Service struct {
 		cfg           *Config
-		sc            stan.Conn
+		ec            *nats.EncodedConn
+		nc            *nats.Conn
 		log           *logrus.Entry
 		pkAddr        common.Address
 		ctx           context.Context

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VideoCoin/common/msg"
+	"github.com/nats-io/go-nats"
 
 	"github.com/VideoCoin/common/stream"
 
@@ -89,9 +89,14 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to get blockchain auth: %s", err.Error())
 	}
 
-	sc, err := msg.ConnectStanWithToken(cfg.NatsURL, cfg.ClusterID, fmt.Sprintf("%x", b), cfg.NatsToken)
+	nc, err := nats.Connect(cfg.NatsURL, nats.Token(cfg.NatsToken))
 	if err != nil {
-		log.Fatalf("failed to connect to nats cluster: %s", err.Error())
+		log.Fatalf("failed to connect to nats: %s", err.Error())
+	}
+
+	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	if err != nil {
+		log.Fatalf("failed to creat encoded connection: %s", err.Error())
 	}
 
 	return &Service{
@@ -101,7 +106,8 @@ func newService() (*Service, error) {
 		cfg:           cfg,
 		manager:       manager,
 		verifier:      v,
-		sc:            sc,
+		ec:            ec,
+		nc:            nc,
 		ctx:           ctx,
 		log:           log,
 	}, nil
