@@ -97,7 +97,7 @@ spec:
             - name: KEY_FILE
               value: keys/transcoder.key
             - name: LOG_LEVEL
-              value: ERROR
+              value: INFO
           image: us.gcr.io/videocoin-183500/transcoder:latest
           imagePullPolicy: Always
           name: xcoders

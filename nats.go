@@ -17,6 +17,8 @@ func (s *Service) subscribe(uid string) {
 
 func (s *Service) listenForAssignment(uid string) {
 	qcb := func(m *stan.Msg) {
+		s.log.Infof("recived nats msg: %d", m.CRC32)
+
 		var assignment = new(pb.Assignment)
 
 		err := json.Unmarshal(m.Data, &assignment)
