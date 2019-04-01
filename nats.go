@@ -33,7 +33,10 @@ func (s *Service) listenForAssignment(uid string) {
 }
 
 func (s *Service) heartBeat(uid string) {
-	s.ec.Subscribe(fmt.Sprintf("%s-ping", uid), func(subj, reply, msg string) {
+	_, err := s.ec.Subscribe(fmt.Sprintf("%s-ping", uid), func(subj, reply, msg string) {
 		s.ec.Publish(reply, "pong")
 	})
+	if err != nil {
+		s.log.Errorf("failed to subscribe to heartBeat: %s", err.Error())
+	}
 }
