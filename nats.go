@@ -16,9 +16,9 @@ var (
 
 func (s *Service) subscribe(uid string) {
 	{
+		s.heartBeat(uid)
 		s.ec.BindRecvChan(uid, assignmentCh)
 		s.listenForAssignment(uid)
-		s.heartBeat(uid)
 	}
 }
 
@@ -33,6 +33,7 @@ func (s *Service) listenForAssignment(uid string) {
 }
 
 func (s *Service) heartBeat(uid string) {
+	s.log.Info("registering heartbeat monitor")
 	_, err := s.ec.Subscribe(fmt.Sprintf("%s-ping", uid), func(subj, reply, msg string) {
 		s.ec.Publish(reply, "pong")
 	})
