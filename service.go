@@ -7,8 +7,10 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/nats-io/go-nats"
@@ -131,6 +133,8 @@ func Start() error {
 		go s.subscribe(uid)
 		s.register(uid)
 	}
+
+	s.wait()
 
 	return nil
 }
@@ -276,4 +280,11 @@ func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
 	}
 
 	return streamInstance, nil
+}
+
+func (s *Service) wait() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	<-c
+	s.log.Info("shutting down")
 }
