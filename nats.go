@@ -15,11 +15,9 @@ var (
 )
 
 func (s *Service) subscribe(uid string) {
-	{
-		s.heartBeat(uid)
-		s.ec.BindRecvChan(uid, assignmentCh)
-		s.listenForAssignment(uid)
-	}
+	s.heartBeat(uid)
+	s.ec.BindRecvChan(uid, assignmentCh)
+	s.listenForAssignment(uid)
 }
 
 func (s *Service) listenForAssignment(uid string) {

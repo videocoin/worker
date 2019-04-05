@@ -171,6 +171,7 @@ func (s *Service) handleTranscode(workOrder *pb.WorkOrder, profile *pb.Profile) 
 		if err != nil {
 			return err
 		}
+
 		go s.syncDir(stopChan, cmd, workOrder, fullDir, b)
 
 	}
