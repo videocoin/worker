@@ -31,9 +31,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+func init() {
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+}
+
 // New initialize and return a new Service object
 func newService() (*Service, error) {
-	logrus.SetFormatter(&logrus.JSONFormatter{})
 	log := logrus.WithField("service", "transcode")
 	cfg := LoadConfig()
 
