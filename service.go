@@ -155,7 +155,7 @@ func (s *Service) register(uid string) {
 	})
 }
 
-func (s *Service) handleTranscode(workOrder *pb.WorkOrder, profile *pb.Profile) error {
+func (s *Service) handleTranscode(workOrder *pb.WorkOrder, profile *pb.Profile, uid string) error {
 	s.log.Infof("starting transcode: %d using input: %s with stream_id: %d",
 		workOrder.Id, workOrder.InputUrl, workOrder.StreamId,
 	)
@@ -188,6 +188,7 @@ func (s *Service) handleTranscode(workOrder *pb.WorkOrder, profile *pb.Profile) 
 		workOrder.InputUrl,
 		workOrder.StreamId,
 		workOrder.ContractAddress,
+		uid,
 	)
 
 	return nil
@@ -200,6 +201,7 @@ func (s *Service) transcode(
 	streamurl string,
 	streamID int64,
 	contractAddr string,
+	uid string,
 ) {
 	s.waitForStreamReady(streamurl)
 	s.log.Info("starting transcode")
@@ -215,6 +217,8 @@ func (s *Service) transcode(
 	if err := s.refund(streamID, contractAddr); err != nil {
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
+
+	s.manager.UpdateTranscoderStatus(s.ctx, &pb.UpdateTranscoderStatusRequest{TranscoderId: uid, Status: pb.TranscoderStatusAvailable.String()})
 
 	s.log.Info("transcode complete")
 

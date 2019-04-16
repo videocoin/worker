@@ -25,7 +25,7 @@ func (s *Service) listenForAssignment(uid string) {
 		select {
 		case a := <-assignmentCh:
 			s.log.Info("recieved assignment")
-			s.handleTranscode(a.Workorder, a.Profile)
+			s.handleTranscode(a.Workorder, a.Profile, uid)
 		}
 	}
 }
