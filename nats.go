@@ -3,7 +3,7 @@ package transcode
 import (
 	"fmt"
 
-	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
+	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
 )
 
 const (
@@ -11,7 +11,7 @@ const (
 )
 
 var (
-	assignmentCh = make(chan *workorder_v1.Assignment)
+	assignmentCh = make(chan *transcoder_v1.Assignment)
 )
 
 func (s *Service) subscribe(uid string) {
