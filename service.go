@@ -13,21 +13,22 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/nats-io/go-nats"
-
-	"github.com/VideoCoin/common/stream"
-
-	"github.com/denisbrodbeck/machineid"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/mem"
-	"github.com/sirupsen/logrus"
-
+	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
+	profiles_v1 "github.com/VideoCoin/cloud-api/profiles/v1"
+	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
+	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
+	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
 	bc "github.com/VideoCoin/common/bcops"
-	pb "github.com/VideoCoin/common/proto"
+	"github.com/VideoCoin/common/stream"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
+	"github.com/denisbrodbeck/machineid"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/nats-io/go-nats"
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/mem"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -58,13 +59,13 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to dial verifier: %s", err.Error())
 	}
 
-	manager := pb.NewManagerServiceClient(managerConn)
+	manager := manager_v1.NewManagerServiceClient(managerConn)
 	status, err := manager.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
 		return nil, fmt.Errorf("failed to get healthy status from manager")
 	}
 
-	v := pb.NewVerifierServiceClient(verifierConn)
+	v := verifier_v1.NewVerifierServiceClient(verifierConn)
 	status, err = v.Health(context.Background(), &empty.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
 		return nil, fmt.Errorf("failed to get healthy status from verifier")
@@ -146,16 +147,16 @@ func (s *Service) register(uid string) {
 	info, _ := cpu.Info()
 	memInfo, _ := mem.VirtualMemory()
 
-	s.manager.RegisterTranscoder(context.Background(), &pb.Transcoder{
+	s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
 		Id:          uid,
 		CpuCores:    info[0].Cores,
 		CpuMhz:      info[0].Mhz,
 		TotalMemory: memInfo.Total,
-		Status:      pb.TranscoderStatusAvailable.String(),
+		Status:      transcoder_v1.TranscoderStatusAvailable.String(),
 	})
 }
 
-func (s *Service) handleTranscode(workOrder *pb.WorkOrder, profile *pb.Profile, uid string) error {
+func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *profiles_v1.Profile, uid string) error {
 	s.log.Infof("starting transcode: %d using input: %s with stream_id: %d",
 		workOrder.Id, workOrder.InputUrl, workOrder.StreamId,
 	)
@@ -218,7 +219,7 @@ func (s *Service) transcode(
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
 
-	s.manager.UpdateTranscoderStatus(s.ctx, &pb.UpdateTranscoderStatusRequest{TranscoderId: uid, Status: pb.TranscoderStatusAvailable.String()})
+	s.manager.UpdateTranscoderStatus(s.ctx, &manager_v1.UpdateTranscoderStatusRequest{TranscoderId: uid, Status: transcoder_v1.TranscoderStatusAvailable.String()})
 
 	s.log.Info("transcode complete")
 
@@ -241,7 +242,7 @@ func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
 
-func buildCmd(inputURL string, dir string, profile *pb.Profile) *exec.Cmd {
+func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
 	for _, b := range bitrates {
@@ -266,9 +267,9 @@ func (s *Service) refund(streamID int64, addr string) error {
 		return err
 	}
 
-	_, err = s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
+	_, err = s.manager.UpdateStreamStatus(s.ctx, &manager_v1.UpdateStreamStatusRequest{
 		StreamId: streamID,
-		Status:   pb.WorkOrderStatusCompleted.String(),
+		Status:   workorder_v1.WorkOrderStatusCompleted.String(),
 		Refunded: true,
 	})
 

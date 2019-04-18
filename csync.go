@@ -10,7 +10,9 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/VideoCoin/common/proto"
+	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
+	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/core/types"
 	"github.com/fsnotify/fsnotify"
@@ -19,7 +21,7 @@ import (
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *pb.WorkOrder, dir string, bitrate uint32) {
+func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorder_v1.WorkOrder, dir string, bitrate uint32) {
 
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
@@ -183,7 +185,7 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 
 	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", localFile, outputURL, job.InputID, job.OutputID, job.StreamID, job.Bitrate)
 
-	_, err := s.verifier.Verify(context.Background(), &pb.VerifyRequest{
+	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
 		StreamId:       job.StreamID.Int64(),
 		Bitrate:        job.Bitrate,
@@ -193,7 +195,7 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		ResultChunkUrl: outputURL,
 	})
 
-	balance, err := s.manager.CheckBalance(context.Background(), &pb.CheckBalanceRequest{ContractAddress: job.ContractAddr})
+	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.ContractAddr})
 	if err != nil {
 		s.log.Warnf("failed to check balance, allowing work")
 	}
@@ -208,14 +210,14 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 	return err
 }
 
-func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
-	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusTranscoding.String())
+func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
+	s.updateStatus(workOrder.StreamId, workorder_v1.WorkOrderStatusTranscoding.String())
 
 	for len(jobChan) < 2 {
 		time.Sleep(1 * time.Second)
 	}
 
-	s.updateStatus(workOrder.StreamId, pb.WorkOrderStatusReady.String())
+	s.updateStatus(workOrder.StreamId, workorder_v1.WorkOrderStatusReady.String())
 
 	for {
 		for len(jobChan) < 2 {
@@ -231,7 +233,7 @@ func (s *Service) process(jobChan chan Job, workOrder *pb.WorkOrder) {
 }
 
 func (s *Service) updateStatus(streamID int64, status string) {
-	_, err := s.manager.UpdateStreamStatus(s.ctx, &pb.UpdateStreamStatusRequest{
+	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.UpdateStreamStatusRequest{
 		StreamId: streamID,
 		Status:   status,
 	})
@@ -242,7 +244,7 @@ func (s *Service) updateStatus(streamID int64, status string) {
 }
 
 func (s *Service) chunkCreated(j *Job) error {
-	_, err := s.manager.ChunkCreated(s.ctx, &pb.ChunkCreatedRequest{
+	_, err := s.manager.ChunkCreated(s.ctx, &manager_v1.ChunkCreatedRequest{
 		StreamId:      j.StreamID.Int64(),
 		SourceChunkId: j.InputID.Int64(),
 		ResultChunkId: j.OutputID.Int64(),
