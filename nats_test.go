@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/VideoCoin/common/proto"
+	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
@@ -24,8 +25,8 @@ func TestService_subscribe(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		uid string
@@ -68,8 +69,8 @@ func TestService_listenForAssignment(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		uid string
@@ -112,8 +113,8 @@ func TestService_heartBeat(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		uid string

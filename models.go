@@ -5,14 +5,14 @@ import (
 	"math/big"
 	"os/exec"
 
-	"github.com/nats-io/go-nats"
-
-	"github.com/VideoCoin/common/proto"
+	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/grafov/m3u8"
+	"github.com/nats-io/go-nats"
 	"github.com/sirupsen/logrus"
 )
 
@@ -58,7 +58,7 @@ type (
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 )
