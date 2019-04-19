@@ -9,7 +9,7 @@ import (
 
 	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	"github.com/VideoCoin/common/streamManager"
+	"github.com/VideoCoin/cloud-pkg/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
