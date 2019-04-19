@@ -7,8 +7,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/VideoCoin/common/proto"
-	pb "github.com/VideoCoin/common/proto"
+	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
+	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
@@ -29,13 +30,13 @@ func TestService_syncDir(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		stop      chan struct{}
 		cmd       *exec.Cmd
-		workOrder *pb.WorkOrder
+		workOrder *workorder_v1.WorkOrder
 		dir       string
 		bitrate   uint32
 	}
@@ -77,8 +78,8 @@ func TestService_handleChunk(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		job *Job
@@ -124,8 +125,8 @@ func TestService_submitProof(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		contractAddress string
@@ -180,8 +181,8 @@ func TestService_verify(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		tx        *types.Transaction
@@ -230,12 +231,12 @@ func TestService_process(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		jobChan   chan Job
-		workOrder *pb.WorkOrder
+		workOrder *workorder_v1.WorkOrder
 	}
 	tests := []struct {
 		name   string
@@ -275,8 +276,8 @@ func TestService_updateStatus(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		streamID int64
@@ -320,8 +321,8 @@ func TestService_chunkCreated(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		j *Job

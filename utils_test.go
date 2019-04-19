@@ -7,7 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/VideoCoin/common/proto"
+	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
 	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
@@ -27,8 +28,8 @@ func TestService_upload(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		output string
@@ -115,8 +116,8 @@ func TestService_duration(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		input string
@@ -168,8 +169,8 @@ func TestService_generatePlaylist(t *testing.T) {
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       proto.ManagerServiceClient
-		verifier      proto.VerifierServiceClient
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
 		streamID int64
