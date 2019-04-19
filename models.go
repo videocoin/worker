@@ -37,7 +37,7 @@ type (
 		InputChunkName  string
 		OutputChunkName string
 		ChunksDir       string
-		ContractAddr    string
+		StreamAddress   string
 		StreamID        *big.Int
 		InputID         *big.Int
 		OutputID        *big.Int

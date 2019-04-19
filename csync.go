@@ -82,7 +82,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						OutputChunkName: fmt.Sprintf("%d.ts", randomID),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
-						ContractAddr:    workOrder.ContractAddress,
+						SteamAddress:    workOrder.StreamAddress,
 						cmd:             cmd,
 						stopChan:        stop,
 					}
