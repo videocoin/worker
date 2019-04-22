@@ -158,13 +158,13 @@ func (s *Service) register(uid string) {
 
 func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *profiles_v1.Profile, uid string) error {
 	s.log.Infof("starting transcode: %d using input: %s with stream_id: %d",
-		workOrder.Id, workOrder.InputUrl, workOrder.StreamId,
+		workOrder.Id, workOrder.TranscodeInputUrl, workOrder.StreamId,
 	)
 
 	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
 
-	cmd := buildCmd(workOrder.InputUrl, dir, profile)
+	cmd := buildCmd(workOrder.TranscodeInputUrl, dir, profile)
 	var stopChan = make(chan struct{})
 
 	for _, b := range bitrates {
@@ -186,9 +186,9 @@ func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *pr
 
 	go s.transcode(cmd,
 		stopChan,
-		workOrder.InputUrl,
+		workOrder.TranscodeInputUrl,
 		workOrder.StreamId,
-		workOrder.ContractAddress,
+		workOrder.StreamAddress,
 		uid,
 	)
 
@@ -219,7 +219,7 @@ func (s *Service) transcode(
 		s.log.Errorf("failed to refund:%s", err.Error())
 	}
 
-	s.manager.UpdateTranscoderStatus(s.ctx, &manager_v1.UpdateTranscoderStatusRequest{TranscoderId: uid, Status: transcoder_v1.TranscoderStatusAvailable.String()})
+	s.manager.UpdateTranscoderStatus(s.ctx, &manager_v1.TranscoderStatusRequest{TranscoderId: uid, Status: transcoder_v1.TranscoderStatusAvailable.String()})
 
 	s.log.Info("transcode complete")
 
@@ -267,7 +267,7 @@ func (s *Service) refund(streamID int64, addr string) error {
 		return err
 	}
 
-	_, err = s.manager.UpdateStreamStatus(s.ctx, &manager_v1.UpdateStreamStatusRequest{
+	_, err = s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
 		StreamId: streamID,
 		Status:   workorder_v1.WorkOrderStatusCompleted.String(),
 		Refunded: true,

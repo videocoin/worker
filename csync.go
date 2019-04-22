@@ -82,7 +82,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						OutputChunkName: fmt.Sprintf("%d.ts", randomID),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
-						SteamAddress:    workOrder.StreamAddress,
+						StreamAddress:   workOrder.StreamAddress,
 						cmd:             cmd,
 						stopChan:        stop,
 					}
@@ -150,7 +150,7 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	tx, err := s.submitProof(job.ContractAddr, job.Bitrate, job.InputID, job.OutputID)
+	tx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
 		return err
 	}
@@ -195,12 +195,12 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		ResultChunkUrl: outputURL,
 	})
 
-	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.ContractAddr})
+	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.StreamAddress})
 	if err != nil {
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	s.log.Infof("current balance at address %s is %f", job.ContractAddr, balance.Balance)
+	s.log.Infof("current balance at address %s is %f", job.StreamAddress, balance.Balance)
 
 	if balance.Balance <= 0 {
 		job.cmd.Process.Kill()
@@ -233,7 +233,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 }
 
 func (s *Service) updateStatus(streamID int64, status string) {
-	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.UpdateStreamStatusRequest{
+	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
 		StreamId: streamID,
 		Status:   status,
 	})
