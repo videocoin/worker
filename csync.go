@@ -182,9 +182,6 @@ func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunk
 
 // verifyChunk calls verifier with input and output chunk urls
 func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL string) error {
-
-	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", localFile, outputURL, job.InputID, job.OutputID, job.StreamID, job.Bitrate)
-
 	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
 		StreamId:       job.StreamID.Int64(),
@@ -195,12 +192,14 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		ResultChunkUrl: outputURL,
 	})
 
+	if err != nil {
+		s.log.Errorf("failed to call verifier: %s", err.Error())
+	}
+
 	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.StreamAddress})
 	if err != nil {
 		s.log.Warnf("failed to check balance, allowing work")
 	}
-
-	s.log.Infof("current balance at address %s is %f", job.StreamAddress, balance.Balance)
 
 	if balance.Balance <= 0 {
 		job.cmd.Process.Kill()
