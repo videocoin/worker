@@ -106,7 +106,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 
 	err = watcher.Add(dir)
 	if err != nil {
-		s.log.Fatalf("water failure: %s", err.Error())
+		s.log.Fatalf("failed to watch directory: %s", err.Error())
 	}
 
 	<-done
