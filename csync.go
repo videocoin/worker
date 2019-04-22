@@ -42,7 +42,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 
 	done := make(chan struct{})
 
-	walletHex := common.HexToAddress(workOrder.WalletAddress)
+	walletHex := common.HexToAddress(workOrder.StreamAddress)
 
 	written := make(map[string]bool)
 
