@@ -210,8 +210,6 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 }
 
 func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
-	s.updateStatus(workOrder.StreamId, workorder_v1.WorkOrderStatusTranscoding.String())
-
 	for len(jobChan) < 2 {
 		time.Sleep(1 * time.Second)
 	}

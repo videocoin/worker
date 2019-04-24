@@ -269,7 +269,7 @@ func (s *Service) refund(streamID int64, addr string) error {
 
 	_, err = s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
 		StreamId: streamID,
-		Status:   workorder_v1.WorkOrderStatusCompleted.String(),
+		Status:   workorder_v1.WorkOrderStatusComplete.String(),
 		Refunded: true,
 	})
 
