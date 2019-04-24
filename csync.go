@@ -158,9 +158,13 @@ func (s *Service) handleChunk(job *Job) error {
 	inputChunk := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
-	if err = s.verify(tx, job, inputChunk, outputChunk); err != nil {
-		return err
-	}
+	// potentially long running process
+	go func() {
+		if err = s.verify(tx, job, inputChunk, outputChunk); err != nil {
+			s.log.Errorf("failed to verify chunk: %s", err.Error())
+		}
+	}()
+
 	return nil
 }
 
