@@ -6,10 +6,6 @@ import (
 	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
 )
 
-const (
-	queueGroup = "transcoder"
-)
-
 var (
 	assignmentCh = make(chan *transcoder_v1.Assignment)
 )
@@ -21,12 +17,9 @@ func (s *Service) subscribe(uid string) {
 }
 
 func (s *Service) listenForAssignment(uid string) {
-	for {
-		select {
-		case a := <-assignmentCh:
-			s.log.Info("recieved assignment")
-			s.handleTranscode(a.Workorder, a.Profile, uid)
-		}
+	for a := range assignmentCh {
+		s.log.Info("recieved assignment")
+		s.handleTranscode(a.Workorder, a.Profile, uid)
 	}
 }
 

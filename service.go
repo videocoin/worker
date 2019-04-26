@@ -292,7 +292,7 @@ func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
 }
 
 func (s *Service) wait() {
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 	s.log.Info("shutting down")

@@ -220,12 +220,12 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 		for len(jobChan) < 2 {
 			time.Sleep(500 * time.Millisecond)
 		}
-		select {
-		case j := <-jobChan:
-			if err := s.handleChunk(&j); err != nil {
-				s.log.Errorf("failed to handle chunk: %s", err.Error())
-			}
+
+		j := <-jobChan
+		if err := s.handleChunk(&j); err != nil {
+			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}
+
 	}
 }
 
