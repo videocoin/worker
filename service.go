@@ -143,33 +143,38 @@ func Start() error {
 }
 
 func (s *Service) register(uid string) {
+
+	var (
+		cores    int32
+		mhz      float64
+		memtotal uint64
+	)
+
 	info, err := cpu.Info()
 	if err != nil {
 		s.log.Errorf("failed to get cpu info: %s", err.Error())
+	} else {
+		cores = info[0].Cores
+		mhz = info[0].Mhz
 	}
+
 	memInfo, err := mem.VirtualMemory()
 	if err != nil {
 		s.log.Errorf("failed to get memory info: %s", err.Error())
+	} else {
+		memtotal = memInfo.Total
 	}
 
-	if err == nil {
-		s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
-			Id:          uid,
-			CpuCores:    info[0].Cores,
-			CpuMhz:      info[0].Mhz,
-			TotalMemory: memInfo.Total,
-			Status:      transcoder_v1.TranscoderStatusAvailable.String(),
-		})
+	_, err = s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
+		Id:          uid,
+		CpuCores:    cores,
+		CpuMhz:      mhz,
+		TotalMemory: memtotal,
+		Status:      transcoder_v1.TranscoderStatusAvailable.String(),
+	})
 
-	} else {
-		s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
-			Id:          uid,
-			CpuCores:    0,
-			CpuMhz:      0,
-			TotalMemory: 0,
-			Status:      transcoder_v1.TranscoderStatusAvailable.String(),
-		})
-
+	if err != nil {
+		s.log.Errorf("failed to register transcoder: %s", err.Error())
 	}
 
 }
