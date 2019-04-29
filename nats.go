@@ -19,7 +19,10 @@ func (s *Service) subscribe(uid string) {
 func (s *Service) listenForAssignment(uid string) {
 	for a := range assignmentCh {
 		s.log.Info("recieved assignment")
-		s.handleTranscode(a.Workorder, a.Profile, uid)
+		err := s.handleTranscode(a.Workorder, a.Profile, uid)
+		if err != nil {
+			s.log.Errorf("failed to handle transcode: %s", err.Error())
+		}
 	}
 }
 
