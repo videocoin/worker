@@ -133,7 +133,6 @@ func Start() error {
 	}
 
 	{
-
 		go s.subscribe(uid)
 		s.register(uid)
 	}
@@ -144,16 +143,35 @@ func Start() error {
 }
 
 func (s *Service) register(uid string) {
-	info, _ := cpu.Info()
-	memInfo, _ := mem.VirtualMemory()
+	info, err := cpu.Info()
+	if err != nil {
+		s.log.Errorf("failed to get cpu info: %s", err.Error())
+	}
+	memInfo, err := mem.VirtualMemory()
+	if err != nil {
+		s.log.Errorf("failed to get memory info: %s", err.Error())
+	}
 
-	s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
-		Id:          uid,
-		CpuCores:    info[0].Cores,
-		CpuMhz:      info[0].Mhz,
-		TotalMemory: memInfo.Total,
-		Status:      transcoder_v1.TranscoderStatusAvailable.String(),
-	})
+	if err == nil {
+		s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
+			Id:          uid,
+			CpuCores:    info[0].Cores,
+			CpuMhz:      info[0].Mhz,
+			TotalMemory: memInfo.Total,
+			Status:      transcoder_v1.TranscoderStatusAvailable.String(),
+		})
+
+	} else {
+		s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
+			Id:          uid,
+			CpuCores:    0,
+			CpuMhz:      0,
+			TotalMemory: 0,
+			Status:      transcoder_v1.TranscoderStatusAvailable.String(),
+		})
+
+	}
+
 }
 
 func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *profiles_v1.Profile, uid string) error {
