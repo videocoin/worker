@@ -175,6 +175,7 @@ func TestService_generatePlaylist(t *testing.T) {
 	type args struct {
 		streamID int64
 		filename string
+		bitrate  uint32
 	}
 	tests := []struct {
 		name    string
@@ -199,7 +200,7 @@ func TestService_generatePlaylist(t *testing.T) {
 				manager:       tt.fields.manager,
 				verifier:      tt.fields.verifier,
 			}
-			if err := s.generatePlaylist(tt.args.streamID, tt.args.filename); (err != nil) != tt.wantErr {
+			if err := s.generatePlaylist(tt.args.streamID, tt.args.filename, tt.args.bitrate); (err != nil) != tt.wantErr {
 				t.Errorf("Service.generatePlaylist() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
