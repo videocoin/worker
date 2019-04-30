@@ -22,7 +22,6 @@ import (
 
 // SyncDir watches file system and processes chunks as they are written
 func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorder_v1.WorkOrder, dir string, bitrate uint32) {
-
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
 
@@ -157,10 +156,7 @@ func (s *Service) handleChunk(job *Job) error {
 	inputChunk := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
-	if err = s.verify(tx, job, inputChunk, outputChunk); err != nil {
-		return err
-	}
-	return nil
+	return s.verify(tx, job, inputChunk, outputChunk)
 }
 
 // SubmitProof registers work (output chunk)
@@ -170,12 +166,7 @@ func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunk
 		return nil, err
 	}
 
-	tx, err := streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
-	if err != nil {
-		return nil, err
-	}
-
-	return tx, nil
+	return streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
 }
 
 // verifyChunk calls verifier with input and output chunk urls
@@ -200,7 +191,7 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 	}
 
 	if balance.Balance <= 0 {
-		job.cmd.Process.Kill()
+		_ = job.cmd.Process.Kill()
 		job.stopChan <- struct{}{}
 	}
 
@@ -221,7 +212,9 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 
 		j := <-jobChan
 
-		s.chunkCreated(&j)
+		if err := s.chunkCreated(&j); err != nil {
+			s.log.Errorf("failed to register chunk: %s", err.Error())
+		}
 
 		if err := s.handleChunk(&j); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
