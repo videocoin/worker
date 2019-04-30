@@ -62,13 +62,8 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 					!written[chunk] {
 
 					written[chunk] = true
+
 					chunkNum := getChunkNum(chunk)
-
-					_, err = s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), chunkNum)
-					if err != nil {
-						s.log.Errorf("failed to add input chunk: [ %d ] bitrate: [ %d ] err: [ %s ]", chunkNum, bitrate, err.Error())
-					}
-
 					randomID := randomBigInt(8)
 
 					// Add job to the job channel to be worked on later
@@ -225,6 +220,9 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 		}
 
 		j := <-jobChan
+
+		s.chunkCreated(&j)
+
 		if err := s.handleChunk(&j); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}

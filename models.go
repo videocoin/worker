@@ -24,12 +24,6 @@ const (
 	GB
 )
 
-var (
-	bitrates = []uint32{
-		8 * MB,
-	}
-)
-
 type (
 	// Job used to queue up chunk work
 	Job struct {

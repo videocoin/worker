@@ -73,12 +73,12 @@ func (s *Service) duration(input string) (float64, error) {
 }
 
 // GeneratePlaylist based on static bitrates
-func (s *Service) generatePlaylist(streamID int64, filename string) error {
+func (s *Service) generatePlaylist(streamID int64, filename string, bitrate uint32) error {
 	m3u8 := []byte(fmt.Sprintf(`#EXTM3U
 #EXT-X-VERSION:4
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
 %d/index.m3u8
-`, bitrates[0]))
+`))
 
 	err := ioutil.WriteFile(filename, m3u8, 0755)
 	if err != nil {

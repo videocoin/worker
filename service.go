@@ -187,20 +187,16 @@ func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *pr
 	cmd := buildCmd(workOrder.TranscodeInputUrl, dir, profile)
 	var stopChan = make(chan struct{})
 
-	for _, b := range bitrates {
+	fullDir := fmt.Sprintf("%s/%d", dir, profile.Bitrate)
+	err := prepareDir(fullDir)
 
-		fullDir := fmt.Sprintf("%s/%d", dir, b)
-		err := prepareDir(fullDir)
-
-		if err != nil {
-			return err
-		}
-
-		go s.syncDir(stopChan, cmd, workOrder, fullDir, b)
-
+	if err != nil {
+		return err
 	}
 
-	if err := s.generatePlaylist(workOrder.StreamId, m3u8); err != nil {
+	go s.syncDir(stopChan, cmd, workOrder, fullDir, profile.Bitrate)
+
+	if err := s.generatePlaylist(workOrder.StreamId, m3u8, profile.Bitrate); err != nil {
 		return err
 	}
 
@@ -265,10 +261,8 @@ func prepareDir(dir string) error {
 func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
-	for _, b := range bitrates {
-		args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -c:v libx264 -c:a aac -r %f -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, profile.Fps, dir, b, dir, b)
-		process = append(process, strings.Split(args, " ")...)
-	}
+	args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -c:v libx264 -c:a aac -r %f -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 10 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, profile.Fps, dir, profile.Bitrate, dir, profile.Bitrate)
+	process = append(process, strings.Split(args, " ")...)
 
 	cmd := exec.Command("ffmpeg", process...)
 
