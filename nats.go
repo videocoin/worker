@@ -12,7 +12,10 @@ var (
 
 func (s *Service) subscribe(uid string) {
 	s.heartBeat(uid)
-	s.ec.BindRecvChan(uid, assignmentCh)
+	_, err := s.ec.BindRecvChan(uid, assignmentCh)
+	if err != nil {
+		s.log.Errorf("failed to bind recieve channel: %s", err.Error())
+	}
 	s.listenForAssignment(uid)
 }
 
@@ -29,7 +32,10 @@ func (s *Service) listenForAssignment(uid string) {
 func (s *Service) heartBeat(uid string) {
 	s.log.Info("registering heartbeat monitor")
 	_, err := s.ec.Subscribe(fmt.Sprintf("%s-ping", uid), func(subj, reply, msg string) {
-		s.ec.Publish(reply, "pong")
+		err := s.ec.Publish(reply, "pong")
+		if err != nil {
+			s.log.Errorf("failed to publish pong: %s", err.Error())
+		}
 	})
 	if err != nil {
 		s.log.Errorf("failed to subscribe to heartBeat: %s", err.Error())

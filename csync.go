@@ -170,7 +170,6 @@ func (s *Service) handleChunk(job *Job) error {
 
 // SubmitProof registers work (output chunk)
 func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
-
 	streamInstance, err := s.createStreamInstance(contractAddress)
 	if err != nil {
 		return nil, err

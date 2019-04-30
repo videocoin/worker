@@ -176,13 +176,10 @@ func (s *Service) register(uid string) {
 	if err != nil {
 		s.log.Errorf("failed to register transcoder: %s", err.Error())
 	}
-
 }
 
 func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *profiles_v1.Profile, uid string) error {
-	s.log.Infof("starting transcode: %d using input: %s with stream_id: %d",
-		workOrder.Id, workOrder.TranscodeInputUrl, workOrder.StreamId,
-	)
+	s.log.Infof("transcoding: %d\nusing input: %s\nwith stream_id: %d", workOrder.Id, workOrder.TranscodeInputUrl, workOrder.StreamId)
 
 	dir := path.Join(s.cfg.OutputDir, fmt.Sprintf("%d", workOrder.StreamId))
 	m3u8 := path.Join(dir, "index.m3u8")
@@ -228,7 +225,7 @@ func (s *Service) transcode(
 	uid string,
 ) {
 	s.waitForStreamReady(streamurl)
-	s.log.Info("starting transcode")
+
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		s.log.Errorf("failed to transcode: err : %s output: %s",
