@@ -5,7 +5,7 @@
 GOOS = linux
 GOARCH = amd64
 
-SERVICE_NAME = transcoder
+SERVICE_NAME = transcoder-testing
 DOCKER_REGISTRY = us.gcr.io
 PROJECT_ID?=
 RELEASE_BUCKET?=
@@ -23,9 +23,11 @@ test:
 	@echo "==> Running tests..."
 	go test -v -short ./...
 
+
 deps:
-	@echo "==> Running go dep..."
-	go mod verify && go mod tidy
+	env GO111MODULE=on go mod vendor
+	cp -r $(GOPATH)/src/github.com/VideoCoin/go-videocoin/crypto/secp256k1/libsecp256k1 \
+	vendor/github.com/VideoCoin/go-videocoin/crypto/secp256k1/
 
 proto-update:
 	env GO111MODULE=on go get github.com/VideoCoin/common@latest
@@ -41,9 +43,8 @@ build-alpine:
 	go build -o bin/$(SERVICE_NAME) --ldflags '-w -linkmode external -extldflags "-static"' cmd/main.go
 
 
-docker:
+docker: deps
 	@echo "==> Docker building..."
-	cd cmd && xgo -x --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
 	docker build -t $(IMAGE_TAG) -t $(LATEST) . --squash
 	docker push $(IMAGE_TAG)
 	docker push $(LATEST)

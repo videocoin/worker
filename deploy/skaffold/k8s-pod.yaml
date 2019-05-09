@@ -101,7 +101,7 @@ spec:
               value: manager:50051
             - name: KEY_FILE
               value: keys/transcoder.key
-          image: us.gcr.io/videocoin-183500/transcoder:latest
+          image: us.gcr.io/videocoin-183500/transcoder-testing:latest
           imagePullPolicy: Always
           name: xcoders
           ports:
