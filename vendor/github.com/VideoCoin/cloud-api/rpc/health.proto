@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package cloud.api.rpc;
+
+option go_package = "rpc";
+
+message HealthStatus {
+    string status = 1;
+}

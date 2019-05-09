@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package cloud.api.verifier.v1;
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+import "github.com/VideoCoin/cloud-api/rpc/health.proto";
+
+option go_package = "v1";
+option (gogoproto.unmarshaler_all) = false;
+option (gogoproto.marshaler_all) = false;
+option (gogoproto.sizer_all) = false;
+
+service VerifierService {
+  rpc Verify(VerifyRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post : "/api/v1/verify"
+      body: "*"
+    };
+  };
+  rpc Health(google.protobuf.Empty) returns (cloud.api.rpc.HealthStatus) {
+    option (google.api.http) = {
+      get : "/healthz"
+    };
+  };
+}
+
+message VerifyRequest {
+    int64 stream_id = 1;
+    uint32 bitrate = 2;
+    uint64 input_id = 3;
+    uint64 output_id = 4;
+    string source_chunk_url = 5;
+    string result_chunk_url = 6;
+    string tx_hash = 7;
+}

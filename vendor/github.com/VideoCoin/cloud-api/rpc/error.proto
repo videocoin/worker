@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package cloud.api.rpc;
+
+option go_package = "rpc";
+
+message ValidationError {
+    string field = 1;
+    string message = 2;
+}
+
+message MultiValidationError {
+    repeated ValidationError errors = 1;
+}

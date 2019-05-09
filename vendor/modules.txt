@@ -1,0 +1,239 @@
+# cloud.google.com/go v0.34.0
+cloud.google.com/go/compute/metadata
+# github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705
+github.com/StackExchange/wmi
+# github.com/VideoCoin/cloud-api v0.0.0-20190509223904-dda4080fb8f7
+github.com/VideoCoin/cloud-api/manager/v1
+github.com/VideoCoin/cloud-api/profiles/v1
+github.com/VideoCoin/cloud-api/transcoder/v1
+github.com/VideoCoin/cloud-api/verifier/v1
+github.com/VideoCoin/cloud-api/workorder/v1
+github.com/VideoCoin/cloud-api/rpc
+# github.com/VideoCoin/cloud-pkg v0.0.0-20190502204644-714c370fbe69
+github.com/VideoCoin/cloud-pkg/bcops
+github.com/VideoCoin/cloud-pkg/stream
+github.com/VideoCoin/cloud-pkg/streamManager
+# github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
+github.com/VideoCoin/go-videocoin/accounts/abi/bind
+github.com/VideoCoin/go-videocoin/common
+github.com/VideoCoin/go-videocoin/core/types
+github.com/VideoCoin/go-videocoin/ethclient
+github.com/VideoCoin/go-videocoin/accounts/keystore
+github.com/VideoCoin/go-videocoin
+github.com/VideoCoin/go-videocoin/accounts/abi
+github.com/VideoCoin/go-videocoin/event
+github.com/VideoCoin/go-videocoin/crypto
+github.com/VideoCoin/go-videocoin/log
+github.com/VideoCoin/go-videocoin/common/hexutil
+github.com/VideoCoin/go-videocoin/crypto/sha3
+github.com/VideoCoin/go-videocoin/params
+github.com/VideoCoin/go-videocoin/rlp
+github.com/VideoCoin/go-videocoin/trie
+github.com/VideoCoin/go-videocoin/rpc
+github.com/VideoCoin/go-videocoin/accounts
+github.com/VideoCoin/go-videocoin/common/math
+github.com/VideoCoin/go-videocoin/common/mclock
+github.com/VideoCoin/go-videocoin/crypto/secp256k1
+github.com/VideoCoin/go-videocoin/common/prque
+github.com/VideoCoin/go-videocoin/ethdb
+github.com/VideoCoin/go-videocoin/metrics
+github.com/VideoCoin/go-videocoin/p2p/netutil
+# github.com/allegro/bigcache v1.2.0
+github.com/allegro/bigcache
+github.com/allegro/bigcache/queue
+# github.com/aristanetworks/goarista v0.0.0-20190502180301-283422fc1708
+github.com/aristanetworks/goarista/monotime
+# github.com/btcsuite/btcd v0.0.0-20190427004231-96897255fd17
+github.com/btcsuite/btcd/btcec
+# github.com/deckarep/golang-set v1.7.1
+github.com/deckarep/golang-set
+# github.com/denisbrodbeck/machineid v1.0.1
+github.com/denisbrodbeck/machineid
+# github.com/envoyproxy/protoc-gen-validate v0.0.14
+github.com/envoyproxy/protoc-gen-validate/validate
+# github.com/fsnotify/fsnotify v1.4.7
+github.com/fsnotify/fsnotify
+# github.com/go-ole/go-ole v1.2.4
+github.com/go-ole/go-ole
+github.com/go-ole/go-ole/oleutil
+# github.com/go-stack/stack v1.8.0
+github.com/go-stack/stack
+# github.com/gogo/protobuf v1.2.1
+github.com/gogo/protobuf/gogoproto
+github.com/gogo/protobuf/types
+github.com/gogo/protobuf/proto
+github.com/gogo/protobuf/protoc-gen-gogo/descriptor
+github.com/gogo/protobuf/sortkeys
+# github.com/golang/protobuf v1.3.1
+github.com/golang/protobuf/ptypes/empty
+github.com/golang/protobuf/proto
+github.com/golang/protobuf/jsonpb
+github.com/golang/protobuf/protoc-gen-go/generator
+github.com/golang/protobuf/ptypes/any
+github.com/golang/protobuf/ptypes/duration
+github.com/golang/protobuf/ptypes/timestamp
+github.com/golang/protobuf/ptypes/wrappers
+github.com/golang/protobuf/protoc-gen-go/descriptor
+github.com/golang/protobuf/ptypes
+github.com/golang/protobuf/ptypes/struct
+github.com/golang/protobuf/protoc-gen-go/generator/internal/remap
+github.com/golang/protobuf/protoc-gen-go/plugin
+# github.com/golang/snappy v0.0.1
+github.com/golang/snappy
+# github.com/google/uuid v1.0.0
+github.com/google/uuid
+# github.com/grafov/m3u8 v0.6.1
+github.com/grafov/m3u8
+# github.com/grpc-ecosystem/grpc-gateway v1.8.6
+github.com/grpc-ecosystem/grpc-gateway/runtime
+github.com/grpc-ecosystem/grpc-gateway/utilities
+github.com/grpc-ecosystem/grpc-gateway/internal
+# github.com/hashicorp/golang-lru v0.5.0
+github.com/hashicorp/golang-lru/simplelru
+# github.com/kelseyhightower/envconfig v1.3.0
+github.com/kelseyhightower/envconfig
+# github.com/konsorten/go-windows-terminal-sequences v1.0.1
+github.com/konsorten/go-windows-terminal-sequences
+# github.com/mwitkow/go-proto-validators v0.0.0-20190212092829-1f388280e944
+github.com/mwitkow/go-proto-validators
+# github.com/nats-io/go-nats v1.7.2
+github.com/nats-io/go-nats
+github.com/nats-io/go-nats/encoders/builtin
+github.com/nats-io/go-nats/util
+# github.com/nats-io/nkeys v0.0.2
+github.com/nats-io/nkeys
+# github.com/nats-io/nuid v1.0.1
+github.com/nats-io/nuid
+# github.com/pborman/uuid v1.2.0
+github.com/pborman/uuid
+# github.com/rjeczalik/notify v0.9.2
+github.com/rjeczalik/notify
+# github.com/rs/cors v1.6.0
+github.com/rs/cors
+# github.com/shirou/gopsutil v2.18.12+incompatible
+github.com/shirou/gopsutil/cpu
+github.com/shirou/gopsutil/mem
+github.com/shirou/gopsutil/internal/common
+# github.com/sirupsen/logrus v1.4.1
+github.com/sirupsen/logrus
+# github.com/syndtr/goleveldb v1.0.0
+github.com/syndtr/goleveldb/leveldb
+github.com/syndtr/goleveldb/leveldb/errors
+github.com/syndtr/goleveldb/leveldb/filter
+github.com/syndtr/goleveldb/leveldb/iterator
+github.com/syndtr/goleveldb/leveldb/opt
+github.com/syndtr/goleveldb/leveldb/util
+github.com/syndtr/goleveldb/leveldb/cache
+github.com/syndtr/goleveldb/leveldb/comparer
+github.com/syndtr/goleveldb/leveldb/journal
+github.com/syndtr/goleveldb/leveldb/memdb
+github.com/syndtr/goleveldb/leveldb/storage
+github.com/syndtr/goleveldb/leveldb/table
+# go.opencensus.io v0.21.0
+go.opencensus.io/plugin/ochttp
+go.opencensus.io/plugin/ochttp/propagation/b3
+go.opencensus.io/stats
+go.opencensus.io/stats/view
+go.opencensus.io/tag
+go.opencensus.io/trace
+go.opencensus.io/trace/propagation
+go.opencensus.io/metric/metricdata
+go.opencensus.io/stats/internal
+go.opencensus.io/internal/tagencoding
+go.opencensus.io/metric/metricproducer
+go.opencensus.io/internal
+go.opencensus.io/trace/internal
+go.opencensus.io/trace/tracestate
+go.opencensus.io/resource
+go.opencensus.io
+# golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/scrypt
+golang.org/x/crypto/ed25519
+golang.org/x/crypto/ed25519/internal/edwards25519
+# golang.org/x/net v0.0.0-20190311183353-d8887717615a
+golang.org/x/net/context
+golang.org/x/net/trace
+golang.org/x/net/websocket
+golang.org/x/net/context/ctxhttp
+golang.org/x/net/internal/timeseries
+golang.org/x/net/http2
+golang.org/x/net/http2/hpack
+golang.org/x/net/http/httpguts
+golang.org/x/net/idna
+# golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
+golang.org/x/oauth2/google
+golang.org/x/oauth2
+golang.org/x/oauth2/internal
+golang.org/x/oauth2/jws
+golang.org/x/oauth2/jwt
+# golang.org/x/sys v0.0.0-20190222072716-a9d3bda3a223
+golang.org/x/sys/windows/registry
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# golang.org/x/text v0.3.0
+golang.org/x/text/secure/bidirule
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+golang.org/x/text/transform
+# google.golang.org/api v0.5.0
+google.golang.org/api/storage/v1
+google.golang.org/api/gensupport
+google.golang.org/api/googleapi
+google.golang.org/api/option
+google.golang.org/api/transport/http
+google.golang.org/api/googleapi/internal/uritemplates
+google.golang.org/api/internal
+google.golang.org/api/googleapi/transport
+google.golang.org/api/transport/http/internal/propagation
+# google.golang.org/appengine v1.4.0
+google.golang.org/appengine
+google.golang.org/appengine/urlfetch
+google.golang.org/appengine/internal
+google.golang.org/appengine/internal/app_identity
+google.golang.org/appengine/internal/modules
+google.golang.org/appengine/internal/urlfetch
+google.golang.org/appengine/internal/base
+google.golang.org/appengine/internal/datastore
+google.golang.org/appengine/internal/log
+google.golang.org/appengine/internal/remote_api
+# google.golang.org/genproto v0.0.0-20190307195333-5fe7a883aa19
+google.golang.org/genproto/googleapis/api/annotations
+google.golang.org/genproto/googleapis/api/httpbody
+google.golang.org/genproto/protobuf/field_mask
+google.golang.org/genproto/googleapis/rpc/status
+# google.golang.org/grpc v1.20.1
+google.golang.org/grpc
+google.golang.org/grpc/codes
+google.golang.org/grpc/grpclog
+google.golang.org/grpc/status
+google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/connectivity
+google.golang.org/grpc/credentials
+google.golang.org/grpc/encoding
+google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/internal
+google.golang.org/grpc/internal/backoff
+google.golang.org/grpc/internal/balancerload
+google.golang.org/grpc/internal/binarylog
+google.golang.org/grpc/internal/channelz
+google.golang.org/grpc/internal/envconfig
+google.golang.org/grpc/internal/grpcrand
+google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/transport
+google.golang.org/grpc/keepalive
+google.golang.org/grpc/metadata
+google.golang.org/grpc/naming
+google.golang.org/grpc/peer
+google.golang.org/grpc/resolver
+google.golang.org/grpc/resolver/dns
+google.golang.org/grpc/resolver/passthrough
+google.golang.org/grpc/stats
+google.golang.org/grpc/tap
+google.golang.org/grpc/balancer/base
+google.golang.org/grpc/credentials/internal
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/internal/syscall
+# gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
+gopkg.in/natefinch/npipe.v2
