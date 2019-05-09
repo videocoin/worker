@@ -32,6 +32,7 @@ type (
 		OutputChunkName string
 		ChunksDir       string
 		StreamAddress   string
+		StreamHash      string
 		StreamID        *big.Int
 		InputID         *big.Int
 		OutputID        *big.Int

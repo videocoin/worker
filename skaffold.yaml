@@ -9,8 +9,3 @@ build:
     - image: us.gcr.io/videocoin-183500/transcoder-testing
   tagPolicy:
     gitCommit: {}
-  # Use local Docker daemon to build artifacts
-  local:
-    push: true
-    useDockerCLI: true
-    useBuildkit: true

@@ -113,7 +113,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 // handleChunk Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) handleChunk(job *Job) error {
 	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
-	uploadPath := fmt.Sprintf("%d/%d", job.StreamID, job.Bitrate)
+	uploadPath := fmt.Sprintf("%s/%d", job.StreamHash, job.Bitrate)
 
 	if job.InputChunkName == "0.ts" {
 		duration, err := s.duration(chunkLoc)
@@ -153,8 +153,8 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	inputChunk := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
-	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
+	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
+	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
 
 	return s.verify(tx, job, inputChunk, outputChunk)
 }

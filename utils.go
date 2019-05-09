@@ -73,7 +73,7 @@ func (s *Service) duration(input string) (float64, error) {
 }
 
 // GeneratePlaylist based on static bitrates
-func (s *Service) generatePlaylist(streamID int64, filename string, bitrate uint32) error {
+func (s *Service) generatePlaylist(streamHash string, filename string, bitrate uint32) error {
 	m3u8 := []byte(fmt.Sprintf(`#EXTM3U
 #EXT-X-VERSION:4
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
@@ -88,7 +88,7 @@ func (s *Service) generatePlaylist(streamID int64, filename string, bitrate uint
 
 	reader := bytes.NewReader(m3u8)
 
-	err = s.upload(fmt.Sprintf("%d/%s", streamID, "index.m3u8"), reader)
+	err = s.upload(fmt.Sprintf("%s/%s", streamHash, "index.m3u8"), reader)
 	if err != nil {
 		s.log.Errorf("failed to upload: %s", err.Error())
 		return err
