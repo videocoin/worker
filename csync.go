@@ -77,6 +77,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
 						StreamAddress:   workOrder.StreamAddress,
+						StreamHash:      workOrder.StreamHash,
 						cmd:             cmd,
 						stopChan:        stop,
 					}
