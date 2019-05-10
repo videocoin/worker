@@ -16,7 +16,7 @@ metadata:
   uid: ae53931e-2e62-11e9-9dae-42010a8a0fcf
 spec:
   maxReplicas: 3
-  minReplicas: 2
+  minReplicas: 1
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
