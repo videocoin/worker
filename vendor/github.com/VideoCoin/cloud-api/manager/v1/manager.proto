@@ -43,9 +43,9 @@ service ManagerService {
     };
   };
 
-  rpc StopStream(StreamRequest) returns (google.protobuf.Empty) {
+  rpc StopStream(StopStreamRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/stream/stop/{stream_id}"
+      post: "/api/v1/stream/stop/{stream_hash}"
       body: "*"
     };
   };
@@ -64,7 +64,7 @@ service ManagerService {
 
   rpc UpdateStreamStatus(StreamStatusRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/v1/stream/{stream_id}/{status}"
+      post: "/api/v1/stream/{stream_hash}/{status}"
       body: "*"
     };
   };
@@ -165,7 +165,7 @@ message TranscoderStatusRequest {
 
 message StreamStatusRequest {
   string transcoder_id = 1;
-  int64 stream_id = 2;
+  string stream_hash = 2;
   string status = 3;
   bool refunded = 4;
   cloud.api.workorder.v1.IngestStatus ingest_status = 5;
@@ -190,4 +190,7 @@ message UpdateJobRequest {
 
 message StreamRequest {
   int64 stream_id = 1;
+}
+message StopStreamRequest {
+  string stream_hash = 1;
 }

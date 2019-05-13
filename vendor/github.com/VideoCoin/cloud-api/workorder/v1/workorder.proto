@@ -58,7 +58,7 @@ message WorkOrder {
 message JobProfile {
 	uint32 id = 1;
 	string pipeline_id = 2;
-    cloud.api.profiles.v1.ProfileId profile_id = 3;
+        cloud.api.profiles.v1.ProfileId profile_id = 3;
 	string ingest_input_url = 4;
 	string transcode_output_url = 5;
 	string client_address = 6;

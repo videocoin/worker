@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 // indirect
-	github.com/VideoCoin/cloud-api v0.0.0-20190509223904-dda4080fb8f7
+	github.com/VideoCoin/cloud-api v0.0.0-20190510235230-d6ce025c82f0
 	github.com/VideoCoin/cloud-pkg v0.0.0-20190502204644-714c370fbe69
 	github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
 	github.com/allegro/bigcache v1.2.0 // indirect

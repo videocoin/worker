@@ -154,7 +154,7 @@ func request_ManagerService_Update_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func request_ManagerService_StopStream_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq StreamRequest
+	var protoReq StopStreamRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -172,15 +172,15 @@ func request_ManagerService_StopStream_0(ctx context.Context, marshaler runtime.
 		_   = err
 	)
 
-	val, ok = pathParams["stream_id"]
+	val, ok = pathParams["stream_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "stream_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "stream_hash")
 	}
 
-	protoReq.StreamId, err = runtime.Int64(val)
+	protoReq.StreamHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "stream_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "stream_hash", err)
 	}
 
 	msg, err := client.StopStream(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -243,15 +243,15 @@ func request_ManagerService_UpdateStreamStatus_0(ctx context.Context, marshaler 
 		_   = err
 	)
 
-	val, ok = pathParams["stream_id"]
+	val, ok = pathParams["stream_hash"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "stream_id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "stream_hash")
 	}
 
-	protoReq.StreamId, err = runtime.Int64(val)
+	protoReq.StreamHash, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "stream_id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "stream_hash", err)
 	}
 
 	val, ok = pathParams["status"]
@@ -786,13 +786,13 @@ var (
 
 	pattern_ManagerService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "job", "pipeline_id"}, ""))
 
-	pattern_ManagerService_StopStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "stream", "stop", "stream_id"}, ""))
+	pattern_ManagerService_StopStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "stream", "stop", "stream_hash"}, ""))
 
 	pattern_ManagerService_Health_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"healthz"}, ""))
 
 	pattern_ManagerService_GetStream_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "stream", "stream_id"}, ""))
 
-	pattern_ManagerService_UpdateStreamStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "stream", "stream_id", "status"}, ""))
+	pattern_ManagerService_UpdateStreamStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "stream", "stream_hash", "status"}, ""))
 
 	pattern_ManagerService_VerifyChunk_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "verify"}, ""))
 
