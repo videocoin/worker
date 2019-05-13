@@ -203,8 +203,8 @@ func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *pr
 	go s.transcode(cmd,
 		stopChan,
 		workOrder.TranscodeInputUrl,
-		workOrder.StreamId,
 		workOrder.StreamAddress,
+		workOrder.StreamHash,
 		uid,
 	)
 
@@ -216,8 +216,8 @@ func (s *Service) transcode(
 	cmd *exec.Cmd,
 	stop chan struct{},
 	streamurl string,
-	streamID int64,
 	contractAddr string,
+	streamHash string,
 	uid string,
 ) {
 	s.waitForStreamReady(streamurl)
@@ -231,7 +231,7 @@ func (s *Service) transcode(
 
 	stop <- struct{}{}
 	s.log.Info("calling refund")
-	if err := s.refund(streamID, contractAddr); err != nil {
+	if err := s.refund(streamHash, contractAddr); err != nil {
 		s.log.Errorf("failed to refund: %s", err.Error())
 	}
 
@@ -272,7 +272,7 @@ func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.C
 
 }
 
-func (s *Service) refund(streamID int64, addr string) error {
+func (s *Service) refund(streamHash, addr string) error {
 	streamInstance, err := s.createStreamInstance(addr)
 	if err != nil {
 		return err
@@ -284,9 +284,9 @@ func (s *Service) refund(streamID int64, addr string) error {
 	}
 
 	_, err = s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
-		StreamId: streamID,
-		Status:   workorder_v1.WorkOrderStatusComplete.String(),
-		Refunded: true,
+		StreamHash: streamHash,
+		Status:     workorder_v1.WorkOrderStatusComplete.String(),
+		Refunded:   true,
 	})
 
 	if err != nil {
