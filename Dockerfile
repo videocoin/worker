@@ -11,11 +11,11 @@ RUN make build
 
 FROM ubuntu:latest AS release
 
-COPY --from=builder /go/src/github.com/VideoCoin/transcode/bin/transcoder-testing ./
+COPY --from=builder /go/src/github.com/VideoCoin/transcode/bin/transcoder ./
 COPY --from=builder /go/src/github.com/VideoCoin/transcode/keys ./keys
 
 RUN apt update && apt upgrade -y
 RUN apt install ca-certificates ffmpeg -y
 
 
-ENTRYPOINT [ "./transcoder-testing" ]
+ENTRYPOINT [ "./transcoder" ]

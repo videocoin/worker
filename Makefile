@@ -5,7 +5,7 @@
 GOOS = linux
 GOARCH = amd64
 
-SERVICE_NAME = transcoder-testing
+SERVICE_NAME = transcoder
 DOCKER_REGISTRY = us.gcr.io
 PROJECT_ID?=
 RELEASE_BUCKET?=

@@ -6,6 +6,6 @@ deploy:
       - deploy/skaffold/k8s-*
 build:
   artifacts:
-    - image: us.gcr.io/videocoin-183500/transcoder-testing
+    - image: us.gcr.io/videocoin-183500/transcoder
   tagPolicy:
     gitCommit: {}
