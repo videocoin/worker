@@ -24,7 +24,7 @@ spec:
       name: {{ .Chart.Name }}
     spec:
       nodeSelector:
-        cloud.google.com/gke-nodepool: {{ }}
+        cloud.google.com/gke-nodepool: {{ .Values.xcode.service.nodePool }}
       containers:
         - env:
             - name: BASE_STORAGE_URL
@@ -95,7 +95,7 @@ spec:
               value: manager:50051
             - name: KEY_FILE
               value: keys/transcoder.key
-          image: us.gcr.io/videocoin-183500/transcoder-testing:latest
+              image: "{{ .Values.xcode.image.repository }}:{{ .Values.xcode.image.tag }}"
           imagePullPolicy: Always
           name: {{ .Chart.Name }}
           ports:
