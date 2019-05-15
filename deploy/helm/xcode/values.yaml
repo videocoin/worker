@@ -1,21 +1,25 @@
-xcode:
-    image:
-        repository: us.gcr.io/videocoin-183500/transcoder
-        tag: testing
-        pullPolicy: Always
-    
-    config: {}
+image:
+  repository: us.gcr.io/videocoin-183500/transcoder
+  tag: testing
+  pullPolicy: Always
 
-    service:
-        type: ClusterIP
-        externalPort: 80
-        internalPort: 80
-        nodePool: transcode
-    
-    resources:
-        limits:
-        cpu: 200m
-        memory: 200Mi
-        requests:
-        cpu: 200m
-        memory: 200Mi
+config:
+  maxReplicas: 5
+  minReplicas: 1
+
+service:
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 80
+  nodePool: transcode
+
+resources:
+  limits:
+  cpu: 200m
+  memory: 200Mi
+  requests:
+  cpu: 200m
+  memory: 200Mi
+
+deployment:
+  nodePool: transcode

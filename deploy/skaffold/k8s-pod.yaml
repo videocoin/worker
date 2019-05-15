@@ -1,17 +1,12 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    deployment.kubernetes.io/revision: "1"
-  creationTimestamp: "2019-02-12T00:58:38Z"
-  generation: 1
   labels:
     app: xcode
     chart: xcode-0.0.1
     heritage: Tiller
   name: xcode
   namespace: default
-  resourceVersion: "30181"
   selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/xcode
   uid: 554a030c-2e61-11e9-9dae-42010a8a0fcf
 spec:
@@ -103,7 +98,7 @@ spec:
               value: keys/transcoder.key
           image: us.gcr.io/videocoin-183500/transcoder:testing
           imagePullPolicy: Always
-          name: xcoders
+          name: xcode
           ports:
             - containerPort: 80
               protocol: TCP

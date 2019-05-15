@@ -3,11 +3,10 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Chart.Name }}
   namespace: default
-  resourceVersion: "27495"
   selfLink: /apis/autoscaling/v1/namespaces/default/horizontalpodautoscalers/xcode
 spec:
-  maxReplicas: 3
-  minReplicas: 1
+  maxReplicas: {{ .Values.config.maxReplicas }}
+  minReplicas: {{ .Values.config.minReplicas }}
   scaleTargetRef:
     apiVersion: extensions/v1beta1
     kind: Deployment
