@@ -60,7 +60,6 @@ func getChunkNum(chunkName string) *big.Int {
 
 // Duration use ffmpeg to find chunk duration
 func (s *Service) duration(input string) (float64, error) {
-	s.log.Infof("using input %s", input)
 	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
 	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
 	cleanOut := strings.TrimSpace(string(stdout))
