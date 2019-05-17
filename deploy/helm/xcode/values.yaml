@@ -8,7 +8,7 @@ config:
   minReplicas: 1
 
 service:
-  type: ClusterIP
+  type: loadBalancerIP
   externalPort: 80
   internalPort: 80
   nodePool: transcode
@@ -20,6 +20,3 @@ resources:
   requests:
   cpu: 200m
   memory: 200Mi
-
-deployment:
-  nodePool: transcode

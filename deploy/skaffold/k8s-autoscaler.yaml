@@ -21,4 +21,4 @@ spec:
     apiVersion: extensions/v1beta1
     kind: Deployment
     name: xcode
-  targetCPUUtilizationPercentage: 10
+  targetCPUUtilizationPercentage: 20

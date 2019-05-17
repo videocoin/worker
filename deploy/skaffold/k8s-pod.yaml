@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   labels:
     app: xcode
-    chart: xcode-0.0.1
-    heritage: Tiller
   name: xcode
   namespace: default
   selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/xcode
@@ -27,7 +25,10 @@ spec:
       nodeSelector:
         cloud.google.com/gke-nodepool: transcode
       containers:
-        - env:
+        - name: xcode
+          image: us.gcr.io/videocoin-183500/transcoder:testing
+          imagePullPolicy: Always
+          env:
             - name: BASE_STORAGE_URL
               valueFrom:
                 configMapKeyRef:
@@ -96,16 +97,8 @@ spec:
               value: manager:50051
             - name: KEY_FILE
               value: keys/transcoder.key
-          image: us.gcr.io/videocoin-183500/transcoder:testing
-          imagePullPolicy: Always
-          name: xcode
           ports:
             - containerPort: 80
               protocol: TCP
-          resources:
-            requests:
-              memory: 0
-              cpu: 0
-            limits:
-              memory: 0
-              cpu: 0
+          resources: {}
+
