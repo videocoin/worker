@@ -1,5 +1,3 @@
-.NOTPARALLEL:
-.EXPORT_ALL_VARIABLES:
 .DEFAULT_GOAL := docker
 
 GOOS = linux
