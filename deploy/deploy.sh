@@ -1,7 +1,7 @@
 #!/bin/bash
 
-readonly CHART_NAME=manager
-readonly CHART_DIR=./helm/manager
+readonly CHART_NAME=transcoder
+readonly CHART_DIR=./helm/transcoder
 
 CONSUL_ADDR=${CONSUL_ADDR:=127.0.0.1:8500}
 ENV=${ENV:=dev}

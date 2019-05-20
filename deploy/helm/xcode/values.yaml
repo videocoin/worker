@@ -1,6 +1,6 @@
 image:
   repository: us.gcr.io/videocoin-183500/transcoder
-  tag: testing
+  tag: latest
   pullPolicy: Always
 
 config:
@@ -22,6 +22,6 @@ resources:
   memory: 200Mi
 
 secrets:
-  dbUri: ""
-  mqUri: ""
-  secret: ""
+  token: ""
+  hash: ""
+  password: ""
