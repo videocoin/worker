@@ -58,8 +58,6 @@ function get_vars() {
     readonly BUCKET=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/bucket`
     readonly VERIFIER_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierUrl`
     readonly LOG_LEVEL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/logLevel` 
-    readonly MQ_URI=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/mqUri`
-    readonly SQL_URI=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/sqlUri`
     readonly PASSWORD=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/password`
     readonly TOKEN=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/token`
     readonly HASH=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/hash`
@@ -79,8 +77,6 @@ function deploy() {
         --set config.clusterId="${CLUSTER_ID}" \
         --set config.verifierUrl="${VERIFIER_URL}" \
         --set config.bucket="${BUCKET}" \
-        --set secrets.sqlUri="${SQL_URI}" \
-        --set secrets.mqUri="${MQ_URI}" \
         --set secrets.password="${PASSWORD}" \
         --set secrets.token="${TOKEN}" \
         --set secrets.hash="${HASH}" \
