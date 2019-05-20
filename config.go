@@ -13,7 +13,7 @@ type Config struct {
 	VerifierURL     string `required:"true" envconfig:"VERIFIER_URL" default:"http://verifier:8100"`
 	VerifierRPCADDR string `required:"true" envconfig:"VERIFIER_RPC_ADDR" default:"verifier:50055"`
 	BaseStorageURL  string `required:"true" envconfig:"BASE_STORAGE_URL"`
-	Bucket          string `required:"true" envconfig:"FUSE_BUCKET"`
+	Bucket          string `required:"true" envconfig:"BUCKET"`
 	OutputDir       string `required:"true" envconfig:"OUTPUT_DIR" default:"/opt/mnt/" description:"Mount point for GCSFUSE"`
 	ManagerRPCADDR  string `required:"true" envconfig:"MANAGER_RPC_ADDR" default:"manager:50051"`
 	BlockchainURL   string `required:"true" envconfig:"BLOCKCHAIN_URL" default:"http://localhost:8545"`
