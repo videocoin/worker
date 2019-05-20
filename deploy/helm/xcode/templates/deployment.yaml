@@ -33,62 +33,62 @@ spec:
           - name: BASE_STORAGE_URL
             valueFrom:
               configMapKeyRef:
-                key: base_storage_url
+                key: baseStorageUrl
                 name: config
           - name: BASE_STREAM_URL
             valueFrom:
               configMapKeyRef:
-                key: base_stream_url
-                name: config
+                key: baseStreamUrl
+                name: {{ .Chart.Name }}
           - name: BLOCKCHAIN_URL
             valueFrom:
               configMapKeyRef:
-                key: blockchain_url
-                name: config
+                key: blockchainUrl
+                name: {{ .Chart.Name }}
           - name: SMCA
             valueFrom:
               configMapKeyRef:
                 key: smca
-                name: config
+                name: {{ .Chart.Name }}
           - name: VERIFIER_URL
             valueFrom:
               configMapKeyRef:
-                key: verifier_url
-                name: config
-          - name: FUSE_BUCKET
+                key: verifierUrl
+                name: {{ .Chart.Name }}
+          - name: BUCKET
             valueFrom:
               configMapKeyRef:
-                key: fuse_bucket
-                name: config
+                key: bucket
+                name: {{ .Chart.Name }}
           - name: NATS_URL
             valueFrom:
               configMapKeyRef:
-                key: nats_url
-                name: config
+                key: natsUrl
+                name: {{ .Chart.Name }}
           - name: CLUSTER_ID
             valueFrom:
               configMapKeyRef:
-                key: cluster_id
-                name: config
+                key: clusterId
+                name: {{ .Chart.Name }}
           - name: LOG_LEVEL
             valueFrom:
               configMapKeyRef:
-                key: log_level
-                name: config
+                key: logLevel
+                name: {{ .Chart.Name }}
           - name: PASSWORD
             valueFrom:
               secretKeyRef:
-                name: transcode-password
+                name: {{ .Chart.Name }}
                 key: password
           - name: HASH_KEY
             valueFrom:
               secretKeyRef:
-                name: secrethash
+                name: {{ .Chart.Name }}
                 key: hash
           - name: NATS_TOKEN
             valueFrom:
               secretKeyRef:
-                name: nats-token
+                name: {{ .Chart.Name }}
                 key: token
           - name: VERIFIER_RPC_ADDR
             value: verifier:50055
