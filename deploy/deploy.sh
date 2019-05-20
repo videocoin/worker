@@ -52,7 +52,6 @@ function get_vars() {
     readonly KUBE_CONTEXT=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/common/kube_context`
     readonly BASE_STREAM_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/baseStreamUrl`
     readonly BASE_STORAGE_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/baseStorageUrl`
-    readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/blockchainUrl`
     readonly NATS_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/natsUrl`
     readonly SMCA=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/smca`
     readonly CLUSTER_ID=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/clusterId`
@@ -60,8 +59,11 @@ function get_vars() {
     readonly VERIFIER_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierUrl`
     readonly LOG_LEVEL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/logLevel` 
     readonly PASSWORD=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/password`
+    readonly SERVICE_IP=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/serviceIp`
+    readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/blockchainUrl`
     readonly TOKEN=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/token`
     readonly HASH=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/hash`
+
 }
 
 function deploy() {
@@ -70,14 +72,15 @@ function deploy() {
         --kube-context "${KUBE_CONTEXT}" \
         --install \
         --set image.tag="${VERSION}" \
+        --set image.repo="${DOCKER_REGISTRY}/${PROJECT}/${CHART_NAME}" \
         --set config.baseStreamUrl="${BASE_STREAM_URL}" \
         --set config.baseStorageUrl="${BASE_STORAGE_URL}" \
-        --set config.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set config.natsUrl="${NATS_URL}" \
         --set config.smca="${SMCA}" \
         --set config.clusterId="${CLUSTER_ID}" \
         --set config.verifierUrl="${VERIFIER_URL}" \
         --set config.bucket="${BUCKET}" \
+        --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set secrets.password="${PASSWORD}" \
         --set secrets.token="${TOKEN}" \
         --set secrets.hash="${HASH}" \

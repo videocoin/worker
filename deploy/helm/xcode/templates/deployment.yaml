@@ -40,11 +40,6 @@ spec:
               configMapKeyRef:
                 key: baseStreamUrl
                 name: {{ .Chart.Name }}
-          - name: BLOCKCHAIN_URL
-            valueFrom:
-              configMapKeyRef:
-                key: blockchainUrl
-                name: {{ .Chart.Name }}
           - name: SMCA
             valueFrom:
               configMapKeyRef:
@@ -74,6 +69,11 @@ spec:
             valueFrom:
               configMapKeyRef:
                 key: logLevel
+                name: {{ .Chart.Name }}
+          - name: BLOCKCHAIN_URL
+            valueFrom:
+              secretKeyRef:
+                key: blockchainUrl
                 name: {{ .Chart.Name }}
           - name: PASSWORD
             valueFrom:

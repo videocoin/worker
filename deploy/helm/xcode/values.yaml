@@ -1,6 +1,6 @@
 image:
-  repository: us.gcr.io/videocoin-183500/transcoder
-  tag: latest
+  repository: ""
+  tag: ""
   pullPolicy: Always
 
 config:
@@ -25,3 +25,4 @@ secrets:
   token: ""
   hash: ""
   password: ""
+  blockchainUrl: ""
