@@ -4,8 +4,9 @@ readonly CHART_NAME=transcoder
 readonly CHART_DIR=./helm/transcoder
 
 CONSUL_ADDR=${CONSUL_ADDR:=127.0.0.1:8500}
-ENV=${ENV:=dev}
-VERSION=${VERSION:=`git describe --abbrev=0`-`git rev-parse --short HEAD`}
+ENV=${ENV:=thor}
+VERSION=${VERSION:=`git rev-parse --short HEAD`}
+PROJECT=${PROJECT:=`gcloud config list --format 'value(core.project)' 2>/dev/null`}
 
 function log {
   local readonly level="$1"
