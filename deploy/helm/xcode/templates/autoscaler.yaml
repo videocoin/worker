@@ -3,7 +3,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Chart.Name }}
   namespace: default
-  selfLink: /apis/autoscaling/v1/namespaces/default/horizontalpodautoscalers/xcode
+  selfLink: /apis/autoscaling/v1/namespaces/default/horizontalpodautoscalers/transcoder
 spec:
   maxReplicas: {{ .Values.config.maxReplicas }}
   minReplicas: {{ .Values.config.minReplicas }}

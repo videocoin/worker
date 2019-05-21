@@ -2,15 +2,15 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
-    app: xcode
-  name: xcode
+    app: transcoder
+  name: transcoder
   namespace: default
-  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/xcode
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/transcoder
   uid: 554a030c-2e61-11e9-9dae-42010a8a0fcf
 spec:
   selector:
     matchLabels:
-      app: xcode
+      app: transcoder
   strategy:
     rollingUpdate:
       maxSurge: 2
@@ -19,13 +19,13 @@ spec:
   template:
     metadata:
       labels:
-        app: xcode
-      name: xcode
+        app: transcoder
+      name: transcoder
     spec:
       nodeSelector:
         cloud.google.com/gke-nodepool: transcode
       containers:
-        - name: xcode
+        - name: transcoder
           image: us.gcr.io/videocoin-183500/transcoder:testing
           imagePullPolicy: Always
           env:

@@ -6,8 +6,8 @@ deploy:
       - deploy/skaffold/k8s-*
   #  helm:
   #    releases:
-  #      - name: xcode
-  #        chartPath: deploy/helm/xcode
+  #      - name: transcoder
+  #        chartPath: deploy/helm/transcoder
   #        values: {}
 build:
     artifacts:

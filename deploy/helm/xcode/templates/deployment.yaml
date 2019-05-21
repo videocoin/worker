@@ -50,6 +50,11 @@ spec:
               configMapKeyRef:
                 key: verifierUrl
                 name: {{ .Chart.Name }}
+          - name: VERIFIER_RPC_ADDR
+            valueFrom:
+              configMapKeyRef:
+                key: verifierRpcAddr
+                name: {{ .Chart.Name }}
           - name: BUCKET
             valueFrom:
               configMapKeyRef:
