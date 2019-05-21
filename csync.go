@@ -156,7 +156,7 @@ func (s *Service) handleChunk(job *Job) error {
 	}
 
 	inputChunk := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
-	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
+	outputChunk := fmt.Sprintf("https://%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
 
 	// potentially long running process
 	go func() {
