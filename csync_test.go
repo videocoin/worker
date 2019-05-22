@@ -280,8 +280,8 @@ func TestService_updateStatus(t *testing.T) {
 		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
-		streamID int64
-		status   string
+		streamHash string
+		status     string
 	}
 	tests := []struct {
 		name   string
@@ -305,7 +305,7 @@ func TestService_updateStatus(t *testing.T) {
 				manager:       tt.fields.manager,
 				verifier:      tt.fields.verifier,
 			}
-			s.updateStatus(tt.args.streamID, tt.args.status)
+			s.updateStatus(tt.args.streamHash, tt.args.status)
 		})
 	}
 }

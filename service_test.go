@@ -168,8 +168,8 @@ func TestService_transcode(t *testing.T) {
 		cmd          *exec.Cmd
 		stop         chan struct{}
 		streamurl    string
-		streamID     int64
 		contractAddr string
+		streamHash   string
 		uid          string
 	}
 	tests := []struct {
@@ -194,7 +194,7 @@ func TestService_transcode(t *testing.T) {
 				manager:       tt.fields.manager,
 				verifier:      tt.fields.verifier,
 			}
-			s.transcode(tt.args.cmd, tt.args.stop, tt.args.streamurl, tt.args.streamID, tt.args.contractAddr, tt.args.uid)
+			s.transcode(tt.args.cmd, tt.args.stop, tt.args.streamurl, tt.args.contractAddr, tt.args.streamHash, tt.args.uid)
 		})
 	}
 }
@@ -300,8 +300,8 @@ func TestService_refund(t *testing.T) {
 		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
-		streamID int64
-		addr     string
+		streamHash string
+		addr       string
 	}
 	tests := []struct {
 		name    string
@@ -326,7 +326,7 @@ func TestService_refund(t *testing.T) {
 				manager:       tt.fields.manager,
 				verifier:      tt.fields.verifier,
 			}
-			if err := s.refund(tt.args.streamID, tt.args.addr); (err != nil) != tt.wantErr {
+			if err := s.refund(tt.args.streamHash, tt.args.addr); (err != nil) != tt.wantErr {
 				t.Errorf("Service.refund() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
