@@ -10,7 +10,6 @@ import (
 // Config default config for transcoder
 type Config struct {
 	BaseStreamURL   string `required:"true" envconfig:"BASE_STREAM_URL" default:"http://ingest.videocoin.io:8080/hls"`
-	VerifierURL     string `required:"true" envconfig:"VERIFIER_URL" default:"http://verifier:8100"`
 	VerifierRPCADDR string `required:"true" envconfig:"VERIFIER_RPC_ADDR" default:"verifier:50055"`
 	BaseStorageURL  string `required:"true" envconfig:"BASE_STORAGE_URL"`
 	Bucket          string `required:"true" envconfig:"BUCKET"`

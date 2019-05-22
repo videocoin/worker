@@ -5,6 +5,7 @@ readonly CHART_DIR=./helm/transcoder
 
 CONSUL_ADDR=${CONSUL_ADDR:=127.0.0.1:8500}
 ENV=${ENV:=thor}
+DOCKER_REGISTRY=us.gcr.io
 VERSION=${VERSION:=`git rev-parse --short HEAD`}
 PROJECT=${PROJECT:=`gcloud config list --format 'value(core.project)' 2>/dev/null`}
 
@@ -56,9 +57,8 @@ function get_vars() {
     readonly SMCA=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/smca`
     readonly CLUSTER_ID=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/clusterId`
     readonly BUCKET=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/bucket`
-    readonly VERIFIER_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierUrl`
+    readonly VERIFIER_RPC_ADDR=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierRpcAddr`
     readonly LOG_LEVEL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/logLevel` 
-    readonly SERVICE_IP=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/serviceIp`
     readonly PASSWORD=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/password`
     readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/blockchainUrl`
     readonly TOKEN=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/token`
@@ -77,8 +77,9 @@ function deploy() {
         --set config.baseStorageUrl="${BASE_STORAGE_URL}" \
         --set config.natsUrl="${NATS_URL}" \
         --set config.smca="${SMCA}" \
+        --set config.logLevel="${LOG_LEVEL}" \
         --set config.clusterId="${CLUSTER_ID}" \
-        --set config.verifierUrl="${VERIFIER_URL}" \
+        --set config.verifierRpcAddr="${VERIFIER_RPC_ADDR}" \
         --set config.bucket="${BUCKET}" \
         --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set secrets.password="${PASSWORD}" \

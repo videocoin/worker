@@ -1,17 +1,17 @@
+.PHONY: deploy
+.NOTPARALLEL:
+.EXPORT_ALL_VARIABLES:
 .DEFAULT_GOAL := docker
 
-GOOS = linux
-GOARCH = amd64
-
-SERVICE_NAME = transcoder
 DOCKER_REGISTRY = us.gcr.io
-PROJECT_ID?=
+CIRCLE_ARTIFACTS = ./bin
+SERVICE_NAME = transcoder
 RELEASE_BUCKET?=
 
-IMAGE_TAG=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):$(VERSION)
-LATEST=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):testing
-
+PROJECT_ID=$$(gcloud config list --format 'value(core.project)' 2>/dev/null)
 VERSION=$$(git rev-parse --short HEAD)
+IMAGE_TAG=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):$(VERSION)
+LATEST=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):latest
 
 
 main: docker
@@ -58,6 +58,9 @@ store:
 	
 clean:
 	rm -rf release/*
+
+deploy:
+	@cd ./deploy && ./deploy.sh
 
 	
 publish: package store clean

@@ -27,14 +27,14 @@ spec:
         cloud.google.com/gke-nodepool: {{ .Values.service.nodePool }}
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
         imagePullPolicy: Always
         env:
           - name: BASE_STORAGE_URL
             valueFrom:
               configMapKeyRef:
                 key: baseStorageUrl
-                name: config
+                name: {{ .Chart.Name }}
           - name: BASE_STREAM_URL
             valueFrom:
               configMapKeyRef:
@@ -48,7 +48,7 @@ spec:
           - name: VERIFIER_URL
             valueFrom:
               configMapKeyRef:
-                key: verifierUrl
+                key: verifierRpcAddr
                 name: {{ .Chart.Name }}
           - name: VERIFIER_RPC_ADDR
             valueFrom:

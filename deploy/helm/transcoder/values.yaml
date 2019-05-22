@@ -1,17 +1,17 @@
 image:
-  repository: ""
+  repo: ""
   tag: ""
   pullPolicy: Always
 
 config:
-  maxReplicas: 5
-  minReplicas: 1
+  maxReplicas: "5"
+  minReplicas: "1"
 
 service:
   type: loadBalancerIP
   externalPort: 80
   internalPort: 80
-  nodePool: transcode
+  nodePool: xcode
 
 resources:
   limits:
