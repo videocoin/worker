@@ -12,18 +12,12 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/storage/v1"
 )
 
 // Upload uploads an object to gcs with publicread acl
 func (s *Service) upload(output string, r io.Reader) error {
-	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
-	if err != nil {
-		return err
-	}
-
-	svc, err := storage.New(client)
+	svc, err := storage.NewService(context.Background())
 	if err != nil {
 		return err
 	}
