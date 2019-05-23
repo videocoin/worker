@@ -11,7 +11,6 @@ import (
 	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
 	"github.com/VideoCoin/cloud-pkg/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
-	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/nats-io/go-nats"
 	"github.com/sirupsen/logrus"
@@ -23,7 +22,6 @@ func TestService_upload(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -50,7 +48,6 @@ func TestService_upload(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -111,7 +108,6 @@ func TestService_duration(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -138,7 +134,6 @@ func TestService_duration(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -164,7 +159,6 @@ func TestService_generatePlaylist(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -192,7 +186,6 @@ func TestService_generatePlaylist(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,

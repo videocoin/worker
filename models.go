@@ -48,7 +48,6 @@ type (
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts

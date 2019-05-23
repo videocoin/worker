@@ -12,7 +12,6 @@ import (
 	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
 	"github.com/VideoCoin/cloud-pkg/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
-	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/core/types"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/nats-io/go-nats"
@@ -25,7 +24,6 @@ func TestService_syncDir(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -54,7 +52,6 @@ func TestService_syncDir(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -73,7 +70,6 @@ func TestService_handleChunk(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -99,7 +95,6 @@ func TestService_handleChunk(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -120,7 +115,6 @@ func TestService_submitProof(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -150,7 +144,6 @@ func TestService_submitProof(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -176,7 +169,6 @@ func TestService_verify(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -205,7 +197,6 @@ func TestService_verify(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -226,7 +217,6 @@ func TestService_process(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -252,7 +242,6 @@ func TestService_process(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -271,7 +260,6 @@ func TestService_updateStatus(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -297,7 +285,6 @@ func TestService_updateStatus(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,
@@ -316,7 +303,6 @@ func TestService_chunkCreated(t *testing.T) {
 		ec            *nats.EncodedConn
 		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
@@ -342,7 +328,6 @@ func TestService_chunkCreated(t *testing.T) {
 				ec:            tt.fields.ec,
 				nc:            tt.fields.nc,
 				log:           tt.fields.log,
-				pkAddr:        tt.fields.pkAddr,
 				ctx:           tt.fields.ctx,
 				bcClient:      tt.fields.bcClient,
 				bcAuth:        tt.fields.bcAuth,

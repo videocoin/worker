@@ -230,10 +230,6 @@ func (s *Service) transcode(
 	}
 
 	stop <- struct{}{}
-	s.log.Info("calling refund")
-	if err := s.refund(streamHash, contractAddr); err != nil {
-		s.log.Errorf("failed to refund: %s", err.Error())
-	}
 
 	s.manager.UpdateTranscoderStatus(s.ctx, &manager_v1.TranscoderStatusRequest{TranscoderId: uid, Status: transcoder_v1.TranscoderStatusAvailable})
 
@@ -269,31 +265,6 @@ func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.C
 	cmd := exec.Command("ffmpeg", process...)
 
 	return cmd
-
-}
-
-func (s *Service) refund(streamHash, addr string) error {
-	streamInstance, err := s.createStreamInstance(addr)
-	if err != nil {
-		return err
-	}
-
-	_, err = streamInstance.Refund(s.bcAuth)
-	if err != nil {
-		return err
-	}
-
-	_, err = s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
-		StreamHash: streamHash,
-		Status:     workorder_v1.WorkOrderStatusComplete.String(),
-		Refunded:   true,
-	})
-
-	if err != nil {
-		s.log.Warnf("failed to update stream status: %s", err.Error())
-	}
-
-	return nil
 
 }
 
