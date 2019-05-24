@@ -119,7 +119,7 @@ func (s *Service) handleChunk(job *Job) error {
 	if job.InputChunkName == "0.ts" {
 		duration, err := s.duration(chunkLoc)
 		if err != nil {
-			duration = 10.0
+			duration = 2.0
 		}
 
 		job.Playlist.TargetDuration = duration
