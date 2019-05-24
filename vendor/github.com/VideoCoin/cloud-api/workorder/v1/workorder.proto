@@ -6,9 +6,11 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/VideoCoin/cloud-api/profiles/v1/profiles.proto";
 
 option go_package = "v1";
-option (gogoproto.marshaler_all) = false;
-option (gogoproto.unmarshaler_all) = false;
-option (gogoproto.sizer_all) = false;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_registration) = true;
+option (gogoproto.messagename_all) = true;
 
 enum WorkOrderStatus {
     option (gogoproto.goproto_enum_prefix) = false;
@@ -58,7 +60,7 @@ message WorkOrder {
 message JobProfile {
 	uint32 id = 1;
 	string pipeline_id = 2;
-        cloud.api.profiles.v1.ProfileId profile_id = 3;
+    cloud.api.profiles.v1.ProfileId profile_id = 3;
 	string ingest_input_url = 4;
 	string transcode_output_url = 5;
 	string client_address = 6;
