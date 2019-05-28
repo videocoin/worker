@@ -23,7 +23,6 @@ type Config struct {
 	HashKey         string `required:"true" envconfig:"HASH" default:"BEEFFEED"`
 	Port            string `required:"true" envconfig:"PORT" default:":50056" description:"listens for new work from manager"`
 	NatsURL         string `required:"true" envconfig:"NATS_URL"`
-	NatsToken       string `required:"true" envconfig:"NATS_TOKEN"`
 }
 
 var cfg Config

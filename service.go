@@ -95,7 +95,7 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to get blockchain auth: %s", err.Error())
 	}
 
-	nc, err := nats.Connect(cfg.NatsURL, nats.Token(cfg.NatsToken))
+	nc, err := nats.Connect(cfg.NatsURL)
 	if err != nil {
 		log.Fatalf("failed to connect to nats: %s", err.Error())
 	}
