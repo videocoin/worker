@@ -53,15 +53,15 @@ function get_vars() {
     readonly KUBE_CONTEXT=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/common/kube_context`
     readonly BASE_STREAM_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/baseStreamUrl`
     readonly BASE_STORAGE_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/baseStorageUrl`
-    readonly NATS_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/natsUrl`
     readonly SMCA=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/smca`
     readonly CLUSTER_ID=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/clusterId`
     readonly BUCKET=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/bucket`
     readonly VERIFIER_RPC_ADDR=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierRpcAddr`
     readonly LOG_LEVEL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/logLevel` 
+
+    readonly NATS_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/natsUrl`
     readonly PASSWORD=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/password`
     readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/blockchainUrl`
-    readonly TOKEN=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/token`
     readonly HASH=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/hash`
 
 }
@@ -75,15 +75,14 @@ function deploy() {
         --set image.repo="${DOCKER_REGISTRY}/${PROJECT}/${CHART_NAME}" \
         --set config.baseStreamUrl="${BASE_STREAM_URL}" \
         --set config.baseStorageUrl="${BASE_STORAGE_URL}" \
-        --set config.natsUrl="${NATS_URL}" \
         --set config.smca="${SMCA}" \
         --set config.logLevel="${LOG_LEVEL}" \
         --set config.clusterId="${CLUSTER_ID}" \
         --set config.verifierRpcAddr="${VERIFIER_RPC_ADDR}" \
         --set config.bucket="${BUCKET}" \
+        --set secrets.natsUrl="${NATS_URL}" \
         --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set secrets.password="${PASSWORD}" \
-        --set secrets.token="${TOKEN}" \
         --set secrets.hash="${HASH}" \
         --wait ${CHART_NAME} ${CHART_DIR}
 }
