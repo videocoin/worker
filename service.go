@@ -16,7 +16,6 @@ import (
 	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
 	profiles_v1 "github.com/VideoCoin/cloud-api/profiles/v1"
 	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
-	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
 	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
 	bc "github.com/VideoCoin/cloud-pkg/bcops"
 	"github.com/VideoCoin/cloud-pkg/stream"
@@ -24,12 +23,10 @@ import (
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/denisbrodbeck/machineid"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/nats-io/go-nats"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 )
 
 func init() {
@@ -46,30 +43,6 @@ func newService() (*Service, error) {
 	// Generate unique connection name
 	b := make([]byte, 16)
 	rand.Read(b)
-
-	opts := []grpc.DialOption{grpc.WithInsecure()}
-
-	managerConn, err := grpc.Dial(cfg.ManagerRPCADDR, opts...)
-	if err != nil {
-		log.Fatalf("failed to dial manager: %s", err.Error())
-	}
-
-	verifierConn, err := grpc.Dial(cfg.VerifierRPCADDR, opts...)
-	if err != nil {
-		log.Fatalf("failed to dial verifier: %s", err.Error())
-	}
-
-	manager := manager_v1.NewManagerServiceClient(managerConn)
-	status, err := manager.Health(context.Background(), &empty.Empty{})
-	if status.GetStatus() != "healthy" || err != nil {
-		return nil, fmt.Errorf("failed to get healthy status from manager")
-	}
-
-	v := verifier_v1.NewVerifierServiceClient(verifierConn)
-	status, err = v.Health(context.Background(), &empty.Empty{})
-	if status.GetStatus() != "healthy" || err != nil {
-		return nil, fmt.Errorf("failed to get healthy status from verifier")
-	}
 
 	ctx := context.Background()
 
@@ -110,8 +83,6 @@ func newService() (*Service, error) {
 		bcAuth:        bcAuth,
 		bcClient:      client,
 		cfg:           cfg,
-		manager:       manager,
-		verifier:      v,
 		ec:            ec,
 		nc:            nc,
 		ctx:           ctx,

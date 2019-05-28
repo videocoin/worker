@@ -89,3 +89,6 @@ func (s *Service) generatePlaylist(streamHash string, filename string, bitrate u
 
 	return nil
 }
+
+func (s *Service) managerRequest()  {}
+func (s *Service) verifierRequest() {}
