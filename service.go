@@ -238,7 +238,7 @@ func (s *Service) transcode(
 }
 
 func (s *Service) waitForStreamReady(streamurl string) {
-	maxretry := 10
+	maxretry := 15
 	for i := 0; i < maxretry; i++ {
 		resp, err := http.Head(streamurl)
 		if err != nil {
@@ -247,7 +247,7 @@ func (s *Service) waitForStreamReady(streamurl string) {
 			return
 		}
 		s.log.Infof("waiting for stream %s to become ready...", streamurl)
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 
 }
