@@ -114,20 +114,6 @@ func checkBalance(address string) (float64, error) {
 	return gjson.GetBytes(data, "balance").Float(), nil
 }
 
-func verify(v *verifier_v1.VerifyRequest) error {
-	_, err := http.PostForm(verifierAPIURL+"verify", url.Values{
-		"tx_hash":          {v.TxHash},
-		"source_chunk_url": {v.SourceChunkUrl},
-		"result_chunk_url": {v.ResultChunkUrl},
-		"stream_id":        {fmt.Sprintf("%d", v.StreamId)},
-		"bitrate":          {fmt.Sprintf("%d", v.Bitrate)},
-		"input_id":         {fmt.Sprintf("%d", v.InputId)},
-		"output_id":        {fmt.Sprintf("%d", v.OutputId)},
-	})
-
-	return err
-}
-
 func updateStreamStatus(streamHash, status string) error {
 	response, err := http.Post(managerAPIURL+path.Join(streamHash, status), "application/json", nil)
 
@@ -142,43 +128,16 @@ func updateStreamStatus(streamHash, status string) error {
 	return nil
 }
 
-func registerTranscoder(t *transcoder_v1.Transcoder) error {
-	response, err := http.PostForm(managerAPIURL+"transcoders", url.Values{
-		"id":           {t.Id},
-		"cpu_mhz":      {fmt.Sprintf("%f", t.CpuMhz)},
-		"status":       {fmt.Sprintf("%d", t.Status)},
-		"cpu_cores":    {fmt.Sprintf("%d", t.CpuCores)},
-		"total_memory": {fmt.Sprintf("%d", t.TotalMemory)},
-	})
-
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to register transcoder: [%d] %s", response.StatusCode, response.Status)
-	}
-
-	return nil
+func verify(verifyRequest *verifier_v1.VerifyRequest) error {
+	return postForm(verifierAPIURL+"verify", verifyRequest)
 }
 
-func chunkCreated(c *manager_v1.ChunkCreatedRequest) error {
-	response, err := http.PostForm(managerAPIURL+"chunk_created", url.Values{
-		"stream_id":       {fmt.Sprintf("%d", c.StreamId)},
-		"source_chunk_id": {fmt.Sprintf("%d", c.SourceChunkId)},
-		"result_chunk_id": {fmt.Sprintf("%d", c.ResultChunkId)},
-		"bitrate":         {fmt.Sprintf("%d", c.Bitrate)},
-	})
+func registerTranscoder(transcoder *transcoder_v1.Transcoder) error {
+	return postForm(managerAPIURL+"transcoders", transcoder)
+}
 
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to register chunk: [%d] %s", response.StatusCode, response.Status)
-	}
-
-	return nil
+func chunkCreated(chunkRequest *manager_v1.ChunkCreatedRequest) error {
+	return postForm(managerAPIURL+"chunk_created", chunkRequest)
 }
 
 func updateTranscoderStatus(id string, status transcoder_v1.TranscoderStatus) error {
@@ -193,4 +152,26 @@ func updateTranscoderStatus(id string, status transcoder_v1.TranscoderStatus) er
 
 	return nil
 
+}
+
+func postForm(uri string, item interface{}) error {
+	form := url.Values{}
+
+	err := encoder.Encode(item, form)
+	if err != nil {
+		return err
+	}
+
+	client := new(http.Client)
+
+	response, err := client.PostForm(uri, form)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to register chunk: [%d] %s", response.StatusCode, response.Status)
+	}
+
+	return nil
 }

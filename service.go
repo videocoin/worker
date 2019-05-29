@@ -13,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/schema"
+
 	profiles_v1 "github.com/VideoCoin/cloud-api/profiles/v1"
 	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
 	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
@@ -28,7 +30,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	encoder *schema.Encoder
+)
+
 func init() {
+	encoder = schema.NewEncoder()
+	encoder.SetAliasTag("json")
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 }
 
