@@ -156,7 +156,7 @@ func (s *Service) register(uid string) {
 }
 
 func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *profiles_v1.Profile, uid string) error {
-	s.log.Infof("transcoding: %d\nusing input: %s\nwith stream_id: %d", workOrder.Id, workOrder.TranscodeInputUrl, workOrder.StreamId)
+	s.log.Infof("transcoding: %d using input: %s with stream_id: %d", workOrder.Id, workOrder.TranscodeInputUrl, workOrder.StreamId)
 
 	dir := path.Join(s.cfg.OutputDir, workOrder.StreamHash)
 	m3u8 := path.Join(dir, "index.m3u8")

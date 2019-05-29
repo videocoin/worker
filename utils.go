@@ -169,7 +169,7 @@ func postForm(uri string, item interface{}) error {
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to register chunk: [%d] %s", response.StatusCode, response.Status)
+		return fmt.Errorf("failed to post form: [%d] %s", response.StatusCode, response.Status)
 	}
 
 	return nil
