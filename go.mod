@@ -7,6 +7,7 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 // indirect
 	github.com/VideoCoin/cloud-api v0.0.0-20190523221244-b90b6c1b3431
 	github.com/VideoCoin/cloud-pkg v0.0.0-20190502204644-714c370fbe69
+	github.com/VideoCoin/common v0.1.110
 	github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
 	github.com/allegro/bigcache v1.2.0 // indirect
 	github.com/aristanetworks/goarista v0.0.0-20190502180301-283422fc1708 // indirect
@@ -21,6 +22,7 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/grafov/m3u8 v0.6.1
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/huin/goupnp v1.0.0 // indirect

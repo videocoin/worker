@@ -13,6 +13,8 @@ github.com/VideoCoin/cloud-api/rpc
 github.com/VideoCoin/cloud-pkg/bcops
 github.com/VideoCoin/cloud-pkg/stream
 github.com/VideoCoin/cloud-pkg/streamManager
+# github.com/VideoCoin/common v0.1.110
+github.com/VideoCoin/common/streamManager
 # github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
 github.com/VideoCoin/go-videocoin/accounts/abi/bind
 github.com/VideoCoin/go-videocoin/common

@@ -10,6 +10,8 @@ github.com/VideoCoin/cloud-api v0.0.0-20190523221244-b90b6c1b3431 h1:0uv8sityOly
 github.com/VideoCoin/cloud-api v0.0.0-20190523221244-b90b6c1b3431/go.mod h1:AcXTiLDPTNLMQVOebHw8c9eD4v8SLV6Ef/R93ODdnSo=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190502204644-714c370fbe69 h1:IM3Nr4OIw0zoWZ9UWHG8gURzTQzPQ0FZ6cLPAYgdZAs=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190502204644-714c370fbe69/go.mod h1:Vks3HtLx+ETgxZzyb9FiD9lanDRnbhLFhPZc68TKpbY=
+github.com/VideoCoin/common v0.1.110 h1:JENGcrlqo/WagnFGv/sgPJ4wZPxsh8wmDP1gj8hxKWw=
+github.com/VideoCoin/common v0.1.110/go.mod h1:LRQ82oaOZ0qsCeAsoMVfDCLp5fTRrK/qElpHclZwsEg=
 github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d h1:n6rINTciFLqXG7offP5sYB3y5obkqGq9TMOVDj/FJec=
 github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d/go.mod h1:aW3yLffGv7TP/5LOg4ihjmyXAG1ABatIoS36yRprbQk=
 github.com/aead/siphash v1.0.1/go.mod h1:Nywa3cDsYNNK3gaciGTWPwHt0wlpNV15vwmswBAUSII=
@@ -71,6 +73,8 @@ github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OI
 github.com/google/uuid v1.0.0 h1:b4Gk+7WdP/d3HZH8EJsZpvV7EtDOgaZLtnaNGIu1adA=
 github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
+github.com/gorilla/schema v1.1.0 h1:CamqUDOFUBqzrvxuz2vEwo8+SUdwsluFh7IlzJh30LY=
+github.com/gorilla/schema v1.1.0/go.mod h1:kgLaKoK1FELgZqMAVxx/5cbj0kT+57qxUrAlIO2eleU=
 github.com/grafov/m3u8 v0.6.1 h1:RC2QCbV39L6xqWN05RrizRlQhBRmwOq08fOuB5/+Dp0=
 github.com/grafov/m3u8 v0.6.1/go.mod h1:PdjzaU/pJUo4jTIn2rcgMFs+HqBGl/sPJLr8BI0Xq/I=
 github.com/grpc-ecosystem/grpc-gateway v1.9.0 h1:bM6ZAFZmc/wPFaRDi0d5L7hGEZEx/2u+Tmr2evNHDiI=
