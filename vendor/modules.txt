@@ -2,7 +2,7 @@
 cloud.google.com/go/compute/metadata
 # github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705
 github.com/StackExchange/wmi
-# github.com/VideoCoin/cloud-api v0.0.0-20190523062553-b30ef1406303
+# github.com/VideoCoin/cloud-api v0.0.0-20190523221244-b90b6c1b3431
 github.com/VideoCoin/cloud-api/manager/v1
 github.com/VideoCoin/cloud-api/profiles/v1
 github.com/VideoCoin/cloud-api/transcoder/v1
@@ -65,8 +65,8 @@ github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 # github.com/golang/protobuf v1.3.1
-github.com/golang/protobuf/ptypes/empty
 github.com/golang/protobuf/proto
+github.com/golang/protobuf/ptypes/empty
 github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/protoc-gen-go/generator
 github.com/golang/protobuf/ptypes/any
@@ -129,6 +129,12 @@ github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
+# github.com/tidwall/gjson v1.2.1
+github.com/tidwall/gjson
+# github.com/tidwall/match v1.0.1
+github.com/tidwall/match
+# github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65
+github.com/tidwall/pretty
 # go.opencensus.io v0.21.0
 go.opencensus.io/plugin/ochttp
 go.opencensus.io/plugin/ochttp/propagation/b3
@@ -167,7 +173,7 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20190523142557-0e01d883c5c5
+# golang.org/x/sys v0.0.0-20190529164535-6a60838ec259
 golang.org/x/sys/windows/registry
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -207,6 +213,7 @@ google.golang.org/grpc
 google.golang.org/grpc/codes
 google.golang.org/grpc/grpclog
 google.golang.org/grpc/status
+google.golang.org/grpc/metadata
 google.golang.org/grpc/balancer
 google.golang.org/grpc/balancer/roundrobin
 google.golang.org/grpc/connectivity
@@ -223,7 +230,6 @@ google.golang.org/grpc/internal/grpcrand
 google.golang.org/grpc/internal/grpcsync
 google.golang.org/grpc/internal/transport
 google.golang.org/grpc/keepalive
-google.golang.org/grpc/metadata
 google.golang.org/grpc/naming
 google.golang.org/grpc/peer
 google.golang.org/grpc/resolver
