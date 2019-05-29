@@ -13,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
 	profiles_v1 "github.com/VideoCoin/cloud-api/profiles/v1"
 	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
 	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
@@ -136,7 +135,7 @@ func (s *Service) register(uid string) {
 		memtotal = memInfo.Total
 	}
 
-	_, err = s.manager.RegisterTranscoder(context.Background(), &transcoder_v1.Transcoder{
+	err = registerTranscoder(&transcoder_v1.Transcoder{
 		Id:          uid,
 		CpuCores:    cores,
 		CpuMhz:      mhz,
@@ -202,7 +201,9 @@ func (s *Service) transcode(
 
 	stop <- struct{}{}
 
-	s.manager.UpdateTranscoderStatus(s.ctx, &manager_v1.TranscoderStatusRequest{TranscoderId: uid, Status: transcoder_v1.TranscoderStatusAvailable})
+	if err := updateTranscoderStatus(uid, transcoder_v1.TranscoderStatusAvailable); err != nil {
+		s.log.Warnf("failed to update transcode status: %s", err.Error())
+	}
 
 	s.log.Info("transcode complete")
 

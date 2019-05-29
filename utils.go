@@ -8,9 +8,17 @@ import (
 	"io"
 	"io/ioutil"
 	"math/big"
+	"net/http"
+	"net/url"
 	"os/exec"
+	"path"
 	"strconv"
 	"strings"
+
+	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
+	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
+	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
+	"github.com/tidwall/gjson"
 
 	"google.golang.org/api/storage/v1"
 )
@@ -81,7 +89,7 @@ func (s *Service) generatePlaylist(streamHash string, filename string, bitrate u
 
 	reader := bytes.NewReader(m3u8)
 
-	err = s.upload(fmt.Sprintf("%s/%s", streamHash, "index.m3u8"), reader)
+	err = s.upload(path.Join(streamHash, "index.m3u8"), reader)
 	if err != nil {
 		s.log.Errorf("failed to upload: %s", err.Error())
 		return err
@@ -90,5 +98,99 @@ func (s *Service) generatePlaylist(streamHash string, filename string, bitrate u
 	return nil
 }
 
-func (s *Service) managerRequest()  {}
-func (s *Service) verifierRequest() {}
+func checkBalance(address string) (float64, error) {
+	response, err := http.Get(path.Join("balance", address))
+	if err != nil {
+		return 0.0, err
+	}
+
+	defer response.Body.Close()
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return gjson.GetBytes(data, "balance").Float(), nil
+}
+
+func verify(v *verifier_v1.VerifyRequest) error {
+	_, err := http.PostForm(verifierAPIURL+"verify", url.Values{
+		"tx_hash":          {v.TxHash},
+		"source_chunk_url": {v.SourceChunkUrl},
+		"result_chunk_url": {v.ResultChunkUrl},
+		"stream_id":        {fmt.Sprintf("%d", v.StreamId)},
+		"bitrate":          {fmt.Sprintf("%d", v.Bitrate)},
+		"input_id":         {fmt.Sprintf("%d", v.InputId)},
+		"output_id":        {fmt.Sprintf("%d", v.OutputId)},
+	})
+
+	return err
+}
+
+func updateStreamStatus(streamHash, status string) error {
+	response, err := http.Post(managerAPIURL+path.Join(streamHash, status), "application/json", nil)
+
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to create post")
+	}
+
+	return nil
+}
+
+func registerTranscoder(t *transcoder_v1.Transcoder) error {
+	response, err := http.PostForm(managerAPIURL+"transcoders", url.Values{
+		"id":           {t.Id},
+		"cpu_mhz":      {fmt.Sprintf("%f", t.CpuMhz)},
+		"status":       {fmt.Sprintf("%d", t.Status)},
+		"cpu_cores":    {fmt.Sprintf("%d", t.CpuCores)},
+		"total_memory": {fmt.Sprintf("%d", t.TotalMemory)},
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to register transcoder: [%d] %s", response.StatusCode, response.Status)
+	}
+
+	return nil
+}
+
+func chunkCreated(c *manager_v1.ChunkCreatedRequest) error {
+	response, err := http.PostForm(managerAPIURL+"chunk_created", url.Values{
+		"stream_id":       {fmt.Sprintf("%d", c.StreamId)},
+		"source_chunk_id": {fmt.Sprintf("%d", c.SourceChunkId)},
+		"result_chunk_id": {fmt.Sprintf("%d", c.ResultChunkId)},
+		"bitrate":         {fmt.Sprintf("%d", c.Bitrate)},
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to register chunk: [%d] %s", response.StatusCode, response.Status)
+	}
+
+	return nil
+}
+
+func updateTranscoderStatus(id string, status transcoder_v1.TranscoderStatus) error {
+	response, err := http.Post(managerAPIURL+fmt.Sprintf("%s/%d", id, status), "application/json", nil)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to update transcoder status: [%d] %s", response.StatusCode, response.Status)
+	}
+
+	return nil
+
+}

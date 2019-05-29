@@ -5,8 +5,6 @@ import (
 	"math/big"
 	"os/exec"
 
-	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
 	"github.com/VideoCoin/cloud-pkg/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/common"
@@ -22,6 +20,11 @@ const (
 	KB = 1 << (10 * iota)
 	MB
 	GB
+)
+
+const (
+	managerAPIURL  = "http://manager:50053/api/v1/"
+	verifierAPIURL = "http://verifier:50054/api/v1/"
 )
 
 type (
@@ -52,7 +55,5 @@ type (
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts
 		streamManager *streamManager.Manager
-		manager       manager_v1.ManagerServiceClient
-		verifier      verifier_v1.VerifierServiceClient
 	}
 )

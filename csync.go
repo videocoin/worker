@@ -1,7 +1,6 @@
 package transcode
 
 import (
-	"context"
 	"fmt"
 	"math/big"
 	"os"
@@ -172,7 +171,7 @@ func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunk
 
 // verifyChunk calls verifier with input and output chunk urls
 func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL string) error {
-	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
+	err := verify(&verifier_v1.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
 		StreamId:       job.StreamID.Int64(),
 		Bitrate:        job.Bitrate,
@@ -186,12 +185,12 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		s.log.Errorf("failed to call verifier: %s", err.Error())
 	}
 
-	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.StreamAddress})
+	balance, err := checkBalance(job.StreamAddress)
 	if err != nil {
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	if balance.Balance <= 0 {
+	if balance <= 0 {
 		_ = job.cmd.Process.Kill()
 		job.stopChan <- struct{}{}
 	}
@@ -204,7 +203,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 		time.Sleep(1 * time.Second)
 	}
 
-	s.updateStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady.String())
+	updateStreamStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady.String())
 
 	for {
 		for len(jobChan) < 2 {
@@ -224,19 +223,8 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 	}
 }
 
-func (s *Service) updateStatus(streamHash, status string) {
-	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
-		StreamHash: streamHash,
-		Status:     status,
-	})
-
-	if err != nil {
-		s.log.Errorf("failed to update stream status: %s", err.Error())
-	}
-}
-
 func (s *Service) chunkCreated(j *Job) error {
-	_, err := s.manager.ChunkCreated(s.ctx, &manager_v1.ChunkCreatedRequest{
+	err := chunkCreated(&manager_v1.ChunkCreatedRequest{
 		StreamId:      j.StreamID.Int64(),
 		SourceChunkId: j.InputID.Int64(),
 		ResultChunkId: j.OutputID.Int64(),
