@@ -23,8 +23,8 @@ const (
 )
 
 const (
-	managerAPIURL  = "http://manager:50053/api/v1/"
-	verifierAPIURL = "http://verifier:50054/api/v1/"
+	managerAPIURL  = "manager:50053/api/v1/"
+	verifierAPIURL = "verifier:50054/api/v1/"
 )
 
 type (
