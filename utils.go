@@ -151,7 +151,6 @@ func updateTranscoderStatus(id string, status transcoder_v1.TranscoderStatus) er
 	}
 
 	return nil
-
 }
 
 func postForm(uri string, item interface{}) error {

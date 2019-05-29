@@ -95,7 +95,6 @@ func newService() (*Service, error) {
 		ctx:           ctx,
 		log:           log,
 	}, nil
-
 }
 
 // Start creates new service and blocks until stop signal
@@ -187,7 +186,6 @@ func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *pr
 	)
 
 	return nil
-
 }
 
 func (s *Service) transcode(
@@ -214,7 +212,6 @@ func (s *Service) transcode(
 	}
 
 	s.log.Info("transcode complete")
-
 }
 
 func (s *Service) waitForStreamReady(streamurl string) {

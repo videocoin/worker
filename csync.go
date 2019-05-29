@@ -219,17 +219,14 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 		if err := s.handleChunk(&j); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}
-
 	}
 }
 
 func (s *Service) chunkCreated(j *Job) error {
-	err := chunkCreated(&manager_v1.ChunkCreatedRequest{
+	return chunkCreated(&manager_v1.ChunkCreatedRequest{
 		StreamId:      j.StreamID.Int64(),
 		SourceChunkId: j.InputID.Int64(),
 		ResultChunkId: j.OutputID.Int64(),
 		Bitrate:       j.Bitrate,
 	})
-
-	return err
 }
