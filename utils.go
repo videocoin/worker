@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"math/big"
 	"net/http"
-	"net/url"
 	"os/exec"
 	"path"
 	"strconv"
@@ -154,16 +154,19 @@ func (s *Service) updateTranscoderStatus(id string, status transcoder_v1.Transco
 }
 
 func postForm(uri string, item interface{}) error {
-	form := url.Values{}
+	client := new(http.Client)
 
-	err := encoder.Encode(item, form)
+	data, err := json.Marshal(&item)
 	if err != nil {
 		return err
 	}
 
-	client := new(http.Client)
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
 
-	response, err := client.PostForm(uri, form)
+	response, err := client.Do(req)
 	if err != nil {
 		return err
 	}
