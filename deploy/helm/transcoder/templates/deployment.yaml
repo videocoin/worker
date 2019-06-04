@@ -45,15 +45,15 @@ spec:
               configMapKeyRef:
                 key: smca
                 name: {{ .Chart.Name }}
-          - name: VERIFIER_URL
+          - name: VERIFIER_HTTP_ADDR
             valueFrom:
               configMapKeyRef:
-                key: verifierRpcAddr
+                key: verifierHttpAddr
                 name: {{ .Chart.Name }}
-          - name: VERIFIER_RPC_ADDR
+          - name: MANAGER_HTTP_ADDR
             valueFrom:
               configMapKeyRef:
-                key: verifierRpcAddr
+                key: managerHttpAddr
                 name: {{ .Chart.Name }}
           - name: BUCKET
             valueFrom:
@@ -95,12 +95,8 @@ spec:
               secretKeyRef:
                 name: {{ .Chart.Name }}
                 key: key
-          - name: VERIFIER_RPC_ADDR
-            value: verifier:50055
           - name: OUTPUT_DIR
             value: /opt/mnt/
-          - name: MANAGER_RPC_ADDR
-            value: manager:50051
         ports:
           - containerPort: 80
             protocol: TCP

@@ -56,7 +56,8 @@ function get_vars() {
     readonly SMCA=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/smca`
     readonly CLUSTER_ID=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/clusterId`
     readonly BUCKET=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/bucket`
-    readonly VERIFIER_RPC_ADDR=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierRpcAddr`
+    readonly VERIFIER_HTTP_ADDR=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierHttpAddr`
+    readonly MANAGER_HTTP_ADDR=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/managerHttpAddr`
     readonly LOG_LEVEL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/logLevel` 
 
     readonly NATS_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/natsUrl`
@@ -79,7 +80,8 @@ function deploy() {
         --set config.smca="${SMCA}" \
         --set config.logLevel="${LOG_LEVEL}" \
         --set config.clusterId="${CLUSTER_ID}" \
-        --set config.verifierRpcAddr="${VERIFIER_RPC_ADDR}" \
+        --set config.verifierHttpAddr="${VERIFIER_HTTP_ADDR}" \
+        --set config.managerHttpAddr="${MANAGER_HTTP_ADDR}" \
         --set config.bucket="${BUCKET}" \
         --set secrets.natsUrl="${NATS_URL}" \
         --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
