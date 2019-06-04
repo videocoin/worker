@@ -90,14 +90,17 @@ spec:
               secretKeyRef:
                 name: {{ .Chart.Name }}
                 key: hash
+          - name: KEY_FILE
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: key
           - name: VERIFIER_RPC_ADDR
             value: verifier:50055
           - name: OUTPUT_DIR
             value: /opt/mnt/
           - name: MANAGER_RPC_ADDR
             value: manager:50051
-          - name: KEY_FILE
-            value: keys/transcoder.key
         ports:
           - containerPort: 80
             protocol: TCP

@@ -63,6 +63,7 @@ function get_vars() {
     readonly PASSWORD=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/password`
     readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/blockchainUrl`
     readonly HASH=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/hash`
+    readonly KEY=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/key`
 
 }
 
@@ -84,6 +85,7 @@ function deploy() {
         --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set secrets.password="${PASSWORD}" \
         --set secrets.hash="${HASH}" \
+        --set secrets.key="${KEY}" \
         --wait ${CHART_NAME} ${CHART_DIR}
 }
 
