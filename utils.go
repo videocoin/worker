@@ -129,15 +129,15 @@ func (s *Service) updateStreamStatus(streamHash, status string) error {
 }
 
 func (s *Service) verify(verifyRequest *verifier_v1.VerifyRequest) error {
-	return postForm(s.cfg.VerifierHTTPADDR+"verify", verifyRequest)
+	return postForm(s.cfg.VerifierHTTPADDR+"/verify", verifyRequest)
 }
 
 func (s *Service) registerTranscoder(transcoder *transcoder_v1.Transcoder) error {
-	return postForm(s.cfg.ManagerHTTPADDR+"transcoders", transcoder)
+	return postForm(s.cfg.ManagerHTTPADDR+"/transcoders", transcoder)
 }
 
 func (s *Service) registerChunk(chunkRequest *manager_v1.ChunkCreatedRequest) error {
-	return postForm(s.cfg.ManagerHTTPADDR+"chunk_created", chunkRequest)
+	return postForm(s.cfg.ManagerHTTPADDR+"/chunk_created", chunkRequest)
 }
 
 func (s *Service) updateTranscoderStatus(id string, status transcoder_v1.TranscoderStatus) error {
