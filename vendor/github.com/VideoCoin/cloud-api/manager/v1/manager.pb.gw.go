@@ -14,8 +14,8 @@ import (
 
 	"github.com/VideoCoin/cloud-api/profiles/v1"
 	v1_1 "github.com/VideoCoin/cloud-api/transcoder/v1"
+	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
 	"golang.org/x/net/context"
@@ -189,7 +189,7 @@ func request_ManagerService_StopStream_0(ctx context.Context, marshaler runtime.
 }
 
 func request_ManagerService_Health_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq empty.Empty
+	var protoReq types.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.Health(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -332,7 +332,7 @@ func request_ManagerService_CheckBalance_0(ctx context.Context, marshaler runtim
 }
 
 func request_ManagerService_GetProfiles_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq empty.Empty
+	var protoReq types.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.GetProfiles(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))

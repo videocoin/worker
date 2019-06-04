@@ -2,14 +2,14 @@
 cloud.google.com/go/compute/metadata
 # github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705
 github.com/StackExchange/wmi
-# github.com/VideoCoin/cloud-api v0.0.0-20190523221244-b90b6c1b3431
+# github.com/VideoCoin/cloud-api v0.0.0-20190603222912-05cac8c64a6b
 github.com/VideoCoin/cloud-api/manager/v1
 github.com/VideoCoin/cloud-api/profiles/v1
 github.com/VideoCoin/cloud-api/transcoder/v1
 github.com/VideoCoin/cloud-api/verifier/v1
 github.com/VideoCoin/cloud-api/workorder/v1
 github.com/VideoCoin/cloud-api/rpc
-# github.com/VideoCoin/cloud-pkg v0.0.0-20190502204644-714c370fbe69
+# github.com/VideoCoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c
 github.com/VideoCoin/cloud-pkg/bcops
 github.com/VideoCoin/cloud-pkg/stream
 github.com/VideoCoin/cloud-pkg/streamManager
@@ -43,16 +43,14 @@ github.com/VideoCoin/go-videocoin/p2p/netutil
 # github.com/allegro/bigcache v1.2.0
 github.com/allegro/bigcache
 github.com/allegro/bigcache/queue
-# github.com/aristanetworks/goarista v0.0.0-20190502180301-283422fc1708
+# github.com/aristanetworks/goarista v0.0.0-20190522184417-004c259faaeb
 github.com/aristanetworks/goarista/monotime
-# github.com/btcsuite/btcd v0.0.0-20190427004231-96897255fd17
+# github.com/btcsuite/btcd v0.0.0-20190523000118-16327141da8c
 github.com/btcsuite/btcd/btcec
 # github.com/deckarep/golang-set v1.7.1
 github.com/deckarep/golang-set
 # github.com/denisbrodbeck/machineid v1.0.1
 github.com/denisbrodbeck/machineid
-# github.com/envoyproxy/protoc-gen-validate v0.0.14
-github.com/envoyproxy/protoc-gen-validate/validate
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/go-ole/go-ole v1.2.4
@@ -60,24 +58,25 @@ github.com/go-ole/go-ole
 github.com/go-ole/go-ole/oleutil
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
+# github.com/gogo/googleapis v1.2.0
+github.com/gogo/googleapis/google/api
 # github.com/gogo/protobuf v1.2.1
 github.com/gogo/protobuf/gogoproto
-github.com/gogo/protobuf/types
 github.com/gogo/protobuf/proto
+github.com/gogo/protobuf/types
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 # github.com/golang/protobuf v1.3.1
 github.com/golang/protobuf/proto
-github.com/golang/protobuf/ptypes/empty
 github.com/golang/protobuf/jsonpb
 github.com/golang/protobuf/protoc-gen-go/generator
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
-github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/ptypes/struct
+github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/protoc-gen-go/generator/internal/remap
 github.com/golang/protobuf/protoc-gen-go/plugin
 # github.com/golang/snappy v0.0.1
@@ -98,8 +97,6 @@ github.com/hashicorp/golang-lru/simplelru
 github.com/kelseyhightower/envconfig
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
-# github.com/mwitkow/go-proto-validators v0.0.0-20190212092829-1f388280e944
-github.com/mwitkow/go-proto-validators
 # github.com/nats-io/go-nats v1.7.2
 github.com/nats-io/go-nats
 github.com/nats-io/go-nats/encoders/builtin
@@ -118,7 +115,7 @@ github.com/rs/cors
 github.com/shirou/gopsutil/cpu
 github.com/shirou/gopsutil/mem
 github.com/shirou/gopsutil/internal/common
-# github.com/sirupsen/logrus v1.4.1
+# github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
 # github.com/syndtr/goleveldb v1.0.0
 github.com/syndtr/goleveldb/leveldb
@@ -208,7 +205,6 @@ google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
 # google.golang.org/genproto v0.0.0-20190522204451-c2c4e71fbf69
-google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/httpbody
 google.golang.org/genproto/protobuf/field_mask
 google.golang.org/genproto/googleapis/rpc/status

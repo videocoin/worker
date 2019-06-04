@@ -32,6 +32,12 @@ service ManagerService {
     };
   };
 
+  rpc Stop(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      post: "/api/v1/job/{pipeline_id}/stop"
+    };
+  };
+
   rpc Get(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
     option (google.api.http) = {
       get: "/api/v1/job/{pipeline_id}"

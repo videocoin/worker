@@ -12,8 +12,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
 	"golang.org/x/net/context"
@@ -47,7 +47,7 @@ func request_VerifierService_Verify_0(ctx context.Context, marshaler runtime.Mar
 }
 
 func request_VerifierService_Health_0(ctx context.Context, marshaler runtime.Marshaler, client VerifierServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq empty.Empty
+	var protoReq types.Empty
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.Health(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
