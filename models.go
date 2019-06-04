@@ -22,11 +22,6 @@ const (
 	GB
 )
 
-const (
-	managerAPIURL  = "manager:50053/api/v1/"
-	verifierAPIURL = "verifier:50054/api/v1/"
-)
-
 type (
 	// Job used to queue up chunk work
 	Job struct {

@@ -142,7 +142,7 @@ func (s *Service) register(uid string) {
 		memtotal = memInfo.Total
 	}
 
-	err = registerTranscoder(&transcoder_v1.Transcoder{
+	err = s.registerTranscoder(&transcoder_v1.Transcoder{
 		Id:          uid,
 		CpuCores:    cores,
 		CpuMhz:      mhz,
@@ -207,7 +207,7 @@ func (s *Service) transcode(
 
 	stop <- struct{}{}
 
-	if err := updateTranscoderStatus(uid, transcoder_v1.TranscoderStatusAvailable); err != nil {
+	if err := s.updateTranscoderStatus(uid, transcoder_v1.TranscoderStatusAvailable); err != nil {
 		s.log.Warnf("failed to update transcode status: %s", err.Error())
 	}
 

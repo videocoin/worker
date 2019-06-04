@@ -34,7 +34,6 @@ func LoadConfig() *Config {
 		if err != nil {
 			logrus.Fatalf("failed to load config: %s", err.Error())
 		}
-
 	})
 	return &cfg
 }

@@ -156,7 +156,7 @@ func (s *Service) handleChunk(job *Job) error {
 	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
 
-	return s.verify(tx, job, inputChunk, outputChunk)
+	return s.verifyChunk(tx, job, inputChunk, outputChunk)
 }
 
 // SubmitProof registers work (output chunk)
@@ -170,8 +170,8 @@ func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunk
 }
 
 // verifyChunk calls verifier with input and output chunk urls
-func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL string) error {
-	err := verify(&verifier_v1.VerifyRequest{
+func (s *Service) verifyChunk(tx *types.Transaction, job *Job, localFile, outputURL string) error {
+	err := s.verify(&verifier_v1.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
 		StreamId:       job.StreamID.Int64(),
 		Bitrate:        job.Bitrate,
@@ -203,7 +203,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 		time.Sleep(1 * time.Second)
 	}
 
-	updateStreamStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady.String())
+	s.updateStreamStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady.String())
 
 	for {
 		for len(jobChan) < 2 {
@@ -223,7 +223,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 }
 
 func (s *Service) chunkCreated(j *Job) error {
-	return chunkCreated(&manager_v1.ChunkCreatedRequest{
+	return s.registerChunk(&manager_v1.ChunkCreatedRequest{
 		StreamId:      j.StreamID.Int64(),
 		SourceChunkId: j.InputID.Int64(),
 		ResultChunkId: j.OutputID.Int64(),

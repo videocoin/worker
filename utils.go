@@ -114,8 +114,8 @@ func checkBalance(address string) (float64, error) {
 	return gjson.GetBytes(data, "balance").Float(), nil
 }
 
-func updateStreamStatus(streamHash, status string) error {
-	response, err := http.Post(managerAPIURL+path.Join(streamHash, status), "application/json", nil)
+func (s *Service) updateStreamStatus(streamHash, status string) error {
+	response, err := http.Post(s.cfg.ManagerHTTPADDR+path.Join(streamHash, status), "application/json", nil)
 
 	if err != nil {
 		return err
@@ -128,20 +128,20 @@ func updateStreamStatus(streamHash, status string) error {
 	return nil
 }
 
-func verify(verifyRequest *verifier_v1.VerifyRequest) error {
-	return postForm(verifierAPIURL+"verify", verifyRequest)
+func (s *Service) verify(verifyRequest *verifier_v1.VerifyRequest) error {
+	return postForm(s.cfg.VerifierHTTPADDR+"verify", verifyRequest)
 }
 
-func registerTranscoder(transcoder *transcoder_v1.Transcoder) error {
-	return postForm(managerAPIURL+"transcoders", transcoder)
+func (s *Service) registerTranscoder(transcoder *transcoder_v1.Transcoder) error {
+	return postForm(s.cfg.ManagerHTTPADDR+"transcoders", transcoder)
 }
 
-func chunkCreated(chunkRequest *manager_v1.ChunkCreatedRequest) error {
-	return postForm(managerAPIURL+"chunk_created", chunkRequest)
+func (s *Service) registerChunk(chunkRequest *manager_v1.ChunkCreatedRequest) error {
+	return postForm(s.cfg.ManagerHTTPADDR+"chunk_created", chunkRequest)
 }
 
-func updateTranscoderStatus(id string, status transcoder_v1.TranscoderStatus) error {
-	response, err := http.Post(managerAPIURL+fmt.Sprintf("%s/%d", id, status), "application/json", nil)
+func (s *Service) updateTranscoderStatus(id string, status transcoder_v1.TranscoderStatus) error {
+	response, err := http.Post(s.cfg.ManagerHTTPADDR+fmt.Sprintf("%s/%d", id, status), "application/json", nil)
 	if err != nil {
 		return err
 	}
