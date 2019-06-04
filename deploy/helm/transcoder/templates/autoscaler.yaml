@@ -11,4 +11,4 @@ spec:
     apiVersion: extensions/v1beta1
     kind: Deployment
     name: {{ .Chart.Name }}
-  targetCPUUtilizationPercentage: 15
+  targetCPUUtilizationPercentage: 35
