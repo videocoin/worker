@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
+	"github.com/nats-io/go-nats"
 )
 
 var (
@@ -40,4 +41,10 @@ func (s *Service) heartBeat(uid string) {
 	if err != nil {
 		s.log.Errorf("failed to subscribe to heartBeat: %s", err.Error())
 	}
+}
+
+func (s *Service) listenForStop(uid string, stopChan chan struct{}) {
+	s.nc.Subscribe(fmt.Sprintf("%s-stop", uid), func(_ *nats.Msg) {
+		stopChan <- struct{}{}
+	})
 }

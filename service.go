@@ -164,6 +164,9 @@ func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *pr
 	cmd := buildCmd(workOrder.TranscodeInputUrl, dir, profile)
 	var stopChan = make(chan struct{})
 
+	go s.handleStop(uid, stopChan, cmd)
+	s.listenForStop(uid, stopChan)
+
 	fullDir := fmt.Sprintf("%s/%d", dir, profile.Bitrate)
 	err := prepareDir(fullDir)
 
@@ -180,8 +183,6 @@ func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *pr
 	go s.transcode(cmd,
 		stopChan,
 		workOrder.TranscodeInputUrl,
-		workOrder.StreamAddress,
-		workOrder.StreamHash,
 		uid,
 	)
 
@@ -192,8 +193,6 @@ func (s *Service) transcode(
 	cmd *exec.Cmd,
 	stop chan struct{},
 	streamurl string,
-	contractAddr string,
-	streamHash string,
 	uid string,
 ) {
 	s.waitForStreamReady(streamurl)
@@ -207,11 +206,16 @@ func (s *Service) transcode(
 
 	stop <- struct{}{}
 
+	s.log.Info("transcode complete")
+}
+
+func (s *Service) handleStop(uid string, stopChan chan struct{}, cmd *exec.Cmd) {
+	<-stopChan
+	cmd.Process.Signal(os.Interrupt)
 	if err := s.updateTranscoderStatus(uid, transcoder_v1.TranscoderStatusAvailable); err != nil {
 		s.log.Warnf("failed to update transcode status: %s", err.Error())
 	}
-
-	s.log.Info("transcode complete")
+	close(stopChan)
 }
 
 func (s *Service) waitForStreamReady(streamurl string) {
@@ -235,14 +239,10 @@ func prepareDir(dir string) error {
 
 func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
-
 	args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -c:v libx264 -c:a aac -r %f -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 2 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, profile.Fps, dir, profile.Bitrate, dir, profile.Bitrate)
 	process = append(process, strings.Split(args, " ")...)
 
-	cmd := exec.Command("ffmpeg", process...)
-
-	return cmd
-
+	return exec.Command("ffmpeg", process...)
 }
 
 func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
