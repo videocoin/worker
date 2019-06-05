@@ -189,11 +189,9 @@ func (s *Service) transcode(
 ) {
 	s.waitForStreamReady(streamurl)
 
-	out, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
-		s.log.Errorf("failed to transcode: err : %s output: %s",
-			err.Error(), string(out),
-		)
+		s.log.Errorf("failed to transcode: err : %s cmd args [ %v ]", err.Error(), cmd.Args)
 	}
 
 	stop <- struct{}{}
