@@ -115,7 +115,7 @@ func checkBalance(address string) (float64, error) {
 }
 
 func (s *Service) updateStreamStatus(streamHash, status string) error {
-	response, err := http.Post(s.cfg.ManagerHTTPADDR+path.Join(streamHash, status), "application/json", nil)
+	response, err := http.Post(fmt.Sprintf("%s/%s/%s", s.cfg.ManagerHTTPADDR, streamHash, status), "application/json", nil)
 
 	if err != nil {
 		return err
