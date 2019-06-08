@@ -9,9 +9,9 @@ import (
 
 var (
 	ErrRpcInternal         = grpc.Errorf(codes.Internal, "Oops. Something went wrong! Sorry. We've let our engineers know.")
-	ErrRpcUnauthenticated  = grpc.Errorf(codes.Unauthenticated, "Unauthenticated")
-	ErrRpcPermissionDenied = grpc.Errorf(codes.PermissionDenied, "Permission Denied")
-	ErrRpcNotFound         = grpc.Errorf(codes.NotFound, "Not Found")
+	ErrRpcUnauthenticated  = grpc.Errorf(codes.Unauthenticated, "Authentication failed")
+	ErrRpcPermissionDenied = grpc.Errorf(codes.PermissionDenied, "Permission denied")
+	ErrRpcNotFound         = grpc.Errorf(codes.NotFound, "Not found")
 	ErrRpcBadRequest       = grpc.Errorf(codes.InvalidArgument, "Bad request")
 )
 

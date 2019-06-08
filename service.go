@@ -24,7 +24,7 @@ import (
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/denisbrodbeck/machineid"
-	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/gogo/protobuf/types"
 	"github.com/nats-io/go-nats"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
@@ -60,13 +60,13 @@ func newService() (*Service, error) {
 	}
 
 	manager := manager_v1.NewManagerServiceClient(managerConn)
-	status, err := manager.Health(context.Background(), &empty.Empty{})
+	status, err := manager.Health(context.Background(), &types.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
 		return nil, fmt.Errorf("failed to get healthy status from manager")
 	}
 
 	v := verifier_v1.NewVerifierServiceClient(verifierConn)
-	status, err = v.Health(context.Background(), &empty.Empty{})
+	status, err = v.Health(context.Background(), &types.Empty{})
 	if status.GetStatus() != "healthy" || err != nil {
 		return nil, fmt.Errorf("failed to get healthy status from verifier")
 	}
@@ -85,7 +85,7 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to make new stream manager: %s", err.Error())
 	}
 
-	key, err := bc.LoadBcPrivKeys(cfg.KeyFile, cfg.Password)
+	key, err := bc.LoadBcPrivKeys(cfg.KeyFile, cfg.Password, bc.FromMemory)
 	if err != nil {
 		log.Fatalf("failed to load private keys: %s", err.Error())
 	}

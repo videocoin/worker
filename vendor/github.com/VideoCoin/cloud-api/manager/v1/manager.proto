@@ -32,6 +32,12 @@ service ManagerService {
     };
   };
 
+  rpc Stop(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      post: "/api/v1/job/{pipeline_id}/stop"
+    };
+  };
+
   rpc Get(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
     option (google.api.http) = {
       get: "/api/v1/job/{pipeline_id}"
@@ -114,7 +120,6 @@ service ManagerService {
   rpc UpdateTranscoderStatus(TranscoderStatusRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/transcoder/{transcoder_id}/{status}"
-      body: "*"
     };
   }; 
 }
@@ -168,7 +173,7 @@ message TranscoderStatusRequest {
 message StreamStatusRequest {
   string transcoder_id = 1;
   string stream_hash = 2;
-  string status = 3;
+  cloud.api.workorder.v1.WorkOrderStatus status = 3;
   bool refunded = 4;
   cloud.api.workorder.v1.IngestStatus ingest_status = 5;
 }

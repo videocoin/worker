@@ -3,28 +3,27 @@
 
 package v1
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import v1 "github.com/VideoCoin/cloud-api/profiles/v1"
-import rpc "github.com/VideoCoin/cloud-api/rpc"
-import v11 "github.com/VideoCoin/cloud-api/transcoder/v1"
-import v12 "github.com/VideoCoin/cloud-api/workorder/v1"
-import _ "github.com/gogo/protobuf/gogoproto"
-import empty "github.com/golang/protobuf/ptypes/empty"
-import _ "google.golang.org/genproto/googleapis/api/annotations"
-
 import (
-	context "golang.org/x/net/context"
+	context "context"
+	encoding_binary "encoding/binary"
+	fmt "fmt"
+	v1 "github.com/VideoCoin/cloud-api/profiles/v1"
+	rpc "github.com/VideoCoin/cloud-api/rpc"
+	v11 "github.com/VideoCoin/cloud-api/transcoder/v1"
+	v12 "github.com/VideoCoin/cloud-api/workorder/v1"
+	_ "github.com/gogo/googleapis/google/api"
+	_ "github.com/gogo/protobuf/gogoproto"
+	proto "github.com/gogo/protobuf/proto"
+	types "github.com/gogo/protobuf/types"
+	golang_proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	io "io"
+	math "math"
 )
-
-import encoding_binary "encoding/binary"
-
-import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
+var _ = golang_proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
@@ -32,7 +31,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type UpdateProfileRequest struct {
 	StreamId             int64        `protobuf:"varint,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
@@ -46,7 +45,7 @@ func (m *UpdateProfileRequest) Reset()         { *m = UpdateProfileRequest{} }
 func (m *UpdateProfileRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateProfileRequest) ProtoMessage()    {}
 func (*UpdateProfileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{0}
+	return fileDescriptor_e02ccd723715ff49, []int{0}
 }
 func (m *UpdateProfileRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -63,8 +62,8 @@ func (m *UpdateProfileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (dst *UpdateProfileRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateProfileRequest.Merge(dst, src)
+func (m *UpdateProfileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateProfileRequest.Merge(m, src)
 }
 func (m *UpdateProfileRequest) XXX_Size() int {
 	return m.Size()
@@ -104,7 +103,7 @@ func (m *Heartbeat) Reset()         { *m = Heartbeat{} }
 func (m *Heartbeat) String() string { return proto.CompactTextString(m) }
 func (*Heartbeat) ProtoMessage()    {}
 func (*Heartbeat) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{1}
+	return fileDescriptor_e02ccd723715ff49, []int{1}
 }
 func (m *Heartbeat) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -121,8 +120,8 @@ func (m *Heartbeat) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *Heartbeat) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Heartbeat.Merge(dst, src)
+func (m *Heartbeat) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Heartbeat.Merge(m, src)
 }
 func (m *Heartbeat) XXX_Size() int {
 	return m.Size()
@@ -155,7 +154,7 @@ func (m *ProfileRequest) Reset()         { *m = ProfileRequest{} }
 func (m *ProfileRequest) String() string { return proto.CompactTextString(m) }
 func (*ProfileRequest) ProtoMessage()    {}
 func (*ProfileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{2}
+	return fileDescriptor_e02ccd723715ff49, []int{2}
 }
 func (m *ProfileRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -172,8 +171,8 @@ func (m *ProfileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (dst *ProfileRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ProfileRequest.Merge(dst, src)
+func (m *ProfileRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProfileRequest.Merge(m, src)
 }
 func (m *ProfileRequest) XXX_Size() int {
 	return m.Size()
@@ -206,7 +205,7 @@ func (m *CheckBalanceRequest) Reset()         { *m = CheckBalanceRequest{} }
 func (m *CheckBalanceRequest) String() string { return proto.CompactTextString(m) }
 func (*CheckBalanceRequest) ProtoMessage()    {}
 func (*CheckBalanceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{3}
+	return fileDescriptor_e02ccd723715ff49, []int{3}
 }
 func (m *CheckBalanceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -223,8 +222,8 @@ func (m *CheckBalanceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (dst *CheckBalanceRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CheckBalanceRequest.Merge(dst, src)
+func (m *CheckBalanceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CheckBalanceRequest.Merge(m, src)
 }
 func (m *CheckBalanceRequest) XXX_Size() int {
 	return m.Size()
@@ -257,7 +256,7 @@ func (m *CheckBalanceResponse) Reset()         { *m = CheckBalanceResponse{} }
 func (m *CheckBalanceResponse) String() string { return proto.CompactTextString(m) }
 func (*CheckBalanceResponse) ProtoMessage()    {}
 func (*CheckBalanceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{4}
+	return fileDescriptor_e02ccd723715ff49, []int{4}
 }
 func (m *CheckBalanceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -274,8 +273,8 @@ func (m *CheckBalanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (dst *CheckBalanceResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CheckBalanceResponse.Merge(dst, src)
+func (m *CheckBalanceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CheckBalanceResponse.Merge(m, src)
 }
 func (m *CheckBalanceResponse) XXX_Size() int {
 	return m.Size()
@@ -309,7 +308,7 @@ func (m *ContractAddrRequest) Reset()         { *m = ContractAddrRequest{} }
 func (m *ContractAddrRequest) String() string { return proto.CompactTextString(m) }
 func (*ContractAddrRequest) ProtoMessage()    {}
 func (*ContractAddrRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{5}
+	return fileDescriptor_e02ccd723715ff49, []int{5}
 }
 func (m *ContractAddrRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -326,8 +325,8 @@ func (m *ContractAddrRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (dst *ContractAddrRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ContractAddrRequest.Merge(dst, src)
+func (m *ContractAddrRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ContractAddrRequest.Merge(m, src)
 }
 func (m *ContractAddrRequest) XXX_Size() int {
 	return m.Size()
@@ -371,7 +370,7 @@ func (m *VerifyChunkRequest) Reset()         { *m = VerifyChunkRequest{} }
 func (m *VerifyChunkRequest) String() string { return proto.CompactTextString(m) }
 func (*VerifyChunkRequest) ProtoMessage()    {}
 func (*VerifyChunkRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{6}
+	return fileDescriptor_e02ccd723715ff49, []int{6}
 }
 func (m *VerifyChunkRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -388,8 +387,8 @@ func (m *VerifyChunkRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (dst *VerifyChunkRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VerifyChunkRequest.Merge(dst, src)
+func (m *VerifyChunkRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VerifyChunkRequest.Merge(m, src)
 }
 func (m *VerifyChunkRequest) XXX_Size() int {
 	return m.Size()
@@ -453,7 +452,7 @@ func (m *ChunkCreatedRequest) Reset()         { *m = ChunkCreatedRequest{} }
 func (m *ChunkCreatedRequest) String() string { return proto.CompactTextString(m) }
 func (*ChunkCreatedRequest) ProtoMessage()    {}
 func (*ChunkCreatedRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{7}
+	return fileDescriptor_e02ccd723715ff49, []int{7}
 }
 func (m *ChunkCreatedRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -470,8 +469,8 @@ func (m *ChunkCreatedRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (dst *ChunkCreatedRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ChunkCreatedRequest.Merge(dst, src)
+func (m *ChunkCreatedRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ChunkCreatedRequest.Merge(m, src)
 }
 func (m *ChunkCreatedRequest) XXX_Size() int {
 	return m.Size()
@@ -526,7 +525,7 @@ func (m *TranscoderStatusRequest) Reset()         { *m = TranscoderStatusRequest
 func (m *TranscoderStatusRequest) String() string { return proto.CompactTextString(m) }
 func (*TranscoderStatusRequest) ProtoMessage()    {}
 func (*TranscoderStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{8}
+	return fileDescriptor_e02ccd723715ff49, []int{8}
 }
 func (m *TranscoderStatusRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -543,8 +542,8 @@ func (m *TranscoderStatusRequest) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (dst *TranscoderStatusRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TranscoderStatusRequest.Merge(dst, src)
+func (m *TranscoderStatusRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TranscoderStatusRequest.Merge(m, src)
 }
 func (m *TranscoderStatusRequest) XXX_Size() int {
 	return m.Size()
@@ -574,21 +573,21 @@ func (*TranscoderStatusRequest) XXX_MessageName() string {
 }
 
 type StreamStatusRequest struct {
-	TranscoderId         string           `protobuf:"bytes,1,opt,name=transcoder_id,json=transcoderId,proto3" json:"transcoder_id,omitempty"`
-	StreamHash           string           `protobuf:"bytes,2,opt,name=stream_hash,json=streamHash,proto3" json:"stream_hash,omitempty"`
-	Status               string           `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Refunded             bool             `protobuf:"varint,4,opt,name=refunded,proto3" json:"refunded,omitempty"`
-	IngestStatus         v12.IngestStatus `protobuf:"varint,5,opt,name=ingest_status,json=ingestStatus,proto3,enum=cloud.api.workorder.v1.IngestStatus" json:"ingest_status,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	TranscoderId         string              `protobuf:"bytes,1,opt,name=transcoder_id,json=transcoderId,proto3" json:"transcoder_id,omitempty"`
+	StreamHash           string              `protobuf:"bytes,2,opt,name=stream_hash,json=streamHash,proto3" json:"stream_hash,omitempty"`
+	Status               v12.WorkOrderStatus `protobuf:"varint,3,opt,name=status,proto3,enum=cloud.api.workorder.v1.WorkOrderStatus" json:"status,omitempty"`
+	Refunded             bool                `protobuf:"varint,4,opt,name=refunded,proto3" json:"refunded,omitempty"`
+	IngestStatus         v12.IngestStatus    `protobuf:"varint,5,opt,name=ingest_status,json=ingestStatus,proto3,enum=cloud.api.workorder.v1.IngestStatus" json:"ingest_status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_unrecognized     []byte              `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
 }
 
 func (m *StreamStatusRequest) Reset()         { *m = StreamStatusRequest{} }
 func (m *StreamStatusRequest) String() string { return proto.CompactTextString(m) }
 func (*StreamStatusRequest) ProtoMessage()    {}
 func (*StreamStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{9}
+	return fileDescriptor_e02ccd723715ff49, []int{9}
 }
 func (m *StreamStatusRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -605,8 +604,8 @@ func (m *StreamStatusRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (dst *StreamStatusRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StreamStatusRequest.Merge(dst, src)
+func (m *StreamStatusRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StreamStatusRequest.Merge(m, src)
 }
 func (m *StreamStatusRequest) XXX_Size() int {
 	return m.Size()
@@ -631,11 +630,11 @@ func (m *StreamStatusRequest) GetStreamHash() string {
 	return ""
 }
 
-func (m *StreamStatusRequest) GetStatus() string {
+func (m *StreamStatusRequest) GetStatus() v12.WorkOrderStatus {
 	if m != nil {
 		return m.Status
 	}
-	return ""
+	return v12.WorkOrderStatusNone
 }
 
 func (m *StreamStatusRequest) GetRefunded() bool {
@@ -667,7 +666,7 @@ func (m *JobResponse) Reset()         { *m = JobResponse{} }
 func (m *JobResponse) String() string { return proto.CompactTextString(m) }
 func (*JobResponse) ProtoMessage()    {}
 func (*JobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{10}
+	return fileDescriptor_e02ccd723715ff49, []int{10}
 }
 func (m *JobResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -684,8 +683,8 @@ func (m *JobResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (dst *JobResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_JobResponse.Merge(dst, src)
+func (m *JobResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JobResponse.Merge(m, src)
 }
 func (m *JobResponse) XXX_Size() int {
 	return m.Size()
@@ -719,7 +718,7 @@ func (m *JobRequest) Reset()         { *m = JobRequest{} }
 func (m *JobRequest) String() string { return proto.CompactTextString(m) }
 func (*JobRequest) ProtoMessage()    {}
 func (*JobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{11}
+	return fileDescriptor_e02ccd723715ff49, []int{11}
 }
 func (m *JobRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -736,8 +735,8 @@ func (m *JobRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *JobRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_JobRequest.Merge(dst, src)
+func (m *JobRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JobRequest.Merge(m, src)
 }
 func (m *JobRequest) XXX_Size() int {
 	return m.Size()
@@ -781,7 +780,7 @@ func (m *UpdateJobRequest) Reset()         { *m = UpdateJobRequest{} }
 func (m *UpdateJobRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateJobRequest) ProtoMessage()    {}
 func (*UpdateJobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{12}
+	return fileDescriptor_e02ccd723715ff49, []int{12}
 }
 func (m *UpdateJobRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -798,8 +797,8 @@ func (m *UpdateJobRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (dst *UpdateJobRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateJobRequest.Merge(dst, src)
+func (m *UpdateJobRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateJobRequest.Merge(m, src)
 }
 func (m *UpdateJobRequest) XXX_Size() int {
 	return m.Size()
@@ -860,7 +859,7 @@ func (m *StreamRequest) Reset()         { *m = StreamRequest{} }
 func (m *StreamRequest) String() string { return proto.CompactTextString(m) }
 func (*StreamRequest) ProtoMessage()    {}
 func (*StreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{13}
+	return fileDescriptor_e02ccd723715ff49, []int{13}
 }
 func (m *StreamRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -877,8 +876,8 @@ func (m *StreamRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (dst *StreamRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StreamRequest.Merge(dst, src)
+func (m *StreamRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StreamRequest.Merge(m, src)
 }
 func (m *StreamRequest) XXX_Size() int {
 	return m.Size()
@@ -911,7 +910,7 @@ func (m *StopStreamRequest) Reset()         { *m = StopStreamRequest{} }
 func (m *StopStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*StopStreamRequest) ProtoMessage()    {}
 func (*StopStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_manager_ec2080fe23ef6563, []int{14}
+	return fileDescriptor_e02ccd723715ff49, []int{14}
 }
 func (m *StopStreamRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -928,8 +927,8 @@ func (m *StopStreamRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (dst *StopStreamRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StopStreamRequest.Merge(dst, src)
+func (m *StopStreamRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StopStreamRequest.Merge(m, src)
 }
 func (m *StopStreamRequest) XXX_Size() int {
 	return m.Size()
@@ -952,20 +951,122 @@ func (*StopStreamRequest) XXX_MessageName() string {
 }
 func init() {
 	proto.RegisterType((*UpdateProfileRequest)(nil), "cloud.api.manager.v1.UpdateProfileRequest")
+	golang_proto.RegisterType((*UpdateProfileRequest)(nil), "cloud.api.manager.v1.UpdateProfileRequest")
 	proto.RegisterType((*Heartbeat)(nil), "cloud.api.manager.v1.Heartbeat")
+	golang_proto.RegisterType((*Heartbeat)(nil), "cloud.api.manager.v1.Heartbeat")
 	proto.RegisterType((*ProfileRequest)(nil), "cloud.api.manager.v1.ProfileRequest")
+	golang_proto.RegisterType((*ProfileRequest)(nil), "cloud.api.manager.v1.ProfileRequest")
 	proto.RegisterType((*CheckBalanceRequest)(nil), "cloud.api.manager.v1.CheckBalanceRequest")
+	golang_proto.RegisterType((*CheckBalanceRequest)(nil), "cloud.api.manager.v1.CheckBalanceRequest")
 	proto.RegisterType((*CheckBalanceResponse)(nil), "cloud.api.manager.v1.CheckBalanceResponse")
+	golang_proto.RegisterType((*CheckBalanceResponse)(nil), "cloud.api.manager.v1.CheckBalanceResponse")
 	proto.RegisterType((*ContractAddrRequest)(nil), "cloud.api.manager.v1.ContractAddrRequest")
+	golang_proto.RegisterType((*ContractAddrRequest)(nil), "cloud.api.manager.v1.ContractAddrRequest")
 	proto.RegisterType((*VerifyChunkRequest)(nil), "cloud.api.manager.v1.VerifyChunkRequest")
+	golang_proto.RegisterType((*VerifyChunkRequest)(nil), "cloud.api.manager.v1.VerifyChunkRequest")
 	proto.RegisterType((*ChunkCreatedRequest)(nil), "cloud.api.manager.v1.ChunkCreatedRequest")
+	golang_proto.RegisterType((*ChunkCreatedRequest)(nil), "cloud.api.manager.v1.ChunkCreatedRequest")
 	proto.RegisterType((*TranscoderStatusRequest)(nil), "cloud.api.manager.v1.TranscoderStatusRequest")
+	golang_proto.RegisterType((*TranscoderStatusRequest)(nil), "cloud.api.manager.v1.TranscoderStatusRequest")
 	proto.RegisterType((*StreamStatusRequest)(nil), "cloud.api.manager.v1.StreamStatusRequest")
+	golang_proto.RegisterType((*StreamStatusRequest)(nil), "cloud.api.manager.v1.StreamStatusRequest")
 	proto.RegisterType((*JobResponse)(nil), "cloud.api.manager.v1.JobResponse")
+	golang_proto.RegisterType((*JobResponse)(nil), "cloud.api.manager.v1.JobResponse")
 	proto.RegisterType((*JobRequest)(nil), "cloud.api.manager.v1.JobRequest")
+	golang_proto.RegisterType((*JobRequest)(nil), "cloud.api.manager.v1.JobRequest")
 	proto.RegisterType((*UpdateJobRequest)(nil), "cloud.api.manager.v1.UpdateJobRequest")
+	golang_proto.RegisterType((*UpdateJobRequest)(nil), "cloud.api.manager.v1.UpdateJobRequest")
 	proto.RegisterType((*StreamRequest)(nil), "cloud.api.manager.v1.StreamRequest")
+	golang_proto.RegisterType((*StreamRequest)(nil), "cloud.api.manager.v1.StreamRequest")
 	proto.RegisterType((*StopStreamRequest)(nil), "cloud.api.manager.v1.StopStreamRequest")
+	golang_proto.RegisterType((*StopStreamRequest)(nil), "cloud.api.manager.v1.StopStreamRequest")
+}
+
+func init() { proto.RegisterFile("manager/v1/manager.proto", fileDescriptor_e02ccd723715ff49) }
+func init() { golang_proto.RegisterFile("manager/v1/manager.proto", fileDescriptor_e02ccd723715ff49) }
+
+var fileDescriptor_e02ccd723715ff49 = []byte{
+	// 1277 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x97, 0x5f, 0x73, 0xdb, 0x44,
+	0x10, 0xc0, 0x47, 0x76, 0x12, 0x92, 0x4d, 0xec, 0x84, 0x4b, 0x28, 0xae, 0x52, 0x1c, 0xf7, 0x9a,
+	0xa4, 0x69, 0x68, 0xa4, 0xba, 0xe5, 0x05, 0x18, 0xa6, 0xb4, 0x81, 0x69, 0xdd, 0x19, 0xa6, 0xe0,
+	0xd0, 0x32, 0xc3, 0x8b, 0x91, 0xa5, 0x8b, 0xad, 0xc6, 0xd1, 0xa9, 0xa7, 0x93, 0xfb, 0xc7, 0x93,
+	0x87, 0xc2, 0x13, 0x8f, 0x0c, 0x3c, 0xf2, 0x61, 0xfa, 0xd8, 0x47, 0x66, 0xf8, 0x00, 0x30, 0x29,
+	0x1f, 0x84, 0xd1, 0xdd, 0xc9, 0x92, 0xff, 0x28, 0x71, 0xdb, 0xbc, 0xf9, 0x56, 0xb7, 0xfb, 0xdb,
+	0xdd, 0xdb, 0xbd, 0x5b, 0x43, 0xe9, 0xd0, 0xf2, 0xac, 0x16, 0x61, 0x66, 0xb7, 0x6a, 0xaa, 0x9f,
+	0x86, 0xcf, 0x28, 0xa7, 0x68, 0xc5, 0xee, 0xd0, 0xd0, 0x31, 0x2c, 0xdf, 0x35, 0xe2, 0x0f, 0xdd,
+	0xaa, 0x6e, 0xb6, 0x5c, 0xde, 0x0e, 0x9b, 0x86, 0x4d, 0x0f, 0xcd, 0x87, 0xae, 0x43, 0xe8, 0x2e,
+	0x75, 0x3d, 0x53, 0x6c, 0xdd, 0xb1, 0x7c, 0xd7, 0x64, 0xbe, 0x6d, 0xb6, 0x89, 0xd5, 0xe1, 0x6d,
+	0x69, 0x46, 0x5f, 0x6d, 0x51, 0xda, 0xea, 0x10, 0x53, 0xac, 0x9a, 0xe1, 0xbe, 0x49, 0x0e, 0x7d,
+	0xfe, 0x4c, 0x7d, 0xbc, 0xa0, 0x3e, 0x46, 0x9a, 0x96, 0xe7, 0x51, 0x6e, 0x71, 0x97, 0x7a, 0x81,
+	0xfa, 0xba, 0x93, 0x62, 0xb5, 0x68, 0x8b, 0x26, 0x36, 0xa2, 0x95, 0x58, 0x88, 0x5f, 0x6a, 0xfb,
+	0xa7, 0xa7, 0xb8, 0xe6, 0x33, 0xba, 0xef, 0x76, 0x48, 0x10, 0x85, 0x1a, 0xff, 0x56, 0xaa, 0x9f,
+	0x9f, 0xa2, 0xfa, 0x84, 0xb2, 0x03, 0xca, 0x1c, 0x99, 0xa6, 0xfe, 0x42, 0x29, 0x7f, 0x71, 0x8a,
+	0x32, 0x67, 0x96, 0x17, 0xd8, 0x54, 0x69, 0x27, 0x2b, 0xa9, 0x8e, 0x39, 0xac, 0x3c, 0xf0, 0x1d,
+	0x8b, 0x93, 0x6f, 0xa5, 0x4f, 0x75, 0xf2, 0x38, 0x24, 0x01, 0x47, 0xab, 0x30, 0x17, 0x70, 0x46,
+	0xac, 0xc3, 0x86, 0xeb, 0x94, 0xb4, 0x8a, 0xb6, 0x95, 0xaf, 0xcf, 0x4a, 0x41, 0xcd, 0x41, 0x37,
+	0x01, 0x54, 0x08, 0xd1, 0xd7, 0x5c, 0x45, 0xdb, 0x2a, 0x5e, 0xaf, 0x18, 0xc9, 0x89, 0xf5, 0xe3,
+	0xeb, 0x56, 0x0d, 0x65, 0xb7, 0xe6, 0xd4, 0xe7, 0xfc, 0xf8, 0x27, 0x5e, 0x85, 0xb9, 0xbb, 0xc4,
+	0x62, 0xbc, 0x49, 0x2c, 0x8e, 0x8a, 0x90, 0x53, 0x8c, 0xb9, 0x7a, 0xce, 0x75, 0xf0, 0x77, 0x50,
+	0x1c, 0x72, 0xe6, 0x9d, 0x79, 0x5f, 0xc2, 0xf2, 0x6e, 0x9b, 0xd8, 0x07, 0xb7, 0xad, 0x8e, 0xe5,
+	0xd9, 0x7d, 0xbb, 0x57, 0x60, 0xc9, 0xa6, 0x1e, 0x67, 0x96, 0xcd, 0x1b, 0x96, 0xe3, 0x30, 0x12,
+	0x04, 0xca, 0x8f, 0xc5, 0x58, 0x7e, 0x4b, 0x8a, 0xf1, 0x35, 0x58, 0x19, 0xb4, 0x10, 0xf8, 0xd4,
+	0x0b, 0x08, 0x2a, 0xc1, 0x7b, 0x4d, 0x29, 0x12, 0x9a, 0x5a, 0x3d, 0x5e, 0x62, 0x0b, 0x96, 0x77,
+	0x53, 0x46, 0x62, 0xe6, 0x1a, 0xcc, 0xfb, 0xae, 0x4f, 0x3a, 0xae, 0x47, 0x1a, 0xfd, 0xb0, 0x21,
+	0x16, 0xd5, 0x9c, 0xb1, 0x4e, 0xe5, 0xc6, 0x3b, 0xf5, 0x52, 0x03, 0xf4, 0x90, 0x30, 0x77, 0xff,
+	0xd9, 0x6e, 0x3b, 0xf4, 0x0e, 0x26, 0x3a, 0xbb, 0x4d, 0x58, 0x0c, 0x68, 0xc8, 0x6c, 0xd2, 0xb0,
+	0x23, 0x9d, 0x38, 0xa1, 0x53, 0xf5, 0x82, 0x14, 0x0b, 0x4b, 0x72, 0x1f, 0x23, 0x41, 0xd8, 0xe1,
+	0xc9, 0xbe, 0xbc, 0xdc, 0x27, 0xc5, 0xf1, 0xbe, 0x4b, 0x50, 0x68, 0x5b, 0x41, 0xbb, 0xe1, 0xb8,
+	0x01, 0x17, 0x69, 0x98, 0xaa, 0x68, 0x5b, 0xd3, 0xf5, 0x85, 0x48, 0xf8, 0x95, 0x92, 0x89, 0x2c,
+	0xb9, 0x9c, 0x59, 0x9c, 0x94, 0xa6, 0x2b, 0xda, 0x56, 0xa1, 0x1e, 0x2f, 0xf1, 0x9f, 0x5a, 0x74,
+	0x34, 0xa1, 0x77, 0xb0, 0xcb, 0x88, 0xc5, 0x89, 0xf3, 0x2e, 0x31, 0xe4, 0x27, 0x8c, 0x21, 0x3f,
+	0x1c, 0x43, 0xca, 0xbd, 0xa9, 0x41, 0xf7, 0x5e, 0x68, 0xf0, 0xe1, 0xf7, 0xfd, 0x9e, 0xd9, 0xe3,
+	0x16, 0x0f, 0x83, 0xd8, 0xc5, 0x4b, 0x50, 0x48, 0xda, 0x29, 0x39, 0xcb, 0x85, 0x44, 0x58, 0x73,
+	0xd0, 0x2d, 0x98, 0x09, 0x84, 0x96, 0x2a, 0xdb, 0x2b, 0xa9, 0xb2, 0x4d, 0x35, 0x63, 0xb7, 0x6a,
+	0x8c, 0x60, 0x94, 0x22, 0xfe, 0x25, 0x07, 0xcb, 0x7b, 0x22, 0xf4, 0xb7, 0xe0, 0xaf, 0xc1, 0xbc,
+	0xca, 0x63, 0x74, 0x20, 0xaa, 0x90, 0x40, 0x8a, 0xee, 0x5a, 0x41, 0x1b, 0xdd, 0xec, 0x3b, 0x98,
+	0x17, 0x0e, 0x5e, 0x4e, 0x39, 0x98, 0xdc, 0x35, 0xdd, 0xaa, 0xf1, 0x03, 0x65, 0x07, 0xf7, 0xd9,
+	0x88, 0x7b, 0x48, 0x87, 0x59, 0x46, 0xf6, 0x43, 0xcf, 0x21, 0x8e, 0xc8, 0xde, 0x6c, 0xbd, 0xbf,
+	0x46, 0x35, 0x28, 0xb8, 0x5e, 0x8b, 0x04, 0xbc, 0xa1, 0x18, 0xd3, 0x82, 0xb1, 0x9e, 0xc5, 0xa8,
+	0x89, 0xcd, 0x0a, 0xb0, 0xe0, 0xa6, 0x56, 0xf8, 0x06, 0xcc, 0xdf, 0xa3, 0xcd, 0x7e, 0xdf, 0xad,
+	0x43, 0x91, 0xf1, 0x43, 0xbf, 0xe1, 0x7a, 0x7e, 0xc8, 0x1b, 0x21, 0xeb, 0xc4, 0xd1, 0x47, 0xd2,
+	0x5a, 0x24, 0x7c, 0xc0, 0x3a, 0xd8, 0x03, 0x10, 0x4a, 0x13, 0xb6, 0xde, 0xe0, 0x3d, 0x93, 0x7f,
+	0xf3, 0x7b, 0xe6, 0x1f, 0x0d, 0x96, 0xe4, 0x75, 0xfa, 0xf6, 0xd8, 0x37, 0xbf, 0xde, 0xd0, 0x06,
+	0x14, 0xed, 0x8e, 0x4b, 0xbc, 0xe4, 0xc2, 0xc8, 0x0b, 0x48, 0x41, 0x4a, 0xd5, 0x75, 0x31, 0xd8,
+	0x53, 0x53, 0x43, 0x3d, 0xb5, 0x01, 0x45, 0xf5, 0x31, 0xb6, 0x31, 0x2d, 0x6d, 0x48, 0x69, 0x7c,
+	0xe5, 0x5c, 0x85, 0x82, 0xac, 0xc5, 0x49, 0x1a, 0x15, 0x7f, 0x02, 0xef, 0xef, 0x71, 0xea, 0x0f,
+	0x6a, 0x0c, 0x95, 0xa4, 0x36, 0x5c, 0x92, 0xd7, 0x5f, 0x2c, 0x42, 0xf1, 0x1b, 0xf9, 0xe8, 0xef,
+	0x11, 0xd6, 0x75, 0x6d, 0x82, 0x1e, 0xc1, 0x8c, 0xbc, 0x20, 0x50, 0x3a, 0x31, 0xc9, 0x64, 0x60,
+	0x24, 0xf9, 0xd6, 0x71, 0x56, 0x75, 0xdd, 0xa3, 0x4d, 0x95, 0x3e, 0xac, 0xff, 0xfc, 0xf7, 0x7f,
+	0xbf, 0xe7, 0x56, 0xf0, 0xa2, 0x78, 0xfc, 0xbb, 0x55, 0xf3, 0x11, 0x6d, 0x9a, 0x1e, 0x79, 0xf2,
+	0x99, 0xb6, 0x8d, 0x18, 0xe4, 0xeb, 0xa1, 0x77, 0x46, 0xa0, 0x0d, 0x01, 0x5a, 0xc3, 0x1f, 0xa5,
+	0x41, 0xbd, 0x54, 0x3d, 0x1c, 0x99, 0x2c, 0xf4, 0x10, 0x87, 0xa9, 0x28, 0x51, 0x67, 0x04, 0xdd,
+	0x14, 0xd0, 0x0a, 0x2e, 0x67, 0x43, 0x83, 0x88, 0xe6, 0x41, 0xfe, 0x0e, 0xe1, 0x67, 0x04, 0xbd,
+	0x28, 0xa0, 0xab, 0xe8, 0x7c, 0x26, 0x14, 0x3d, 0x87, 0x19, 0xd9, 0x1d, 0x68, 0x73, 0x3c, 0x72,
+	0xb8, 0x77, 0x26, 0x02, 0xaf, 0x0b, 0x70, 0x59, 0xcf, 0x06, 0x47, 0xa7, 0xda, 0x03, 0x48, 0x4a,
+	0x11, 0x5d, 0x1e, 0xcf, 0x1f, 0x29, 0x56, 0xfd, 0x9c, 0x21, 0x87, 0x44, 0x23, 0x9e, 0xfe, 0x8c,
+	0xaf, 0xa3, 0x09, 0x12, 0x5f, 0x15, 0xd0, 0x4d, 0x7c, 0x31, 0x86, 0xca, 0xfa, 0x15, 0x79, 0x35,
+	0x7b, 0xa9, 0xfa, 0x16, 0xf0, 0xfb, 0x30, 0x73, 0x57, 0x8c, 0xa5, 0x28, 0xc3, 0x9e, 0xbe, 0x9a,
+	0x72, 0x88, 0xf9, 0xb6, 0x21, 0xb7, 0xab, 0xbb, 0x6f, 0x49, 0xc0, 0x00, 0xcd, 0xaa, 0xe1, 0xf6,
+	0x39, 0x7a, 0x0a, 0x73, 0x77, 0x08, 0x57, 0xc1, 0x5c, 0xca, 0x0a, 0x26, 0x1d, 0xc8, 0x24, 0x99,
+	0xc4, 0x82, 0x73, 0x01, 0xe9, 0x43, 0x41, 0xf5, 0xfa, 0x1d, 0x7e, 0x84, 0x7e, 0xd5, 0x00, 0xc9,
+	0x63, 0x4a, 0xbf, 0x49, 0xe8, 0xca, 0x49, 0x3e, 0x0c, 0xbc, 0x5b, 0x99, 0x29, 0xbd, 0x26, 0xe8,
+	0xdb, 0x78, 0x23, 0x83, 0x2e, 0xb2, 0x19, 0xad, 0x22, 0x63, 0x22, 0xad, 0x8f, 0x60, 0x3e, 0x35,
+	0xfe, 0xa0, 0xad, 0xf1, 0x3e, 0x8c, 0x4e, 0x48, 0x99, 0x2e, 0x9c, 0x17, 0x2e, 0x2c, 0xe3, 0x62,
+	0xec, 0x42, 0x57, 0xe8, 0x46, 0xac, 0x00, 0x16, 0xd2, 0x73, 0x4a, 0x56, 0xc0, 0x63, 0x66, 0x99,
+	0x4c, 0x5a, 0x45, 0xd0, 0x74, 0xfc, 0x41, 0x4c, 0x93, 0x53, 0x8a, 0x2d, 0xb5, 0x23, 0xe8, 0x6f,
+	0x5a, 0x44, 0x4d, 0xc6, 0xce, 0x6c, 0xea, 0xc8, 0x70, 0xab, 0x6f, 0x4f, 0xb2, 0x55, 0xbe, 0xa6,
+	0x78, 0x5b, 0x78, 0xb2, 0x8e, 0x70, 0xec, 0x89, 0x1a, 0x62, 0xcd, 0xde, 0xf0, 0x28, 0x7a, 0x84,
+	0x7e, 0x82, 0xf9, 0x3b, 0x84, 0xab, 0x92, 0x09, 0x32, 0x0b, 0x7a, 0xed, 0xe4, 0x07, 0x2c, 0xc0,
+	0x25, 0xc1, 0x44, 0x68, 0x29, 0x66, 0xc6, 0xbb, 0xd0, 0x53, 0x80, 0x84, 0x80, 0xd6, 0xc7, 0xc7,
+	0x31, 0xf8, 0x17, 0x41, 0x2f, 0x9f, 0x8c, 0x8b, 0x2f, 0x09, 0x74, 0x61, 0x88, 0x66, 0xf6, 0x92,
+	0xa7, 0xf7, 0x08, 0x3d, 0x06, 0x54, 0x27, 0x2d, 0x37, 0xe0, 0x84, 0x25, 0xe3, 0xd8, 0x40, 0x7f,
+	0x65, 0xcd, 0x6c, 0x99, 0x87, 0x5c, 0x16, 0xe0, 0x12, 0x5e, 0x8e, 0xc1, 0x89, 0x85, 0x20, 0x3a,
+	0xe2, 0x3f, 0x34, 0x38, 0x27, 0xfb, 0x69, 0x78, 0x00, 0x44, 0x3b, 0xe3, 0x23, 0xcf, 0x98, 0x47,
+	0x33, 0x3d, 0xb8, 0x21, 0x3c, 0xd8, 0xc1, 0x1f, 0x8f, 0x7a, 0x60, 0xf6, 0x06, 0x26, 0xc8, 0xa4,
+	0xbb, 0x6e, 0x97, 0x5e, 0x1d, 0x97, 0xb5, 0xbf, 0x8e, 0xcb, 0xda, 0xbf, 0xc7, 0x65, 0xed, 0xe5,
+	0xeb, 0xb2, 0xf6, 0xea, 0x75, 0x59, 0xfb, 0x31, 0xd7, 0xad, 0x36, 0x67, 0x84, 0xf9, 0x1b, 0xff,
+	0x07, 0x00, 0x00, 0xff, 0xff, 0x91, 0xa6, 0x40, 0x8b, 0xbc, 0x0f, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -982,19 +1083,20 @@ const _ = grpc.SupportPackageIsVersion4
 type ManagerServiceClient interface {
 	Create(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
 	Run(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
+	Stop(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
 	Get(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
 	Update(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
-	StopStream(ctx context.Context, in *StopStreamRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	Health(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*rpc.HealthStatus, error)
+	StopStream(ctx context.Context, in *StopStreamRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	Health(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*rpc.HealthStatus, error)
 	GetStream(ctx context.Context, in *StreamRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
-	UpdateStreamStatus(ctx context.Context, in *StreamStatusRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	VerifyChunk(ctx context.Context, in *VerifyChunkRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	ChunkCreated(ctx context.Context, in *ChunkCreatedRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	UpdateStreamStatus(ctx context.Context, in *StreamStatusRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	VerifyChunk(ctx context.Context, in *VerifyChunkRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	ChunkCreated(ctx context.Context, in *ChunkCreatedRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	CheckBalance(ctx context.Context, in *CheckBalanceRequest, opts ...grpc.CallOption) (*CheckBalanceResponse, error)
-	GetProfiles(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*v1.Profiles, error)
+	GetProfiles(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*v1.Profiles, error)
 	GetProfile(ctx context.Context, in *ProfileRequest, opts ...grpc.CallOption) (*v1.Profile, error)
-	RegisterTranscoder(ctx context.Context, in *v11.Transcoder, opts ...grpc.CallOption) (*empty.Empty, error)
-	UpdateTranscoderStatus(ctx context.Context, in *TranscoderStatusRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	RegisterTranscoder(ctx context.Context, in *v11.Transcoder, opts ...grpc.CallOption) (*types.Empty, error)
+	UpdateTranscoderStatus(ctx context.Context, in *TranscoderStatusRequest, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
 type managerServiceClient struct {
@@ -1023,6 +1125,15 @@ func (c *managerServiceClient) Run(ctx context.Context, in *JobRequest, opts ...
 	return out, nil
 }
 
+func (c *managerServiceClient) Stop(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error) {
+	out := new(v12.JobProfile)
+	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/Stop", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *managerServiceClient) Get(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error) {
 	out := new(v12.JobProfile)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/Get", in, out, opts...)
@@ -1041,8 +1152,8 @@ func (c *managerServiceClient) Update(ctx context.Context, in *UpdateJobRequest,
 	return out, nil
 }
 
-func (c *managerServiceClient) StopStream(ctx context.Context, in *StopStreamRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *managerServiceClient) StopStream(ctx context.Context, in *StopStreamRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/StopStream", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1050,7 +1161,7 @@ func (c *managerServiceClient) StopStream(ctx context.Context, in *StopStreamReq
 	return out, nil
 }
 
-func (c *managerServiceClient) Health(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*rpc.HealthStatus, error) {
+func (c *managerServiceClient) Health(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*rpc.HealthStatus, error) {
 	out := new(rpc.HealthStatus)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/Health", in, out, opts...)
 	if err != nil {
@@ -1068,8 +1179,8 @@ func (c *managerServiceClient) GetStream(ctx context.Context, in *StreamRequest,
 	return out, nil
 }
 
-func (c *managerServiceClient) UpdateStreamStatus(ctx context.Context, in *StreamStatusRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *managerServiceClient) UpdateStreamStatus(ctx context.Context, in *StreamStatusRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/UpdateStreamStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1077,8 +1188,8 @@ func (c *managerServiceClient) UpdateStreamStatus(ctx context.Context, in *Strea
 	return out, nil
 }
 
-func (c *managerServiceClient) VerifyChunk(ctx context.Context, in *VerifyChunkRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *managerServiceClient) VerifyChunk(ctx context.Context, in *VerifyChunkRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/VerifyChunk", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1086,8 +1197,8 @@ func (c *managerServiceClient) VerifyChunk(ctx context.Context, in *VerifyChunkR
 	return out, nil
 }
 
-func (c *managerServiceClient) ChunkCreated(ctx context.Context, in *ChunkCreatedRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *managerServiceClient) ChunkCreated(ctx context.Context, in *ChunkCreatedRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/ChunkCreated", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1104,7 +1215,7 @@ func (c *managerServiceClient) CheckBalance(ctx context.Context, in *CheckBalanc
 	return out, nil
 }
 
-func (c *managerServiceClient) GetProfiles(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*v1.Profiles, error) {
+func (c *managerServiceClient) GetProfiles(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*v1.Profiles, error) {
 	out := new(v1.Profiles)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/GetProfiles", in, out, opts...)
 	if err != nil {
@@ -1122,8 +1233,8 @@ func (c *managerServiceClient) GetProfile(ctx context.Context, in *ProfileReques
 	return out, nil
 }
 
-func (c *managerServiceClient) RegisterTranscoder(ctx context.Context, in *v11.Transcoder, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *managerServiceClient) RegisterTranscoder(ctx context.Context, in *v11.Transcoder, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/RegisterTranscoder", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1131,8 +1242,8 @@ func (c *managerServiceClient) RegisterTranscoder(ctx context.Context, in *v11.T
 	return out, nil
 }
 
-func (c *managerServiceClient) UpdateTranscoderStatus(ctx context.Context, in *TranscoderStatusRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *managerServiceClient) UpdateTranscoderStatus(ctx context.Context, in *TranscoderStatusRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/UpdateTranscoderStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1144,19 +1255,20 @@ func (c *managerServiceClient) UpdateTranscoderStatus(ctx context.Context, in *T
 type ManagerServiceServer interface {
 	Create(context.Context, *JobRequest) (*v12.JobProfile, error)
 	Run(context.Context, *JobRequest) (*v12.JobProfile, error)
+	Stop(context.Context, *JobRequest) (*v12.JobProfile, error)
 	Get(context.Context, *JobRequest) (*v12.JobProfile, error)
 	Update(context.Context, *UpdateJobRequest) (*v12.JobProfile, error)
-	StopStream(context.Context, *StopStreamRequest) (*empty.Empty, error)
-	Health(context.Context, *empty.Empty) (*rpc.HealthStatus, error)
+	StopStream(context.Context, *StopStreamRequest) (*types.Empty, error)
+	Health(context.Context, *types.Empty) (*rpc.HealthStatus, error)
 	GetStream(context.Context, *StreamRequest) (*v12.JobProfile, error)
-	UpdateStreamStatus(context.Context, *StreamStatusRequest) (*empty.Empty, error)
-	VerifyChunk(context.Context, *VerifyChunkRequest) (*empty.Empty, error)
-	ChunkCreated(context.Context, *ChunkCreatedRequest) (*empty.Empty, error)
+	UpdateStreamStatus(context.Context, *StreamStatusRequest) (*types.Empty, error)
+	VerifyChunk(context.Context, *VerifyChunkRequest) (*types.Empty, error)
+	ChunkCreated(context.Context, *ChunkCreatedRequest) (*types.Empty, error)
 	CheckBalance(context.Context, *CheckBalanceRequest) (*CheckBalanceResponse, error)
-	GetProfiles(context.Context, *empty.Empty) (*v1.Profiles, error)
+	GetProfiles(context.Context, *types.Empty) (*v1.Profiles, error)
 	GetProfile(context.Context, *ProfileRequest) (*v1.Profile, error)
-	RegisterTranscoder(context.Context, *v11.Transcoder) (*empty.Empty, error)
-	UpdateTranscoderStatus(context.Context, *TranscoderStatusRequest) (*empty.Empty, error)
+	RegisterTranscoder(context.Context, *v11.Transcoder) (*types.Empty, error)
+	UpdateTranscoderStatus(context.Context, *TranscoderStatusRequest) (*types.Empty, error)
 }
 
 func RegisterManagerServiceServer(s *grpc.Server, srv ManagerServiceServer) {
@@ -1195,6 +1307,24 @@ func _ManagerService_Run_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ManagerServiceServer).Run(ctx, req.(*JobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ManagerService_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ManagerServiceServer).Stop(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.manager.v1.ManagerService/Stop",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ManagerServiceServer).Stop(ctx, req.(*JobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1254,7 +1384,7 @@ func _ManagerService_StopStream_Handler(srv interface{}, ctx context.Context, de
 }
 
 func _ManagerService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(empty.Empty)
+	in := new(types.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1266,7 +1396,7 @@ func _ManagerService_Health_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/cloud.api.manager.v1.ManagerService/Health",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServiceServer).Health(ctx, req.(*empty.Empty))
+		return srv.(ManagerServiceServer).Health(ctx, req.(*types.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1362,7 +1492,7 @@ func _ManagerService_CheckBalance_Handler(srv interface{}, ctx context.Context, 
 }
 
 func _ManagerService_GetProfiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(empty.Empty)
+	in := new(types.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1374,7 +1504,7 @@ func _ManagerService_GetProfiles_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: "/cloud.api.manager.v1.ManagerService/GetProfiles",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServiceServer).GetProfiles(ctx, req.(*empty.Empty))
+		return srv.(ManagerServiceServer).GetProfiles(ctx, req.(*types.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1444,6 +1574,10 @@ var _ManagerService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Run",
 			Handler:    _ManagerService_Run_Handler,
+		},
+		{
+			MethodName: "Stop",
+			Handler:    _ManagerService_Stop_Handler,
 		},
 		{
 			MethodName: "Get",
@@ -1819,11 +1953,10 @@ func (m *StreamStatusRequest) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintManager(dAtA, i, uint64(len(m.StreamHash)))
 		i += copy(dAtA[i:], m.StreamHash)
 	}
-	if len(m.Status) > 0 {
-		dAtA[i] = 0x1a
+	if m.Status != 0 {
+		dAtA[i] = 0x18
 		i++
-		i = encodeVarintManager(dAtA, i, uint64(len(m.Status)))
-		i += copy(dAtA[i:], m.Status)
+		i = encodeVarintManager(dAtA, i, uint64(m.Status))
 	}
 	if m.Refunded {
 		dAtA[i] = 0x20
@@ -2200,9 +2333,8 @@ func (m *StreamStatusRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovManager(uint64(l))
 	}
-	l = len(m.Status)
-	if l > 0 {
-		n += 1 + l + sovManager(uint64(l))
+	if m.Status != 0 {
+		n += 1 + sovManager(uint64(m.Status))
 	}
 	if m.Refunded {
 		n += 2
@@ -3275,10 +3407,10 @@ func (m *StreamStatusRequest) Unmarshal(dAtA []byte) error {
 			m.StreamHash = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
-			var stringLen uint64
+			m.Status = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowManager
@@ -3288,21 +3420,11 @@ func (m *StreamStatusRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				m.Status |= (v12.WorkOrderStatus(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthManager
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Status = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Refunded", wireType)
@@ -3973,88 +4095,3 @@ var (
 	ErrInvalidLengthManager = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowManager   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() { proto.RegisterFile("manager/v1/manager.proto", fileDescriptor_manager_ec2080fe23ef6563) }
-
-var fileDescriptor_manager_ec2080fe23ef6563 = []byte{
-	// 1261 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcf, 0x73, 0xdb, 0xc4,
-	0x17, 0xff, 0xca, 0x4e, 0xf2, 0x4d, 0x5e, 0x62, 0x37, 0x6c, 0x42, 0x71, 0x95, 0xe0, 0xb8, 0xdb,
-	0xa4, 0xa4, 0xa1, 0x91, 0xe2, 0x96, 0x61, 0x06, 0x18, 0x06, 0xda, 0xc0, 0x24, 0xee, 0x0c, 0x03,
-	0x38, 0xb4, 0x07, 0x2e, 0x46, 0x96, 0x36, 0xb6, 0x12, 0x47, 0xab, 0xae, 0x56, 0xee, 0x0f, 0x4f,
-	0x0e, 0x70, 0xe3, 0xc2, 0x0c, 0xc3, 0x01, 0x0e, 0xfc, 0x31, 0x3d, 0xf6, 0xc8, 0x0c, 0x37, 0x2e,
-	0x30, 0x09, 0x7f, 0x08, 0xa3, 0xdd, 0x95, 0x25, 0x3b, 0x56, 0xe2, 0xfe, 0xb8, 0xe9, 0x3d, 0xed,
-	0x7b, 0x9f, 0xcf, 0x7b, 0xfb, 0xde, 0xdb, 0x07, 0xa5, 0x23, 0xcb, 0xb3, 0x5a, 0x84, 0x99, 0xdd,
-	0xaa, 0xa9, 0x3e, 0x0d, 0x9f, 0x51, 0x4e, 0xd1, 0xa2, 0xdd, 0xa1, 0xa1, 0x63, 0x58, 0xbe, 0x6b,
-	0xc4, 0x3f, 0xba, 0x55, 0xdd, 0x6c, 0xb9, 0xbc, 0x1d, 0x36, 0x0d, 0x9b, 0x1e, 0x99, 0x0f, 0x5c,
-	0x87, 0xd0, 0x6d, 0xea, 0x7a, 0xa6, 0x38, 0xba, 0x69, 0xf9, 0xae, 0xc9, 0x7c, 0xdb, 0x6c, 0x13,
-	0xab, 0xc3, 0xdb, 0xd2, 0x8d, 0xbe, 0xd4, 0xa2, 0xb4, 0xd5, 0x21, 0xa6, 0x90, 0x9a, 0xe1, 0xbe,
-	0x49, 0x8e, 0x7c, 0xfe, 0x44, 0xfd, 0x5c, 0x56, 0x3f, 0x23, 0x4b, 0xcb, 0xf3, 0x28, 0xb7, 0xb8,
-	0x4b, 0xbd, 0x40, 0xfd, 0xdd, 0x4c, 0x61, 0xb5, 0x68, 0x8b, 0x26, 0x3e, 0x22, 0x49, 0x08, 0xe2,
-	0x4b, 0x1d, 0xff, 0xe0, 0x02, 0x6a, 0x3e, 0xa3, 0xfb, 0x6e, 0x87, 0x04, 0x51, 0xa8, 0xf1, 0xb7,
-	0x32, 0xfd, 0xe8, 0x02, 0xd3, 0x47, 0x94, 0x1d, 0x52, 0xe6, 0xc8, 0x34, 0xf5, 0x05, 0x65, 0xfc,
-	0xf1, 0x05, 0xc6, 0x9c, 0x59, 0x5e, 0x60, 0x53, 0x65, 0x9d, 0x48, 0xd2, 0x1c, 0x73, 0x58, 0xbc,
-	0xef, 0x3b, 0x16, 0x27, 0x5f, 0x49, 0x4e, 0x75, 0xf2, 0x30, 0x24, 0x01, 0x47, 0x4b, 0x30, 0x13,
-	0x70, 0x46, 0xac, 0xa3, 0x86, 0xeb, 0x94, 0xb4, 0x8a, 0xb6, 0x9e, 0xaf, 0x4f, 0x4b, 0x45, 0xcd,
-	0x41, 0x9f, 0x00, 0xa8, 0x10, 0xa2, 0xbf, 0xb9, 0x8a, 0xb6, 0x5e, 0xbc, 0x55, 0x31, 0x92, 0x1b,
-	0xeb, 0xc7, 0xd7, 0xad, 0x1a, 0xca, 0x6f, 0xcd, 0xa9, 0xcf, 0xf8, 0xf1, 0x27, 0x5e, 0x82, 0x99,
-	0x5d, 0x62, 0x31, 0xde, 0x24, 0x16, 0x47, 0x45, 0xc8, 0x29, 0x8c, 0x99, 0x7a, 0xce, 0x75, 0xf0,
-	0xd7, 0x50, 0x1c, 0x22, 0xf3, 0xca, 0x78, 0x9f, 0xc2, 0xc2, 0x76, 0x9b, 0xd8, 0x87, 0x77, 0xad,
-	0x8e, 0xe5, 0xd9, 0x7d, 0xbf, 0x37, 0x60, 0xde, 0xa6, 0x1e, 0x67, 0x96, 0xcd, 0x1b, 0x96, 0xe3,
-	0x30, 0x12, 0x04, 0x8a, 0xc7, 0xa5, 0x58, 0x7f, 0x47, 0xaa, 0xf1, 0x16, 0x2c, 0x0e, 0x7a, 0x08,
-	0x7c, 0xea, 0x05, 0x04, 0x95, 0xe0, 0xff, 0x4d, 0xa9, 0x12, 0x96, 0x5a, 0x3d, 0x16, 0xb1, 0x05,
-	0x0b, 0xdb, 0x29, 0x27, 0x31, 0xe6, 0x0a, 0xcc, 0xfa, 0xae, 0x4f, 0x3a, 0xae, 0x47, 0x1a, 0xfd,
-	0xb0, 0x21, 0x56, 0xd5, 0x9c, 0x91, 0xa4, 0x72, 0xa3, 0x49, 0x3d, 0xd3, 0x00, 0x3d, 0x20, 0xcc,
-	0xdd, 0x7f, 0xb2, 0xdd, 0x0e, 0xbd, 0xc3, 0xb1, 0xee, 0xee, 0x3a, 0x5c, 0x0a, 0x68, 0xc8, 0x6c,
-	0xd2, 0xb0, 0x23, 0x9b, 0x38, 0xa1, 0x13, 0xf5, 0x82, 0x54, 0x0b, 0x4f, 0xf2, 0x1c, 0x23, 0x41,
-	0xd8, 0xe1, 0xc9, 0xb9, 0xbc, 0x3c, 0x27, 0xd5, 0xf1, 0xb9, 0x6b, 0x50, 0x68, 0x5b, 0x41, 0xbb,
-	0xe1, 0xb8, 0x01, 0x17, 0x69, 0x98, 0xa8, 0x68, 0xeb, 0x93, 0xf5, 0xb9, 0x48, 0xf9, 0x99, 0xd2,
-	0x89, 0x2c, 0xb9, 0x9c, 0x59, 0x9c, 0x94, 0x26, 0x2b, 0xda, 0x7a, 0xa1, 0x1e, 0x8b, 0xf8, 0x77,
-	0x2d, 0xba, 0x9a, 0xd0, 0x3b, 0xdc, 0x66, 0xc4, 0xe2, 0xc4, 0x79, 0x95, 0x18, 0xf2, 0x63, 0xc6,
-	0x90, 0x1f, 0x8e, 0x21, 0x45, 0x6f, 0x62, 0x90, 0xde, 0xf7, 0x1a, 0xbc, 0xf5, 0x4d, 0xbf, 0x67,
-	0xf6, 0xb8, 0xc5, 0xc3, 0x20, 0xa6, 0x78, 0x0d, 0x0a, 0x49, 0x3b, 0x25, 0x77, 0x39, 0x97, 0x28,
-	0x6b, 0x0e, 0xba, 0x03, 0x53, 0x81, 0xb0, 0x52, 0x65, 0x7b, 0x23, 0x55, 0xb6, 0xa9, 0x66, 0xec,
-	0x56, 0x8d, 0x33, 0x30, 0xca, 0x10, 0xff, 0xa5, 0xc1, 0xc2, 0x9e, 0x08, 0xfd, 0x25, 0xf0, 0x57,
-	0x60, 0x56, 0xe5, 0x31, 0xba, 0x10, 0x55, 0x48, 0x20, 0x55, 0xbb, 0x56, 0xd0, 0x46, 0x97, 0xfb,
-	0x04, 0xf3, 0xe2, 0x9f, 0x92, 0x90, 0x0e, 0xd3, 0x8c, 0xec, 0x87, 0x9e, 0x43, 0x1c, 0x91, 0x94,
-	0xe9, 0x7a, 0x5f, 0x46, 0x35, 0x28, 0xb8, 0x5e, 0x8b, 0x04, 0xbc, 0xa1, 0x4c, 0x27, 0x45, 0x6c,
-	0xab, 0xa9, 0xd8, 0x92, 0x31, 0xd5, 0xad, 0x1a, 0x35, 0x71, 0x58, 0xb1, 0x9f, 0x73, 0x53, 0x12,
-	0xbe, 0x0d, 0xb3, 0xf7, 0x68, 0xb3, 0xdf, 0x4e, 0xab, 0x50, 0x64, 0xfc, 0xc8, 0x6f, 0xb8, 0x9e,
-	0x1f, 0xf2, 0x46, 0xc8, 0x3a, 0x71, 0x50, 0x91, 0xb6, 0x16, 0x29, 0xef, 0xb3, 0x0e, 0xf6, 0x00,
-	0x84, 0xd1, 0x98, 0x1d, 0x35, 0x38, 0x3e, 0xf2, 0x2f, 0x3e, 0x3e, 0xfe, 0xd6, 0x60, 0x5e, 0x4e,
-	0xc9, 0x97, 0x87, 0x7d, 0xf1, 0xa9, 0x85, 0xd6, 0xa0, 0x68, 0x77, 0x5c, 0xe2, 0x25, 0x73, 0x40,
-	0x5e, 0x51, 0x41, 0x6a, 0xd5, 0x14, 0x18, 0x6c, 0x95, 0x89, 0xa1, 0x56, 0x59, 0x83, 0xa2, 0xfa,
-	0x19, 0xfb, 0x98, 0x94, 0x3e, 0xa4, 0x36, 0x9e, 0x24, 0x37, 0xa1, 0x20, 0x4b, 0x6c, 0x9c, 0xfe,
-	0xc3, 0xef, 0xc1, 0x1b, 0x7b, 0x9c, 0xfa, 0x83, 0x16, 0x43, 0x95, 0xa6, 0x0d, 0x57, 0xda, 0xad,
-	0x9f, 0x8a, 0x50, 0xfc, 0x42, 0xbe, 0xe5, 0x7b, 0x84, 0x75, 0x5d, 0x9b, 0xa0, 0x03, 0x98, 0x92,
-	0x7d, 0x8f, 0xd2, 0x89, 0x49, 0x1e, 0x7c, 0x23, 0xc9, 0xb7, 0x8e, 0xb3, 0xaa, 0xeb, 0x1e, 0x6d,
-	0xaa, 0xf4, 0x61, 0xfd, 0x87, 0x3f, 0xff, 0xfd, 0x25, 0xb7, 0x88, 0x2f, 0x89, 0x37, 0xbd, 0x5b,
-	0x35, 0x0f, 0x68, 0xd3, 0xf4, 0xc8, 0xa3, 0x0f, 0xb5, 0x0d, 0xc4, 0x20, 0x5f, 0x0f, 0xbd, 0xd7,
-	0x04, 0xb4, 0x26, 0x80, 0x56, 0xf0, 0xdb, 0x69, 0xa0, 0x5e, 0xaa, 0x1e, 0x8e, 0x4d, 0x16, 0x7a,
-	0xc8, 0x83, 0xfc, 0x0e, 0xe1, 0xaf, 0x09, 0xf3, 0xaa, 0xc0, 0x5c, 0x42, 0x57, 0x32, 0x31, 0xd1,
-	0x53, 0x98, 0x92, 0x75, 0x8a, 0xae, 0x8f, 0x86, 0x1c, 0xae, 0xe2, 0xb1, 0x80, 0x57, 0x05, 0x70,
-	0x59, 0xcf, 0x06, 0x8e, 0xf2, 0xdb, 0x03, 0x48, 0x8a, 0x02, 0xbd, 0x33, 0x1a, 0xff, 0x4c, 0xd9,
-	0xe8, 0x97, 0x0d, 0xb9, 0x85, 0x19, 0xf1, 0x7a, 0x65, 0x7c, 0x1e, 0xad, 0x68, 0xf8, 0xa6, 0x00,
-	0xbd, 0x8e, 0xaf, 0xc6, 0xa0, 0xb2, 0x92, 0xcc, 0x80, 0x53, 0xdf, 0xec, 0xa5, 0x2a, 0x4d, 0x80,
-	0x7f, 0x09, 0x53, 0xbb, 0x62, 0xef, 0x43, 0x19, 0xfe, 0xf4, 0xa5, 0x14, 0x21, 0xe6, 0xdb, 0x86,
-	0x3c, 0xae, 0xa6, 0xd0, 0xbc, 0x00, 0x03, 0x34, 0xad, 0xb6, 0xc7, 0xa7, 0xe8, 0x31, 0xcc, 0xec,
-	0x10, 0xae, 0x82, 0xb9, 0x96, 0x15, 0x4c, 0x3a, 0x90, 0x71, 0x32, 0x89, 0x05, 0xce, 0x32, 0xd2,
-	0x87, 0x82, 0xea, 0xf5, 0x7b, 0xed, 0x18, 0xfd, 0xa8, 0x01, 0x92, 0xd7, 0x94, 0x1e, 0xfa, 0xe8,
-	0xc6, 0x79, 0x1c, 0x06, 0x1e, 0x86, 0xcc, 0x94, 0x6e, 0x09, 0xf4, 0x0d, 0xbc, 0x96, 0x81, 0x2e,
-	0xb2, 0x19, 0x49, 0x91, 0x33, 0x91, 0xd6, 0x03, 0x98, 0x4d, 0xed, 0x17, 0x68, 0x7d, 0x34, 0x87,
-	0xb3, 0x2b, 0x48, 0x26, 0x85, 0x2b, 0x82, 0xc2, 0x02, 0x2e, 0xc6, 0x14, 0xba, 0xc2, 0x36, 0xc2,
-	0x0a, 0x60, 0x2e, 0xbd, 0x08, 0x64, 0x05, 0x3c, 0x62, 0x59, 0xc8, 0x44, 0xab, 0x08, 0x34, 0x1d,
-	0xbf, 0x19, 0xa3, 0xc9, 0x35, 0xc0, 0x96, 0xd6, 0x11, 0xe8, 0xcf, 0x5a, 0x84, 0x9a, 0xec, 0x75,
-	0xd9, 0xa8, 0x67, 0xb6, 0x47, 0x7d, 0x63, 0x9c, 0xa3, 0xf2, 0x5d, 0xc3, 0x1b, 0x82, 0xc9, 0x2a,
-	0xc2, 0x31, 0x13, 0xb5, 0x25, 0x9a, 0xbd, 0xe1, 0x5d, 0xef, 0x18, 0x7d, 0x07, 0xb3, 0x3b, 0x84,
-	0xab, 0x92, 0x09, 0x32, 0x0b, 0x7a, 0xe5, 0xfc, 0xa7, 0x24, 0xc0, 0x25, 0x81, 0x89, 0xd0, 0x7c,
-	0x8c, 0x19, 0x9f, 0x42, 0x8f, 0x01, 0x12, 0x04, 0xb4, 0x3a, 0x3a, 0x8e, 0xc1, 0x1d, 0x5c, 0x2f,
-	0x9f, 0x0f, 0x17, 0x0f, 0x09, 0xb4, 0x3c, 0x84, 0x66, 0xf6, 0x92, 0x47, 0xf0, 0x18, 0x3d, 0x04,
-	0x54, 0x27, 0x2d, 0x37, 0xe0, 0x84, 0x25, 0xfb, 0xce, 0x40, 0x7f, 0x65, 0x2d, 0x45, 0x99, 0x97,
-	0x5c, 0x16, 0xc0, 0x25, 0xbc, 0x10, 0x03, 0x27, 0x1e, 0x82, 0xe8, 0x8a, 0x7f, 0xd5, 0xe0, 0xb2,
-	0xec, 0xa7, 0xe1, 0x0d, 0x0b, 0x6d, 0x8e, 0x8e, 0x3c, 0x63, 0xe1, 0xcb, 0x64, 0xf0, 0xbe, 0x60,
-	0xb0, 0x85, 0xdf, 0x3d, 0xcb, 0xc0, 0xec, 0x0d, 0xac, 0x68, 0x03, 0xdd, 0x75, 0x77, 0xf9, 0xf9,
-	0x49, 0x59, 0xfb, 0xe3, 0xa4, 0xac, 0xfd, 0x73, 0x52, 0xd6, 0x7e, 0x3b, 0x2d, 0xff, 0xef, 0xd9,
-	0x69, 0x59, 0x7b, 0x7e, 0x5a, 0xd6, 0xbe, 0xcd, 0x75, 0xab, 0xcd, 0x29, 0x81, 0x72, 0xfb, 0xbf,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x02, 0x05, 0x9b, 0x7d, 0x24, 0x0f, 0x00, 0x00,
-}

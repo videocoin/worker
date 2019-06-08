@@ -204,7 +204,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 		time.Sleep(1 * time.Second)
 	}
 
-	s.updateStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady.String())
+	s.updateStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady)
 
 	for {
 		for len(jobChan) < 2 {
@@ -224,7 +224,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 	}
 }
 
-func (s *Service) updateStatus(streamHash, status string) {
+func (s *Service) updateStatus(streamHash string, status workorder_v1.WorkOrderStatus) {
 	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
 		StreamHash: streamHash,
 		Status:     status,
