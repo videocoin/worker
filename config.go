@@ -17,7 +17,7 @@ type Config struct {
 	ManagerHTTPADDR  string `required:"true" envconfig:"MANAGER_HTTP_ADDR" default:"http://manager:50053/api/v1"`
 	BlockchainURL    string `required:"true" envconfig:"BLOCKCHAIN_URL" default:"http://localhost:8545"`
 	SMCA             string `required:"true" envconfig:"SMCA" default:"0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721" description:"stream manager contract address"`
-	KeyFile          string `required:"true" envconfig:"KEY_FILE" default:"keys/transcoder.key"`
+	Key              string `required:"true" envconfig:"KEY" default:"keys/transcoder.key"`
 	Password         string `required:"true" envconfig:"PASSWORD" default:"transcoder"`
 	LogLevel         string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
 	HashKey          string `required:"true" envconfig:"HASH" default:"BEEFFEED"`

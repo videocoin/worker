@@ -90,7 +90,7 @@ spec:
               secretKeyRef:
                 name: {{ .Chart.Name }}
                 key: hash
-          - name: KEY_FILE
+          - name: KEY
             valueFrom:
               secretKeyRef:
                 name: {{ .Chart.Name }}
