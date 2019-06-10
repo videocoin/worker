@@ -84,7 +84,7 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to make new stream manager: %s", err.Error())
 	}
 
-	key, err := bc.LoadBcPrivKeys(cfg.Key, cfg.Password, bc.FromMemory)
+	key, err := bc.LoadBcPrivKeys(cfg.Key, cfg.Secret, bc.FromMemory)
 	if err != nil {
 		log.Fatalf("failed to load private keys: %s", err.Error())
 	}

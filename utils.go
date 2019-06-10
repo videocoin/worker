@@ -46,7 +46,7 @@ func randomBigInt(len int) *big.Int {
 func randomId(len int) string {
 	b := make([]byte, len)
 	rand.Read(b)
-	return fmt.Sprint("%x", b)
+	return fmt.Sprintf("%x", b)
 }
 
 // ChunkNum strip .ts from input chunk and return as bigInt

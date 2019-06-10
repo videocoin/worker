@@ -18,7 +18,7 @@ type Config struct {
 	BlockchainURL   string `required:"true" envconfig:"BLOCKCHAIN_URL" default:"http://localhost:8545"`
 	SMCA            string `required:"true" envconfig:"SMCA" default:"0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721" description:"stream manager contract address"`
 	Key             string `required:"true" envconfig:"KEY"`
-	Password        string `required:"true" envconfig:"PASSWORD" default:"transcoder"`
+	Secret          string `required:"true" envconfig:"SECRET" default:"transcoder"`
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
 	Port            string `required:"true" envconfig:"PORT" default:":50056" description:"listens for new work from manager"`
 	NatsURL         string `required:"true" envconfig:"NATS_URL"`

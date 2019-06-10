@@ -80,11 +80,11 @@ spec:
               secretKeyRef:
                 key: natsUrl
                 name: {{ .Chart.Name }}
-          - name: PASSWORD
+          - name: SECRET
             valueFrom:
               secretKeyRef:
                 name: {{ .Chart.Name }}
-                key: password
+                key: secret
           - name: KEY
             valueFrom:
               secretKeyRef:
