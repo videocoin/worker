@@ -170,7 +170,7 @@ func (s *Service) register(uid string) {
 		CpuCores:    cores,
 		CpuMhz:      mhz,
 		TotalMemory: memtotal,
-		Status:      transcoder_v1.TranscoderStatusAvailable,
+		Status:      transcoder_v1.TranscoderStatusAvailable.String(),
 	})
 
 	if err != nil {

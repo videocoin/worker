@@ -14,7 +14,6 @@ import (
 
 	"github.com/VideoCoin/cloud-api/profiles/v1"
 	v1_1 "github.com/VideoCoin/cloud-api/transcoder/v1"
-	v1_0 "github.com/VideoCoin/cloud-api/workorder/v1"
 	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -274,7 +273,6 @@ func request_ManagerService_UpdateStreamStatus_0(ctx context.Context, marshaler 
 
 	var (
 		val string
-		e   int32
 		ok  bool
 		err error
 		_   = err
@@ -296,13 +294,11 @@ func request_ManagerService_UpdateStreamStatus_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "status")
 	}
 
-	e, err = runtime.Enum(val, v1_0.WorkOrderStatus_value)
+	protoReq.Status, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "status", err)
 	}
-
-	protoReq.Status = v1_0.WorkOrderStatus(e)
 
 	msg, err := client.UpdateStreamStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
