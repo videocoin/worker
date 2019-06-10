@@ -43,6 +43,12 @@ func randomBigInt(len int) *big.Int {
 	return n
 }
 
+func randomId(len int) string {
+	b := make([]byte, len)
+	rand.Read(b)
+	return fmt.Sprint("%x", b)
+}
+
 // ChunkNum strip .ts from input chunk and return as bigInt
 func getChunkNum(chunkName string) *big.Int {
 	chunkNum, err := strconv.ParseInt(strings.TrimSuffix(chunkName, ".ts"), 10, 64)

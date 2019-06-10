@@ -85,11 +85,6 @@ spec:
               secretKeyRef:
                 name: {{ .Chart.Name }}
                 key: password
-          - name: HASH_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Chart.Name }}
-                key: hash
           - name: KEY
             valueFrom:
               secretKeyRef:

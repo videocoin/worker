@@ -23,7 +23,6 @@ import (
 	"github.com/VideoCoin/cloud-pkg/streamManager"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
-	"github.com/denisbrodbeck/machineid"
 	"github.com/gogo/protobuf/types"
 	"github.com/nats-io/go-nats"
 	"github.com/shirou/gopsutil/cpu"
@@ -127,10 +126,7 @@ func Start() error {
 		return err
 	}
 
-	uid, err := machineid.ProtectedID(cfg.HashKey)
-	if err != nil {
-		s.log.Warnf("failed to calculate machine id: %s", err.Error())
-	}
+	uid := randomId(16)
 
 	{
 		go s.subscribe(uid)
