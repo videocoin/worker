@@ -10,7 +10,7 @@ import (
 // Config default config for transcoder
 type Config struct {
 	BaseStreamURL    string `required:"true" envconfig:"BASE_STREAM_URL" default:"http://ingest.videocoin.io:8080/hls"`
-	VerifierHTTPADDR string `required:"true" envconfig:"VERIFIER_HTTP_ADDR" default:"http://verifier:50054"`
+	VerifierHTTPADDR string `required:"true" envconfig:"VERIFIER_HTTP_ADDR" default:"http://verifier:50054/api/v1"`
 	BaseStorageURL   string `required:"true" envconfig:"BASE_STORAGE_URL" default:"/tmp"`
 	Bucket           string `required:"true" envconfig:"BUCKET" default:"streams.videocoin.network"`
 	OutputDir        string `required:"true" envconfig:"OUTPUT_DIR" default:"/opt/mnt/" description:"ffmpeg output dir"`
