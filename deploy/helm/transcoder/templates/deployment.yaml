@@ -60,17 +60,7 @@ spec:
               configMapKeyRef:
                 key: bucket
                 name: {{ .Chart.Name }}
-          - name: CLUSTER_ID
-            valueFrom:
-              configMapKeyRef:
-                key: clusterId
-                name: {{ .Chart.Name }}
-          - name: LOG_LEVEL
-            valueFrom:
-              configMapKeyRef:
-                key: logLevel
-                name: {{ .Chart.Name }}
-          - name: BLOCKCHAIN_URL
+=          - name: BLOCKCHAIN_URL
             valueFrom:
               secretKeyRef:
                 key: blockchainUrl

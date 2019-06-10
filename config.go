@@ -13,7 +13,7 @@ type Config struct {
 	VerifierHTTPADDR string `required:"true" envconfig:"VERIFIER_HTTP_ADDR" default:"http://verifier:50054"`
 	BaseStorageURL   string `required:"true" envconfig:"BASE_STORAGE_URL" default:"/tmp"`
 	Bucket           string `required:"true" envconfig:"BUCKET" default:"streams.videocoin.network"`
-	OutputDir        string `required:"true" envconfig:"OUTPUT_DIR" default:"/opt/mnt/" description:"Mount point for GCSFUSE"`
+	OutputDir        string `required:"true" envconfig:"OUTPUT_DIR" default:"/opt/mnt/" description:"ffmpeg output dir"`
 	ManagerHTTPADDR  string `required:"true" envconfig:"MANAGER_HTTP_ADDR" default:"http://manager:50053/api/v1"`
 	BlockchainURL    string `required:"true" envconfig:"BLOCKCHAIN_URL" default:"http://localhost:8545"`
 	SMCA             string `required:"true" envconfig:"SMCA" default:"0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721" description:"stream manager contract address"`
