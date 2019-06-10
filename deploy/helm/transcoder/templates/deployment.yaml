@@ -60,11 +60,6 @@ spec:
               configMapKeyRef:
                 key: bucket
                 name: {{ .Chart.Name }}
-          - name: CLUSTER_ID
-            valueFrom:
-              configMapKeyRef:
-                key: clusterId
-                name: {{ .Chart.Name }}
           - name: LOG_LEVEL
             valueFrom:
               configMapKeyRef:
