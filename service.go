@@ -43,7 +43,7 @@ func newService() (*Service, error) {
 	level, _ := logrus.ParseLevel(cfg.LogLevel)
 	logrus.SetLevel(level)
 	// Generate unique connection name
-	b := make([]byte, 16)
+	b := make([]byte, 8)
 	rand.Read(b)
 
 	opts := []grpc.DialOption{grpc.WithInsecure()}
