@@ -12,7 +12,7 @@ import (
 	"io"
 	"net/http"
 
-	v1 "github.com/VideoCoin/cloud-api/profiles/v1"
+	"github.com/VideoCoin/cloud-api/profiles/v1"
 	v1_1 "github.com/VideoCoin/cloud-api/transcoder/v1"
 	v1_0 "github.com/VideoCoin/cloud-api/workorder/v1"
 	"github.com/gogo/protobuf/types"

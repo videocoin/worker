@@ -17,7 +17,7 @@ message Transcoder {
     int32 cpu_cores = 2;
     double cpu_mhz = 3;
     uint64 total_memory = 4;
-    TranscoderStatus status = 6;
+    string status = 6;
     bytes worker = 7;
 }
 

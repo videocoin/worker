@@ -47,13 +47,13 @@ message WorkOrder {
     string transcode_input_url = 8;
     string ingest_input_url = 9;
     string transcode_output_url =10;
-    WorkOrderStatus status = 11;
+    string status = 11;
     bytes chunks = 12 [ (gogoproto.moretags) = "gorm:\"chunks;type:json\"sql:\"type:json\"" ];
     int64 created_at = 13;
     int64 updated_at = 14;
     bytes worker = 15 [ (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" ];
     bool refunded = 20;
-    IngestStatus ingest_status = 21;
+    string ingest_status = 21;
     string stream_hash = 22;
 }
 
@@ -66,8 +66,8 @@ message JobProfile {
 	string client_address = 6;
 	int64 stream_id = 7;
 	string stream_address = 8;
-	WorkOrderStatus status = 9;
-	IngestStatus ingest_status = 10;
+	string status = 9;
+	string ingest_status = 10;
 }
 
 message JobProfiles {
