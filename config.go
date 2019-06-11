@@ -20,8 +20,6 @@ type Config struct {
 	Key             string `required:"true" envconfig:"KEY"`
 	Secret          string `required:"true" envconfig:"SECRET" default:"transcoder"`
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
-	Port            string `required:"true" envconfig:"PORT" default:":50056" description:"listens for new work from manager"`
-	NatsURL         string `required:"true" envconfig:"NATS_URL"`
 }
 
 var cfg Config

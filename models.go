@@ -12,7 +12,6 @@ import (
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/grafov/m3u8"
-	"github.com/nats-io/go-nats"
 	"github.com/sirupsen/logrus"
 )
 
@@ -45,8 +44,6 @@ type (
 	// Service primary reciever for service
 	Service struct {
 		cfg           *Config
-		ec            *nats.EncodedConn
-		nc            *nats.Conn
 		log           *logrus.Entry
 		ctx           context.Context
 		bcClient      *ethclient.Client

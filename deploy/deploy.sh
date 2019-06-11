@@ -4,7 +4,7 @@ readonly CHART_NAME=transcoder
 readonly CHART_DIR=./helm/transcoder
 
 CONSUL_ADDR=${CONSUL_ADDR:=127.0.0.1:8500}
-ENV=${ENV:=thor}
+ENV=${ENV:=hulk}
 DOCKER_REGISTRY=us.gcr.io
 VERSION=${VERSION:=`git rev-parse --short HEAD`}
 PROJECT=${PROJECT:=`gcloud config list --format 'value(core.project)' 2>/dev/null`}
@@ -58,7 +58,6 @@ function get_vars() {
     readonly VERIFIER_RPC_ADDR=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/verifierRpcAddr`
     readonly LOG_LEVEL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/logLevel` 
 
-    readonly NATS_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/natsUrl`
     readonly SECRET=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/secret`
     readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/blockchainUrl`
     readonly KEY=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/key`
@@ -78,7 +77,6 @@ function deploy() {
         --set config.logLevel="${LOG_LEVEL}" \
         --set config.verifierRpcAddr="${VERIFIER_RPC_ADDR}" \
         --set config.bucket="${BUCKET}" \
-        --set secrets.natsUrl="${NATS_URL}" \
         --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set secrets.secret="${SECRET}" \
         --set secrets.key="${KEY}" \

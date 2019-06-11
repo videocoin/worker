@@ -70,11 +70,6 @@ spec:
               secretKeyRef:
                 key: blockchainUrl
                 name: {{ .Chart.Name }}
-          - name: NATS_URL
-            valueFrom:
-              secretKeyRef:
-                key: natsUrl
-                name: {{ .Chart.Name }}
           - name: SECRET
             valueFrom:
               secretKeyRef:

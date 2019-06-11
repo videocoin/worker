@@ -24,7 +24,6 @@ import (
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/gogo/protobuf/types"
-	"github.com/nats-io/go-nats"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/sirupsen/logrus"
@@ -94,16 +93,6 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to get blockchain auth: %s", err.Error())
 	}
 
-	nc, err := nats.Connect(cfg.NatsURL)
-	if err != nil {
-		log.Fatalf("failed to connect to nats: %s", err.Error())
-	}
-
-	ec, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
-	if err != nil {
-		log.Fatalf("failed to creat encoded connection: %s", err.Error())
-	}
-
 	return &Service{
 		streamManager: sm,
 		bcAuth:        bcAuth,
@@ -111,8 +100,6 @@ func newService() (*Service, error) {
 		cfg:           cfg,
 		manager:       manager,
 		verifier:      v,
-		ec:            ec,
-		nc:            nc,
 		ctx:           ctx,
 		log:           log,
 	}, nil
