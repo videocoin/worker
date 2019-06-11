@@ -3,7 +3,6 @@ package transcode
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -32,15 +31,6 @@ func (s *Service) upload(output string, r io.Reader) error {
 	}
 
 	return nil
-}
-
-// RandomBigInt Generates a random big integer with max 64 bits so we can store as int64
-func randomBigInt(len int) *big.Int {
-	b := make([]byte, len)
-	rand.Read(b)
-	n := big.NewInt(0)
-	n = n.SetBytes(b)
-	return n
 }
 
 // ChunkNum strip .ts from input chunk and return as bigInt

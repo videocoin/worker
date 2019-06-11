@@ -8,8 +8,8 @@ import (
 
 	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
 	profiles_v1 "github.com/VideoCoin/cloud-api/profiles/v1"
+	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
 	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
 	"github.com/VideoCoin/cloud-pkg/stream"
 	"github.com/VideoCoin/cloud-pkg/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
@@ -98,6 +98,48 @@ func TestService_register(t *testing.T) {
 	}
 }
 
+func TestService_pollForWork(t *testing.T) {
+	type fields struct {
+		cfg           *Config
+		ec            *nats.EncodedConn
+		nc            *nats.Conn
+		log           *logrus.Entry
+		ctx           context.Context
+		bcClient      *ethclient.Client
+		bcAuth        *bind.TransactOpts
+		streamManager *streamManager.Manager
+		manager       manager_v1.ManagerServiceClient
+		verifier      verifier_v1.VerifierServiceClient
+	}
+	type args struct {
+		uid string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Service{
+				cfg:           tt.fields.cfg,
+				ec:            tt.fields.ec,
+				nc:            tt.fields.nc,
+				log:           tt.fields.log,
+				ctx:           tt.fields.ctx,
+				bcClient:      tt.fields.bcClient,
+				bcAuth:        tt.fields.bcAuth,
+				streamManager: tt.fields.streamManager,
+				manager:       tt.fields.manager,
+				verifier:      tt.fields.verifier,
+			}
+			s.pollForWork(tt.args.uid)
+		})
+	}
+}
+
 func TestService_handleTranscode(t *testing.T) {
 	type fields struct {
 		cfg           *Config
@@ -112,9 +154,8 @@ func TestService_handleTranscode(t *testing.T) {
 		verifier      verifier_v1.VerifierServiceClient
 	}
 	type args struct {
-		workOrder *workorder_v1.WorkOrder
-		profile   *profiles_v1.Profile
-		uid       string
+		a   *transcoder_v1.Assignment
+		uid string
 	}
 	tests := []struct {
 		name    string
@@ -138,7 +179,7 @@ func TestService_handleTranscode(t *testing.T) {
 				manager:       tt.fields.manager,
 				verifier:      tt.fields.verifier,
 			}
-			if err := s.handleTranscode(tt.args.workOrder, tt.args.profile, tt.args.uid); (err != nil) != tt.wantErr {
+			if err := s.handleTranscode(tt.args.a, tt.args.uid); (err != nil) != tt.wantErr {
 				t.Errorf("Service.handleTranscode() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

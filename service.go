@@ -17,7 +17,6 @@ import (
 	profiles_v1 "github.com/VideoCoin/cloud-api/profiles/v1"
 	transcoder_v1 "github.com/VideoCoin/cloud-api/transcoder/v1"
 	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
 	bc "github.com/VideoCoin/cloud-pkg/bcops"
 	"github.com/VideoCoin/cloud-pkg/stream"
 	"github.com/VideoCoin/cloud-pkg/streamManager"
@@ -132,12 +131,11 @@ func Start() error {
 		return err
 	}
 
-	{
-		go s.subscribe(uid)
-		s.register(uid)
-	}
+	go s.wait()
 
-	s.wait()
+	s.register(uid)
+
+	s.pollForWork(uid)
 
 	return nil
 }
@@ -178,38 +176,50 @@ func (s *Service) register(uid string) {
 	}
 }
 
-func (s *Service) handleTranscode(workOrder *workorder_v1.WorkOrder, profile *profiles_v1.Profile, uid string) error {
-	s.log.Infof("transcoding: %d\nusing input: %s\nwith stream_id: %d", workOrder.Id, workOrder.TranscodeInputUrl, workOrder.StreamId)
+func (s *Service) pollForWork(uid string) {
+	ticker := time.NewTicker(2 * time.Second)
+	for range ticker.C {
+		assignment, err := s.manager.GetWork(context.Background(), &types.Empty{})
+		if err != nil {
+			s.log.Errorf("failed to get work: %s", err.Error())
+			continue
+		}
 
-	dir := path.Join(s.cfg.OutputDir, workOrder.StreamHash)
+		s.handleTranscode(assignment, uid)
+	}
+}
+
+func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error {
+	s.log.Infof("transcoding: %d\nusing input: %s\nwith stream_id: %d", a.Workorder.Id, a.Workorder.TranscodeInputUrl, a.Workorder.StreamId)
+
+	dir := path.Join(s.cfg.OutputDir, a.Workorder.StreamHash)
 	m3u8 := path.Join(dir, "index.m3u8")
 
-	cmd := buildCmd(workOrder.TranscodeInputUrl, dir, profile)
+	cmd := buildCmd(a.Workorder.TranscodeInputUrl, dir, a.Profile)
 	var stopChan = make(chan struct{})
 
-	fullDir := fmt.Sprintf("%s/%d", dir, profile.Bitrate)
+	fullDir := fmt.Sprintf("%s/%d", dir, a.Profile.Bitrate)
 	err := prepareDir(fullDir)
 
 	if err != nil {
 		return err
 	}
 
-	go s.syncDir(stopChan, cmd, workOrder, fullDir, profile.Bitrate)
+	go s.syncDir(stopChan, cmd, a.Workorder, fullDir, a.Profile.Bitrate)
 
-	if err := s.generatePlaylist(workOrder.StreamHash, m3u8, profile.Bitrate); err != nil {
+	if err := s.generatePlaylist(a.Workorder.StreamHash, m3u8, a.Profile.Bitrate); err != nil {
 		return err
 	}
 
 	go s.transcode(cmd,
 		stopChan,
-		workOrder.TranscodeInputUrl,
-		workOrder.StreamAddress,
-		workOrder.StreamHash,
+		a.Workorder.TranscodeInputUrl,
+		a.Workorder.StreamAddress,
+		a.Workorder.StreamHash,
 		uid,
 	)
 
 	return nil
-
 }
 
 func (s *Service) transcode(
