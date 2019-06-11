@@ -154,7 +154,7 @@ func (s *Service) handleChunk(job *Job) error {
 	}
 
 	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
-	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
+	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
 
 	go s.verify(tx, job, inputChunk, outputChunk)
 
