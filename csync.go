@@ -208,15 +208,17 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 	s.updateStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady)
 
 	for {
-		for len(jobChan) < 1 {
+		for len(jobChan) < 2 {
 			time.Sleep(500 * time.Millisecond)
 		}
 
 		j := <-jobChan
 
-		if err := s.chunkCreated(&j); err != nil {
-			s.log.Errorf("failed to register chunk: %s", err.Error())
-		}
+		go func() {
+			if err := s.chunkCreated(&j); err != nil {
+				s.log.Errorf("failed to register chunk: %s", err.Error())
+			}
+		}()
 
 		if err := s.handleChunk(&j); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
