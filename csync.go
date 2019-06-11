@@ -207,7 +207,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 	s.updateStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady)
 
 	for {
-		for len(jobChan) < 2 {
+		for len(jobChan) < 1 {
 			time.Sleep(500 * time.Millisecond)
 		}
 
