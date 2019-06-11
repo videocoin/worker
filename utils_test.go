@@ -9,7 +9,7 @@ import (
 
 	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	"github.com/VideoCoin/cloud-pkg/streamManager"
+	"github.com/VideoCoin/common/streamManager"
 	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/nats-io/go-nats"
@@ -57,26 +57,6 @@ func TestService_upload(t *testing.T) {
 			}
 			if err := s.upload(tt.args.output, tt.args.r); (err != nil) != tt.wantErr {
 				t.Errorf("Service.upload() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_randomBigInt(t *testing.T) {
-	type args struct {
-		len int
-	}
-	tests := []struct {
-		name string
-		args args
-		want *big.Int
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := randomBigInt(tt.args.len); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("randomBigInt() = %v, want %v", got, tt.want)
 			}
 		})
 	}
