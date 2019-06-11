@@ -21,6 +21,7 @@ import (
 	bc "github.com/VideoCoin/cloud-pkg/bcops"
 	"github.com/VideoCoin/cloud-pkg/stream"
 	"github.com/VideoCoin/cloud-pkg/streamManager"
+	"github.com/VideoCoin/cloud-pkg/uuid4"
 	"github.com/VideoCoin/go-videocoin/common"
 	"github.com/VideoCoin/go-videocoin/ethclient"
 	"github.com/gogo/protobuf/types"
@@ -126,7 +127,10 @@ func Start() error {
 		return err
 	}
 
-	uid := randomId(16)
+	uid, err := uuid4.New()
+	if err != nil {
+		return err
+	}
 
 	{
 		go s.subscribe(uid)

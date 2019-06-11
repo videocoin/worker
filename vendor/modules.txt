@@ -13,6 +13,7 @@ github.com/VideoCoin/cloud-api/rpc
 github.com/VideoCoin/cloud-pkg/bcops
 github.com/VideoCoin/cloud-pkg/stream
 github.com/VideoCoin/cloud-pkg/streamManager
+github.com/VideoCoin/cloud-pkg/uuid4
 # github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
 github.com/VideoCoin/go-videocoin/accounts/abi/bind
 github.com/VideoCoin/go-videocoin/common
@@ -95,10 +96,6 @@ github.com/konsorten/go-windows-terminal-sequences
 github.com/nats-io/go-nats
 github.com/nats-io/go-nats/encoders/builtin
 github.com/nats-io/go-nats/util
-# github.com/nats-io/nats.go v1.8.1
-github.com/nats-io/nats.go
-github.com/nats-io/nats.go/encoders/builtin
-github.com/nats-io/nats.go/util
 # github.com/nats-io/nkeys v0.0.2
 github.com/nats-io/nkeys
 # github.com/nats-io/nuid v1.0.1

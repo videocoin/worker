@@ -7,9 +7,8 @@ import (
 )
 
 func (s *Service) subscribe(uid string) {
-	s.heartBeat(uid)
-
 	s.listenForAssignment(uid)
+	s.heartBeat(uid)
 }
 
 func (s *Service) listenForAssignment(uid string) {
