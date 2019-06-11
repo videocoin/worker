@@ -122,6 +122,12 @@ service ManagerService {
       post: "/api/v1/transcoder/{transcoder_id}/{status}"
     };
   }; 
+
+  rpc GetWork(google.protobuf.Empty) returns (cloud.api.transcoder.v1.Assignment) {
+    option (google.api.http) = {
+      get: "/api/v1/work"
+    };
+  };
 }
 
 message UpdateProfileRequest {

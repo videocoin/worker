@@ -2,7 +2,7 @@
 cloud.google.com/go/compute/metadata
 # github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705
 github.com/StackExchange/wmi
-# github.com/VideoCoin/cloud-api v0.0.15
+# github.com/VideoCoin/cloud-api v0.0.16
 github.com/VideoCoin/cloud-api/manager/v1
 github.com/VideoCoin/cloud-api/profiles/v1
 github.com/VideoCoin/cloud-api/transcoder/v1

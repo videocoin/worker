@@ -467,6 +467,15 @@ func request_ManagerService_UpdateTranscoderStatus_0(ctx context.Context, marsha
 
 }
 
+func request_ManagerService_GetWork_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq types.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetWork(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 // RegisterManagerServiceHandlerFromEndpoint is same as RegisterManagerServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterManagerServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
@@ -825,6 +834,26 @@ func RegisterManagerServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
+	mux.Handle("GET", pattern_ManagerService_GetWork_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ManagerService_GetWork_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ManagerService_GetWork_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -860,6 +889,8 @@ var (
 	pattern_ManagerService_RegisterTranscoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "transcoders"}, ""))
 
 	pattern_ManagerService_UpdateTranscoderStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "transcoder", "transcoder_id", "status"}, ""))
+
+	pattern_ManagerService_GetWork_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "work"}, ""))
 )
 
 var (
@@ -894,4 +925,6 @@ var (
 	forward_ManagerService_RegisterTranscoder_0 = runtime.ForwardResponseMessage
 
 	forward_ManagerService_UpdateTranscoderStatus_0 = runtime.ForwardResponseMessage
+
+	forward_ManagerService_GetWork_0 = runtime.ForwardResponseMessage
 )

@@ -10,8 +10,8 @@ github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 h1:UUppSQnhf4Yc6
 github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
 github.com/VideoCoin/cloud-api v0.0.0-20190523062553-b30ef1406303 h1:ioNZlBULFiWO1rxSgGqsnfB4bCfsIJ3x9y0ylROMzAc=
 github.com/VideoCoin/cloud-api v0.0.0-20190523062553-b30ef1406303/go.mod h1:AcXTiLDPTNLMQVOebHw8c9eD4v8SLV6Ef/R93ODdnSo=
-github.com/VideoCoin/cloud-api v0.0.15 h1:SOCbbWA6ge2ux75zFvwOVIkwGZLuJa7aOgRO7I6Blr4=
-github.com/VideoCoin/cloud-api v0.0.15/go.mod h1:chA30hq2zP5PS2Uac2wV6vOdMbNmZ2sibwktFJLrs7A=
+github.com/VideoCoin/cloud-api v0.0.16 h1:MsyteOWTD9zuErM1waX0LaSIc816gXrpc5yLGX4GK0E=
+github.com/VideoCoin/cloud-api v0.0.16/go.mod h1:chA30hq2zP5PS2Uac2wV6vOdMbNmZ2sibwktFJLrs7A=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c h1:qhYyBvcLWaKhRYmFnj+907T7qX9mLB7Ax+1RhUtMO5Q=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c/go.mod h1:8Lz6j8/H7l2RfUzGizZMy5iPatpEcGTs/mTGUQid+n8=
 github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d h1:n6rINTciFLqXG7offP5sYB3y5obkqGq9TMOVDj/FJec=
