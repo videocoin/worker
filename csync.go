@@ -63,7 +63,6 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 					written[chunk] = true
 
 					chunkNum := getChunkNum(chunk)
-					randomID := randomBigInt(8)
 
 					// Add job to the job channel to be worked on later
 					jobChan <- Job{
@@ -71,9 +70,9 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						InputChunkName:  chunk,
 						Bitrate:         bitrate,
 						Playlist:        playlist,
-						OutputID:        randomID,
+						OutputID:        chunkNum,
 						InputID:         chunkNum,
-						OutputChunkName: fmt.Sprintf("%d.ts", randomID),
+						OutputChunkName: fmt.Sprintf("%d.ts", chunkNum),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
 						StreamAddress:   workOrder.StreamAddress,
@@ -157,7 +156,9 @@ func (s *Service) handleChunk(job *Job) error {
 	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://storage.googleapis.com/%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
 
-	return s.verify(tx, job, inputChunk, outputChunk)
+	go s.verify(tx, job, inputChunk, outputChunk)
+
+	return nil
 }
 
 // SubmitProof registers work (output chunk)
