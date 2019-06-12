@@ -5,12 +5,12 @@ import (
 	"math/big"
 	"os/exec"
 
-	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	"github.com/VideoCoin/cloud-pkg/streamManager"
-	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
-	"github.com/VideoCoin/go-videocoin/common"
-	"github.com/VideoCoin/go-videocoin/ethclient"
+	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
+	"github.com/videocoin/cloud-pkg/streamManager"
+	"github.com/videocoin/go-videocoin/accounts/abi/bind"
+	"github.com/videocoin/go-videocoin/common"
+	"github.com/videocoin/go-videocoin/ethclient"
 	"github.com/grafov/m3u8"
 	"github.com/sirupsen/logrus"
 )

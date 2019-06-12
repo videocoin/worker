@@ -1,14 +1,14 @@
-module github.com/VideoCoin/transcode
+module github.com/videocoin/transcode
 
 go 1.12
 
 require (
 	cloud.google.com/go v0.40.0 // indirect
 	github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705 // indirect
-	github.com/VideoCoin/cloud-api v0.0.16
-	github.com/VideoCoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c
-	github.com/VideoCoin/common v0.1.110
-	github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
+	github.com/videocoin/cloud-api v0.0.16
+	github.com/videocoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c
+	github.com/videocoin/common v0.1.110
+	github.com/videocoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
 	github.com/cespare/cp v1.1.1 // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/fjl/memsize v0.0.0-20180929194037-2a09253e352a // indirect

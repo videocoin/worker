@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
-	"github.com/VideoCoin/go-videocoin/common"
-	"github.com/VideoCoin/go-videocoin/core/types"
+	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
+	workorder_v1 "github.com/videocoin/cloud-api/workorder/v1"
+	"github.com/videocoin/go-videocoin/common"
+	"github.com/videocoin/go-videocoin/core/types"
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/grafov/m3u8"

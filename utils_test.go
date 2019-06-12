@@ -7,11 +7,11 @@ import (
 	"reflect"
 	"testing"
 
-	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	"github.com/VideoCoin/common/streamManager"
-	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
-	"github.com/VideoCoin/go-videocoin/ethclient"
+	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
+	"github.com/videocoin/common/streamManager"
+	"github.com/videocoin/go-videocoin/accounts/abi/bind"
+	"github.com/videocoin/go-videocoin/ethclient"
 	"github.com/nats-io/go-nats"
 	"github.com/sirupsen/logrus"
 )
