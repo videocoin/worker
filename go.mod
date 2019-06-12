@@ -14,7 +14,7 @@ require (
 	github.com/grafov/m3u8 v0.6.1
 	github.com/huin/goupnp v1.0.0 // indirect
 	github.com/jackpal/go-nat-pmp v1.0.1 // indirect
-	github.com/jinzhu/gorm v1.9.8
+	github.com/jinzhu/gorm v1.9.8 // indirect
 	github.com/karalabe/hid v1.0.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/nats-io/gnatsd v1.4.1 // indirect

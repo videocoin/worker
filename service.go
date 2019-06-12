@@ -164,7 +164,7 @@ func (s *Service) register(uid string) {
 }
 
 func (s *Service) pollForWork(uid string) {
-	ticker := time.NewTicker(2 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 	for range ticker.C {
 		assignment, err := s.manager.GetWork(context.Background(), &types.Empty{})
 		if assignment == nil {
