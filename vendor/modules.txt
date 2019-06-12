@@ -1,55 +1,40 @@
-# cloud.google.com/go v0.40.0
+# cloud.google.com/go v0.38.0
 cloud.google.com/go/compute/metadata
-# github.com/StackExchange/wmi v0.0.0-20181212234831-e0a55b97c705
+# github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
 github.com/StackExchange/wmi
-# github.com/VideoCoin/cloud-api v0.0.16
-github.com/VideoCoin/cloud-api/manager/v1
-github.com/VideoCoin/cloud-api/profiles/v1
-github.com/VideoCoin/cloud-api/transcoder/v1
-github.com/VideoCoin/cloud-api/verifier/v1
-github.com/VideoCoin/cloud-api/workorder/v1
-github.com/VideoCoin/cloud-api/rpc
-# github.com/VideoCoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c
-github.com/VideoCoin/cloud-pkg/bcops
-github.com/VideoCoin/cloud-pkg/stream
-github.com/VideoCoin/cloud-pkg/streamManager
-github.com/VideoCoin/cloud-pkg/uuid4
-# github.com/VideoCoin/common v0.1.110
-github.com/VideoCoin/common/streamManager
-# github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d
-github.com/VideoCoin/go-videocoin/accounts/abi/bind
-github.com/VideoCoin/go-videocoin/common
-github.com/VideoCoin/go-videocoin/core/types
-github.com/VideoCoin/go-videocoin/ethclient
-github.com/VideoCoin/go-videocoin/accounts/keystore
-github.com/VideoCoin/go-videocoin
-github.com/VideoCoin/go-videocoin/accounts/abi
-github.com/VideoCoin/go-videocoin/event
-github.com/VideoCoin/go-videocoin/crypto
-github.com/VideoCoin/go-videocoin/log
-github.com/VideoCoin/go-videocoin/common/hexutil
-github.com/VideoCoin/go-videocoin/crypto/sha3
-github.com/VideoCoin/go-videocoin/params
-github.com/VideoCoin/go-videocoin/rlp
-github.com/VideoCoin/go-videocoin/trie
-github.com/VideoCoin/go-videocoin/rpc
-github.com/VideoCoin/go-videocoin/accounts
-github.com/VideoCoin/go-videocoin/common/math
-github.com/VideoCoin/go-videocoin/common/mclock
-github.com/VideoCoin/go-videocoin/crypto/secp256k1
-github.com/VideoCoin/go-videocoin/common/prque
-github.com/VideoCoin/go-videocoin/ethdb
-github.com/VideoCoin/go-videocoin/metrics
-github.com/VideoCoin/go-videocoin/p2p/netutil
 # github.com/allegro/bigcache v1.2.0
 github.com/allegro/bigcache
 github.com/allegro/bigcache/queue
-# github.com/aristanetworks/goarista v0.0.0-20190522184417-004c259faaeb
+# github.com/aristanetworks/goarista v0.0.0-20190607111240-52c2a7864a08
 github.com/aristanetworks/goarista/monotime
-# github.com/btcsuite/btcd v0.0.0-20190523000118-16327141da8c
+# github.com/btcsuite/btcd v0.0.0-20190605094302-a0d1e3e36d50
 github.com/btcsuite/btcd/btcec
 # github.com/deckarep/golang-set v1.7.1
 github.com/deckarep/golang-set
+# github.com/ethereum/go-ethereum v1.8.27
+github.com/ethereum/go-ethereum/accounts/abi/bind
+github.com/ethereum/go-ethereum/common
+github.com/ethereum/go-ethereum/core/types
+github.com/ethereum/go-ethereum/ethclient
+github.com/ethereum/go-ethereum
+github.com/ethereum/go-ethereum/accounts/abi
+github.com/ethereum/go-ethereum/accounts/keystore
+github.com/ethereum/go-ethereum/crypto
+github.com/ethereum/go-ethereum/event
+github.com/ethereum/go-ethereum/log
+github.com/ethereum/go-ethereum/common/hexutil
+github.com/ethereum/go-ethereum/params
+github.com/ethereum/go-ethereum/rlp
+github.com/ethereum/go-ethereum/trie
+github.com/ethereum/go-ethereum/rpc
+github.com/ethereum/go-ethereum/common/math
+github.com/ethereum/go-ethereum/accounts
+github.com/ethereum/go-ethereum/crypto/secp256k1
+github.com/ethereum/go-ethereum/common/mclock
+github.com/ethereum/go-ethereum/common/prque
+github.com/ethereum/go-ethereum/ethdb
+github.com/ethereum/go-ethereum/metrics
+github.com/ethereum/go-ethereum/p2p/netutil
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/go-ole/go-ole v1.2.4
@@ -61,9 +46,9 @@ github.com/go-stack/stack
 github.com/gogo/googleapis/google/api
 # github.com/gogo/protobuf v1.2.1
 github.com/gogo/protobuf/types
-github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
+github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 # github.com/golang/protobuf v1.3.1
 github.com/golang/protobuf/proto
@@ -78,7 +63,7 @@ github.com/golang/protobuf/ptypes/struct
 github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/protoc-gen-go/generator/internal/remap
 github.com/golang/protobuf/protoc-gen-go/plugin
-# github.com/golang/snappy v0.0.1
+# github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
 # github.com/google/uuid v1.0.0
 github.com/google/uuid
@@ -90,7 +75,7 @@ github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/grpc-ecosystem/grpc-gateway/internal
 # github.com/hashicorp/golang-lru v0.5.1
 github.com/hashicorp/golang-lru/simplelru
-# github.com/kelseyhightower/envconfig v1.3.0
+# github.com/kelseyhightower/envconfig v1.4.0
 github.com/kelseyhightower/envconfig
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
@@ -127,7 +112,19 @@ github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
-# go.opencensus.io v0.22.0
+# github.com/videocoin/cloud-api v0.1.18
+github.com/videocoin/cloud-api/manager/v1
+github.com/videocoin/cloud-api/profiles/v1
+github.com/videocoin/cloud-api/transcoder/v1
+github.com/videocoin/cloud-api/verifier/v1
+github.com/videocoin/cloud-api/workorder/v1
+github.com/videocoin/cloud-api/rpc
+# github.com/videocoin/cloud-pkg v0.0.1
+github.com/videocoin/cloud-pkg/bcops
+github.com/videocoin/cloud-pkg/stream
+github.com/videocoin/cloud-pkg/streamManager
+github.com/videocoin/cloud-pkg/uuid4
+# go.opencensus.io v0.21.0
 go.opencensus.io/plugin/ochttp
 go.opencensus.io/plugin/ochttp/propagation/b3
 go.opencensus.io/stats
@@ -144,12 +141,13 @@ go.opencensus.io/trace/internal
 go.opencensus.io/trace/tracestate
 go.opencensus.io/resource
 go.opencensus.io
-# golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
+# golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+golang.org/x/crypto/sha3
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/ed25519/internal/edwards25519
-# golang.org/x/net v0.0.0-20190607181551-461777fb6f67
+# golang.org/x/net v0.0.0-20190522155817-f3200d17e092
 golang.org/x/net/context
 golang.org/x/net/trace
 golang.org/x/net/websocket
@@ -165,9 +163,10 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20190606203320-7fc4e5ec1444
+# golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed
 golang.org/x/sys/unix
 golang.org/x/sys/windows
+golang.org/x/sys/cpu
 # golang.org/x/text v0.3.2
 golang.org/x/text/secure/bidirule
 golang.org/x/text/unicode/bidi
@@ -183,7 +182,7 @@ google.golang.org/api/googleapi/internal/uritemplates
 google.golang.org/api/internal
 google.golang.org/api/googleapi/transport
 google.golang.org/api/transport/http/internal/propagation
-# google.golang.org/appengine v1.6.1
+# google.golang.org/appengine v1.5.0
 google.golang.org/appengine/urlfetch
 google.golang.org/appengine
 google.golang.org/appengine/internal
@@ -194,7 +193,7 @@ google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
-# google.golang.org/genproto v0.0.0-20190605220351-eb0b1bdb6ae6
+# google.golang.org/genproto v0.0.0-20190502173448-54afdca5d873
 google.golang.org/genproto/googleapis/api/httpbody
 google.golang.org/genproto/protobuf/field_mask
 google.golang.org/genproto/googleapis/rpc/status

@@ -8,9 +8,9 @@ import (
 	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
 	"github.com/videocoin/cloud-pkg/streamManager"
-	"github.com/videocoin/go-videocoin/accounts/abi/bind"
-	"github.com/videocoin/go-videocoin/common"
-	"github.com/videocoin/go-videocoin/ethclient"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/grafov/m3u8"
 	"github.com/sirupsen/logrus"
 )

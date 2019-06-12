@@ -24,8 +24,8 @@ test:
 
 deps:
 	env GO111MODULE=on go mod vendor
-	cp -r $(GOPATH)/src/github.com/videocoin/go-videocoin/crypto/secp256k1/libsecp256k1 \
-	vendor/github.com/videocoin/go-videocoin/crypto/secp256k1/
+	cp -r $(GOPATH)/src/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1 \
+	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
 proto-update:
 	env GO111MODULE=on go get github.com/videocoin/common@latest

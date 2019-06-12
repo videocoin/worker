@@ -7,9 +7,9 @@ import (
 	"math/big"
 	"math/rand"
 
-	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
-	"github.com/VideoCoin/go-videocoin/accounts/keystore"
-	"github.com/VideoCoin/go-videocoin/ethclient"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (

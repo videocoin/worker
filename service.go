@@ -13,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gogo/protobuf/types"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
@@ -25,8 +27,6 @@ import (
 	"github.com/videocoin/cloud-pkg/stream"
 	"github.com/videocoin/cloud-pkg/streamManager"
 	"github.com/videocoin/cloud-pkg/uuid4"
-	"github.com/videocoin/go-videocoin/common"
-	"github.com/videocoin/go-videocoin/ethclient"
 	"google.golang.org/grpc"
 )
 

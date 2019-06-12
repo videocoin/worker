@@ -3,7 +3,7 @@ package v1
 import (
 	fmt "fmt"
 
-	profiles_v1 "github.com/VideoCoin/cloud-api/profiles/v1"
+	profiles_v1 "github.com/videocoin/cloud-api/profiles/v1"
 )
 
 // CheckErrs used to ensure a job is valid before passing to transcoder
