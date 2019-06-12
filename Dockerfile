@@ -9,13 +9,19 @@ ADD ./ ./
 
 RUN make build
 
-FROM ubuntu:latest AS release
+FROM ubuntu:xenial AS release
 
 COPY --from=builder /go/src/github.com/VideoCoin/transcode/bin/transcoder ./
 COPY --from=builder /go/src/github.com/VideoCoin/transcode/keys ./keys
 
-RUN apt update && apt upgrade -y
-RUN apt install ca-certificates ffmpeg -y
+RUN apt-get update && apt upgrade -y
+
+RUN apt-get install -y --no-install-recommends \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common \
+    ffmpeg
 
 
 ENTRYPOINT [ "./transcoder" ]
