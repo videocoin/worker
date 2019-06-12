@@ -9,19 +9,14 @@ ADD ./ ./
 
 RUN make build
 
-FROM ubuntu:xenial AS release
+FROM jrottenberg/ffmpeg:4.0-ubuntu AS release
 
 COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder ./
-COPY --from=builder /go/src/github.com/videocoin/transcode/keys ./keys
 
 RUN apt-get update && apt upgrade -y
 
 RUN apt-get install -y --no-install-recommends \
     apt-transport-https \
-    ca-certificates \
-    curl \
-    software-properties-common \
-    ffmpeg
-
+    ca-certificates
 
 ENTRYPOINT [ "./transcoder" ]
