@@ -170,11 +170,14 @@ func (s *Service) pollForWork(uid string) {
 	for range ticker.C {
 		assignment, err := s.manager.GetWork(context.Background(), &types.Empty{})
 		if err == gorm.ErrRecordNotFound {
-			s.log.Debugf("no work available...")
+			s.log.Debug("no work available...")
+			continue
 		} else if err != nil {
 			s.log.Errorf("failed to get work: %s", err.Error())
 			continue
 		}
+
+		s.log.Info("work found")
 
 		s.handleTranscode(assignment, uid)
 	}
