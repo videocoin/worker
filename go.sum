@@ -14,6 +14,8 @@ github.com/VideoCoin/cloud-api v0.0.16 h1:MsyteOWTD9zuErM1waX0LaSIc816gXrpc5yLGX
 github.com/VideoCoin/cloud-api v0.0.16/go.mod h1:chA30hq2zP5PS2Uac2wV6vOdMbNmZ2sibwktFJLrs7A=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c h1:qhYyBvcLWaKhRYmFnj+907T7qX9mLB7Ax+1RhUtMO5Q=
 github.com/VideoCoin/cloud-pkg v0.0.0-20190531224643-5af68d53755c/go.mod h1:8Lz6j8/H7l2RfUzGizZMy5iPatpEcGTs/mTGUQid+n8=
+github.com/VideoCoin/common v0.1.110 h1:JENGcrlqo/WagnFGv/sgPJ4wZPxsh8wmDP1gj8hxKWw=
+github.com/VideoCoin/common v0.1.110/go.mod h1:LRQ82oaOZ0qsCeAsoMVfDCLp5fTRrK/qElpHclZwsEg=
 github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d h1:n6rINTciFLqXG7offP5sYB3y5obkqGq9TMOVDj/FJec=
 github.com/VideoCoin/go-videocoin v0.0.0-20190502173438-f0f47eddff0d/go.mod h1:aW3yLffGv7TP/5LOg4ihjmyXAG1ABatIoS36yRprbQk=
 github.com/aead/siphash v1.0.1/go.mod h1:Nywa3cDsYNNK3gaciGTWPwHt0wlpNV15vwmswBAUSII=
