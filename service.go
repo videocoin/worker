@@ -13,8 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gogo/protobuf/types"
@@ -169,8 +167,8 @@ func (s *Service) pollForWork(uid string) {
 	ticker := time.NewTicker(2 * time.Second)
 	for range ticker.C {
 		assignment, err := s.manager.GetWork(context.Background(), &types.Empty{})
-		if err == gorm.ErrRecordNotFound {
-			s.log.Debug("no work available...")
+		if assignment == nil {
+			s.log.Debug("no work available")
 			continue
 		} else if err != nil {
 			s.log.Errorf("failed to get work: %s", err.Error())
