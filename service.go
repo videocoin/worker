@@ -164,11 +164,11 @@ func (s *Service) register(uid string) {
 }
 
 func (s *Service) pollForWork(uid string) {
+	s.log.Info("polling for work")
 	ticker := time.NewTicker(5 * time.Second)
 	for range ticker.C {
 		assignment, err := s.manager.GetWork(context.Background(), &types.Empty{})
 		if err != nil {
-			s.log.Warnf("no job available: %s", err.Error())
 			continue
 		}
 
