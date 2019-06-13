@@ -200,7 +200,7 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 		return err
 	}
 
-	go s.transcode(cmd,
+	s.transcode(cmd,
 		stopChan,
 		a.Workorder.TranscodeInputUrl,
 		a.Workorder.StreamAddress,
