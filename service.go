@@ -179,8 +179,6 @@ func (s *Service) pollForWork(uid string) {
 }
 
 func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error {
-	s.log.Infof("transcoding: %d\nusing input: %s\nwith stream_id: %d", a.Workorder.Id, a.Workorder.TranscodeInputUrl, a.Workorder.StreamId)
-
 	dir := path.Join(s.cfg.OutputDir, a.Workorder.StreamHash)
 	m3u8 := path.Join(dir, "index.m3u8")
 
