@@ -7,22 +7,5 @@ config:
   maxReplicas: "3"
   minReplicas: "1"
 
-service:
-  type: loadBalancerIP
-  externalPort: 80
-  internalPort: 80
+deployment:
   nodePool: xcode
-
-resources:
-  limits:
-  cpu: 200m
-  memory: 200Mi
-  requests:
-  cpu: 200m
-  memory: 200Mi
-
-secrets:
-  token: ""
-  hash: ""
-  password: ""
-  blockchainUrl: ""

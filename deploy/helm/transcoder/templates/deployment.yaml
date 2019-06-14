@@ -24,7 +24,7 @@ spec:
       name: {{ .Chart.Name }}
     spec:
       nodeSelector:
-        cloud.google.com/gke-nodepool: {{ .Values.service.nodePool }}
+        cloud.google.com/gke-nodepool: {{ .Values.deployment.nodePool }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
