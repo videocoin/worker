@@ -92,11 +92,11 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 				}
 
 			case <-stop:
-				watcher.Close()
 				err = watcher.Remove(dir)
 				if err != nil {
 					s.log.Errorf("failed to remove dir [ %s ]: %s", dir, err.Error())
 				}
+				watcher.Close()
 
 			}
 		}
