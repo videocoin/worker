@@ -1,19 +1,17 @@
+.PHONY: deploy
 .NOTPARALLEL:
 .EXPORT_ALL_VARIABLES:
 .DEFAULT_GOAL := docker
 
-GOOS = linux
-GOARCH = amd64
-
-SERVICE_NAME = transcoder
 DOCKER_REGISTRY = us.gcr.io
-PROJECT_ID?=
+CIRCLE_ARTIFACTS = ./bin
+SERVICE_NAME = transcoder
 RELEASE_BUCKET?=
 
+PROJECT_ID=$$(gcloud config list --format 'value(core.project)' 2>/dev/null)
+VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):$(VERSION)
 LATEST=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):latest
-
-VERSION=$$(git rev-parse --short HEAD)
 
 
 main: docker
@@ -23,12 +21,14 @@ test:
 	@echo "==> Running tests..."
 	go test -v -short ./...
 
+
 deps:
-	@echo "==> Running go dep..."
-	go mod verify && go mod tidy
+	env GO111MODULE=on go mod vendor
+	cp -r $(GOPATH)/src/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1 \
+	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
 proto-update:
-	env GO111MODULE=on go get github.com/VideoCoin/common@latest
+	env GO111MODULE=on go get github.com/videocoin/common@latest
 	env GO111MODULE=on go mod vendor
 	env GO111MODULE=on go mod tidy
 
@@ -41,9 +41,8 @@ build-alpine:
 	go build -o bin/$(SERVICE_NAME) --ldflags '-w -linkmode external -extldflags "-static"' cmd/main.go
 
 
-docker:
+docker: deps
 	@echo "==> Docker building..."
-	cd cmd && xgo -x --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
 	docker build -t $(IMAGE_TAG) -t $(LATEST) . --squash
 	docker push $(IMAGE_TAG)
 	docker push $(LATEST)
@@ -59,6 +58,9 @@ store:
 	
 clean:
 	rm -rf release/*
+
+deploy:
+	@cd ./deploy && ./deploy.sh
 
 	
 publish: package store clean

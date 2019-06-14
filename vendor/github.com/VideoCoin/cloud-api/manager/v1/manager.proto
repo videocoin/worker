@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+package cloud.api.manager.v1;
+
+
+import "github.com/videocoin/cloud-api/rpc/health.proto";
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/videocoin/cloud-api/profiles/v1/profiles.proto";
+import "github.com/videocoin/cloud-api/workorder/v1/workorder.proto";
+import "github.com/videocoin/cloud-api/transcoder/v1/transcoder.proto";
+
+option go_package = "v1";
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.goproto_registration) = true;
+option (gogoproto.messagename_all) = true;
+
+service ManagerService {
+  rpc Create(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      post: "/api/v1/job/new"
+      body: "*"
+    };
+  };
+
+  rpc Run(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      post: "/api/v1/job/{pipeline_id}/run"
+    };
+  };
+
+  rpc Stop(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      post: "/api/v1/job/{pipeline_id}/stop"
+    };
+  };
+
+  rpc Get(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      get: "/api/v1/job/{pipeline_id}"
+    };
+  };
+
+  rpc Update(UpdateJobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      put: "/api/v1/job/{pipeline_id}"
+      body: "*"
+    };
+  };
+
+  rpc StopStream(StopStreamRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/stream/stop/{stream_hash}"
+      body: "*"
+    };
+  };
+
+  rpc Health(google.protobuf.Empty) returns (cloud.api.rpc.HealthStatus) {
+    option (google.api.http) = {
+      get: "/healthz"
+    };
+  }
+
+  rpc GetStream(StreamRequest) returns (cloud.api.workorder.v1.JobProfile) {
+    option (google.api.http) = {
+      get: "/api/v1/stream/{stream_id}"
+    };
+  };
+
+  rpc UpdateStreamStatus(StreamStatusRequest) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/api/v1/stream/{stream_hash}/{status}"
+      body: "*"
+    };
+  };
+
+  rpc VerifyChunk(VerifyChunkRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/verify"
+      body: "*"
+    };
+  };
+
+
+  rpc ChunkCreated(ChunkCreatedRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/chunk_created"
+      body: "*"
+    };
+  };
+
+  rpc CheckBalance(CheckBalanceRequest) returns (CheckBalanceResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/balance/{contract_address}"
+    };
+  };
+
+  rpc GetProfiles(google.protobuf.Empty) returns (cloud.api.profiles.v1.Profiles) {
+    option (google.api.http) = {
+      get: "/api/v1/profiles"
+    };
+  };
+
+  rpc GetProfile(ProfileRequest) returns (cloud.api.profiles.v1.Profile) {
+    option (google.api.http) = {
+      get: "/api/v1/profile/{profile_id}"
+    };
+  };
+
+  rpc RegisterTranscoder(cloud.api.transcoder.v1.Transcoder) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/transcoders"
+      body: "*"
+    };
+  }; 
+
+  rpc UpdateTranscoderStatus(TranscoderStatusRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/transcoder/{transcoder_id}/{status}"
+    };
+  }; 
+
+  rpc GetWork(google.protobuf.Empty) returns (cloud.api.transcoder.v1.Assignment) {
+    option (google.api.http) = {
+      get: "/api/v1/work"
+    };
+  };
+}
+
+message UpdateProfileRequest {
+  int64 stream_id = 1;
+  cloud.api.profiles.v1.ProfileId profile_id = 2;
+}
+
+message Heartbeat {
+  string id = 1;
+}
+
+message ProfileRequest {
+  cloud.api.profiles.v1.ProfileId profile_id = 2;
+}
+
+message CheckBalanceRequest {
+  string contract_address = 1 ;
+}
+
+message CheckBalanceResponse {
+  double balance = 1;
+}
+
+message ContractAddrRequest {
+  string pipeline_id = 1;
+  string contract_address = 2;
+}
+
+message VerifyChunkRequest {
+  int64 stream_id = 1;
+  uint64 source_chunk_id = 2;
+  uint64 result_chunk_id = 3;
+  int32 hash_distance = 4;
+  uint32 bitrate = 5;
+}
+
+message ChunkCreatedRequest {
+  int64 stream_id = 1;
+  int64 source_chunk_id = 2;
+  int64 result_chunk_id = 3;
+  uint32 bitrate = 4;
+}
+
+message TranscoderStatusRequest {
+  string transcoder_id = 1;
+  cloud.api.transcoder.v1.TranscoderStatus status = 2;
+}
+
+message StreamStatusRequest {
+  string transcoder_id = 1;
+  string stream_hash = 2;
+  cloud.api.workorder.v1.WorkOrderStatus status = 3;
+  bool refunded = 4;
+  cloud.api.workorder.v1.IngestStatus ingest_status = 5;
+}
+
+message JobResponse {
+  string rtmp_input_url = 1;
+}
+
+message JobRequest {
+  string pipeline_id = 1;
+  cloud.api.profiles.v1.ProfileId profile_id = 3;
+}
+
+message UpdateJobRequest {
+  string pipeline_id = 1;
+  cloud.api.profiles.v1.ProfileId profile_id = 2;
+  string client_address = 3;
+  int64 stream_id = 4;
+  string stream_address = 5;
+}
+
+message StreamRequest {
+  int64 stream_id = 1;
+}
+message StopStreamRequest {
+  string stream_hash = 1;
+}

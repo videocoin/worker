@@ -1,13 +1,22 @@
-FROM ubuntu:latest AS release
+FROM golang:latest AS builder
 
 LABEL maintainer="Videocoin" description="transcoding client streams"
 
-RUN apt update && apt upgrade -y
-RUN apt install ca-certificates ffmpeg -y
 
-WORKDIR /opt/
+WORKDIR /go/src/github.com/videocoin/transcode
 
-ADD keys keys
-ADD release/transcoder-linux-amd64 ./
+ADD ./ ./
 
-ENTRYPOINT [ "./transcoder-linux-amd64" ]
+RUN make build
+
+FROM jrottenberg/ffmpeg:4.0-ubuntu AS release
+
+COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder ./
+
+RUN apt-get update && apt upgrade -y
+
+RUN apt-get install -y --no-install-recommends \
+    apt-transport-https \
+    ca-certificates
+
+ENTRYPOINT [ "./transcoder" ]

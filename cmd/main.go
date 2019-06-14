@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/VideoCoin/transcode"
+	"github.com/videocoin/transcode"
 )
 
 func main() {

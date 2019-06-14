@@ -10,19 +10,18 @@ import (
 	"strings"
 	"time"
 
-	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	workorder_v1 "github.com/VideoCoin/cloud-api/workorder/v1"
-	"github.com/VideoCoin/go-videocoin/common"
-	"github.com/VideoCoin/go-videocoin/core/types"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fsnotify/fsnotify"
+	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
+	workorder_v1 "github.com/videocoin/cloud-api/workorder/v1"
 
 	"github.com/grafov/m3u8"
 )
 
 // SyncDir watches file system and processes chunks as they are written
 func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorder_v1.WorkOrder, dir string, bitrate uint32) {
-
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
 
@@ -42,7 +41,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 
 	done := make(chan struct{})
 
-	walletHex := common.HexToAddress(workOrder.WalletAddress)
+	walletHex := common.HexToAddress(workOrder.StreamAddress)
 
 	written := make(map[string]bool)
 
@@ -62,14 +61,8 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 					!written[chunk] {
 
 					written[chunk] = true
+
 					chunkNum := getChunkNum(chunk)
-
-					_, err = s.streamManager.AddInputChunkId(s.bcAuth, big.NewInt(workOrder.StreamId), chunkNum)
-					if err != nil {
-						s.log.Errorf("failed to add input chunk: [ %d ] bitrate: [ %d ] err: [ %s ]", chunkNum, bitrate, err.Error())
-					}
-
-					randomID := randomBigInt(8)
 
 					// Add job to the job channel to be worked on later
 					jobChan <- Job{
@@ -77,12 +70,13 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						InputChunkName:  chunk,
 						Bitrate:         bitrate,
 						Playlist:        playlist,
-						OutputID:        randomID,
+						OutputID:        chunkNum,
 						InputID:         chunkNum,
-						OutputChunkName: fmt.Sprintf("%d.ts", randomID),
+						OutputChunkName: fmt.Sprintf("%d.ts", chunkNum),
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
-						ContractAddr:    workOrder.ContractAddress,
+						StreamAddress:   workOrder.StreamAddress,
+						StreamHash:      workOrder.StreamHash,
 						cmd:             cmd,
 						stopChan:        stop,
 					}
@@ -99,14 +93,18 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 
 			case <-stop:
 				watcher.Close()
-				watcher.Remove(dir)
+				err = watcher.Remove(dir)
+				if err != nil {
+					s.log.Errorf("failed to remove dir [ %s ]: %s", dir, err.Error())
+				}
+
 			}
 		}
 	}()
 
 	err = watcher.Add(dir)
 	if err != nil {
-		s.log.Fatalf("water failure: %s", err.Error())
+		s.log.Fatalf("failed to watch directory: %s", err.Error())
 	}
 
 	<-done
@@ -115,12 +113,12 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 // handleChunk Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) handleChunk(job *Job) error {
 	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
-	uploadPath := fmt.Sprintf("%d/%d", job.StreamID, job.Bitrate)
+	uploadPath := fmt.Sprintf("%s/%d", job.StreamHash, job.Bitrate)
 
 	if job.InputChunkName == "0.ts" {
 		duration, err := s.duration(chunkLoc)
 		if err != nil {
-			duration = 10.0
+			duration = 2.0
 		}
 
 		job.Playlist.TargetDuration = duration
@@ -150,45 +148,31 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	tx, err := s.submitProof(job.ContractAddr, job.Bitrate, job.InputID, job.OutputID)
+	tx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
 		return err
 	}
 
-	inputChunk := fmt.Sprintf("%s/%d-%x/%s", s.cfg.BaseStreamURL, job.StreamID, job.Wallet, job.InputChunkName)
-	outputChunk := fmt.Sprintf("https://%s/%d/%d/%s", s.cfg.Bucket, job.StreamID, job.Bitrate, job.OutputChunkName)
+	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
+	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
 
-	// potentially long running process
-	go func() {
-		if err = s.verify(tx, job, inputChunk, outputChunk); err != nil {
-			s.log.Errorf("failed to verify chunk: %s", err.Error())
-		}
-	}()
+	go s.verify(tx, job, inputChunk, outputChunk)
 
 	return nil
 }
 
 // SubmitProof registers work (output chunk)
 func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
-
 	streamInstance, err := s.createStreamInstance(contractAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	tx, err := streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
-	if err != nil {
-		return nil, err
-	}
-
-	return tx, nil
+	return streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
 }
 
 // verifyChunk calls verifier with input and output chunk urls
 func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL string) error {
-
-	s.log.Infof("calling verifier with: src: %s \nres: %s \ninput_id: %d \noutput_id: %d \nstream_id: %d \nbitrate: %d", localFile, outputURL, job.InputID, job.OutputID, job.StreamID, job.Bitrate)
-
 	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
 		StreamId:       job.StreamID.Int64(),
@@ -199,15 +183,17 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		ResultChunkUrl: outputURL,
 	})
 
-	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.ContractAddr})
+	if err != nil {
+		s.log.Errorf("failed to call verifier: %s", err.Error())
+	}
+
+	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.StreamAddress})
 	if err != nil {
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	s.log.Infof("current balance at address %s is %f", job.ContractAddr, balance.Balance)
-
 	if balance.Balance <= 0 {
-		job.cmd.Process.Kill()
+		_ = job.cmd.Process.Kill()
 		job.stopChan <- struct{}{}
 	}
 
@@ -215,31 +201,36 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 }
 
 func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
-	s.updateStatus(workOrder.StreamId, workorder_v1.WorkOrderStatusTranscoding.String())
-
 	for len(jobChan) < 2 {
 		time.Sleep(1 * time.Second)
 	}
 
-	s.updateStatus(workOrder.StreamId, workorder_v1.WorkOrderStatusReady.String())
+	s.updateStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady)
 
 	for {
 		for len(jobChan) < 2 {
 			time.Sleep(500 * time.Millisecond)
 		}
-		select {
-		case j := <-jobChan:
-			if err := s.handleChunk(&j); err != nil {
-				s.log.Errorf("failed to handle chunk: %s", err.Error())
+
+		j := <-jobChan
+
+		go func() {
+			if err := s.chunkCreated(&j); err != nil {
+				s.log.Errorf("failed to register chunk: %s", err.Error())
 			}
+		}()
+
+		if err := s.handleChunk(&j); err != nil {
+			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}
+
 	}
 }
 
-func (s *Service) updateStatus(streamID int64, status string) {
-	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.UpdateStreamStatusRequest{
-		StreamId: streamID,
-		Status:   status,
+func (s *Service) updateStatus(streamHash string, status workorder_v1.WorkOrderStatus) {
+	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
+		StreamHash: streamHash,
+		Status:     status,
 	})
 
 	if err != nil {

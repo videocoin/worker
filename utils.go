@@ -3,7 +3,6 @@ package transcode
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,18 +11,12 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/storage/v1"
 )
 
 // Upload uploads an object to gcs with publicread acl
 func (s *Service) upload(output string, r io.Reader) error {
-	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
-	if err != nil {
-		return err
-	}
-
-	svc, err := storage.New(client)
+	svc, err := storage.NewService(context.Background())
 	if err != nil {
 		return err
 	}
@@ -40,15 +33,6 @@ func (s *Service) upload(output string, r io.Reader) error {
 	return nil
 }
 
-// RandomBigInt Generates a random big integer with max 64 bits so we can store as int64
-func randomBigInt(len int) *big.Int {
-	b := make([]byte, len)
-	rand.Read(b)
-	n := big.NewInt(0)
-	n = n.SetBytes(b)
-	return n
-}
-
 // ChunkNum strip .ts from input chunk and return as bigInt
 func getChunkNum(chunkName string) *big.Int {
 	chunkNum, err := strconv.ParseInt(strings.TrimSuffix(chunkName, ".ts"), 10, 64)
@@ -60,7 +44,6 @@ func getChunkNum(chunkName string) *big.Int {
 
 // Duration use ffmpeg to find chunk duration
 func (s *Service) duration(input string) (float64, error) {
-	s.log.Infof("using input %s", input)
 	args := []string{"-v", "panic", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", input}
 	stdout, err := exec.Command("ffprobe", args...).CombinedOutput()
 	cleanOut := strings.TrimSpace(string(stdout))
@@ -73,12 +56,12 @@ func (s *Service) duration(input string) (float64, error) {
 }
 
 // GeneratePlaylist based on static bitrates
-func (s *Service) generatePlaylist(streamID int64, filename string) error {
+func (s *Service) generatePlaylist(streamHash string, filename string, bitrate uint32) error {
 	m3u8 := []byte(fmt.Sprintf(`#EXTM3U
 #EXT-X-VERSION:4
 #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1048576,RESOLUTION=640x360,CODECS="avc1.42e00a,mp4a.40.2"
 %d/index.m3u8
-`, bitrates[0]))
+`, bitrate))
 
 	err := ioutil.WriteFile(filename, m3u8, 0755)
 	if err != nil {
@@ -88,7 +71,7 @@ func (s *Service) generatePlaylist(streamID int64, filename string) error {
 
 	reader := bytes.NewReader(m3u8)
 
-	err = s.upload(fmt.Sprintf("%d/%s", streamID, "index.m3u8"), reader)
+	err = s.upload(fmt.Sprintf("%s/%s", streamHash, "index.m3u8"), reader)
 	if err != nil {
 		s.log.Errorf("failed to upload: %s", err.Error())
 		return err

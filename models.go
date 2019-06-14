@@ -5,14 +5,13 @@ import (
 	"math/big"
 	"os/exec"
 
-	manager_v1 "github.com/VideoCoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/VideoCoin/cloud-api/verifier/v1"
-	"github.com/VideoCoin/cloud-pkg/streamManager"
-	"github.com/VideoCoin/go-videocoin/accounts/abi/bind"
-	"github.com/VideoCoin/go-videocoin/common"
-	"github.com/VideoCoin/go-videocoin/ethclient"
+	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
+	"github.com/videocoin/cloud-pkg/streamManager"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/grafov/m3u8"
-	"github.com/nats-io/go-nats"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,12 +23,6 @@ const (
 	GB
 )
 
-var (
-	bitrates = []uint32{
-		8 * MB,
-	}
-)
-
 type (
 	// Job used to queue up chunk work
 	Job struct {
@@ -37,7 +30,8 @@ type (
 		InputChunkName  string
 		OutputChunkName string
 		ChunksDir       string
-		ContractAddr    string
+		StreamAddress   string
+		StreamHash      string
 		StreamID        *big.Int
 		InputID         *big.Int
 		OutputID        *big.Int
@@ -50,10 +44,7 @@ type (
 	// Service primary reciever for service
 	Service struct {
 		cfg           *Config
-		ec            *nats.EncodedConn
-		nc            *nats.Conn
 		log           *logrus.Entry
-		pkAddr        common.Address
 		ctx           context.Context
 		bcClient      *ethclient.Client
 		bcAuth        *bind.TransactOpts

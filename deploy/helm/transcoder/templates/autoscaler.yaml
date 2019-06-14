@@ -1,0 +1,14 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: default
+  selfLink: /apis/autoscaling/v1/namespaces/default/horizontalpodautoscalers/transcoder
+spec:
+  maxReplicas: {{ .Values.config.maxReplicas }}
+  minReplicas: {{ .Values.config.minReplicas }}
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ .Chart.Name }}
+  targetCPUUtilizationPercentage: 15

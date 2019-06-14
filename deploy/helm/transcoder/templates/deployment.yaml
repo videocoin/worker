@@ -1,0 +1,93 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Chart.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+  name: {{ .Chart.Name }}
+  namespace: default
+  selfLink: /apis/extensions/v1beta1/namespaces/default/deployments/{{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+      name: {{ .Chart.Name }}
+    spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: {{ .Values.service.nodePool }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
+        imagePullPolicy: Always
+        env:
+          - name: BASE_STORAGE_URL
+            valueFrom:
+              configMapKeyRef:
+                key: baseStorageUrl
+                name: {{ .Chart.Name }}
+          - name: BASE_STREAM_URL
+            valueFrom:
+              configMapKeyRef:
+                key: baseStreamUrl
+                name: {{ .Chart.Name }}
+          - name: SMCA
+            valueFrom:
+              configMapKeyRef:
+                key: smca
+                name: {{ .Chart.Name }}
+          - name: VERIFIER_URL
+            valueFrom:
+              configMapKeyRef:
+                key: verifierRpcAddr
+                name: {{ .Chart.Name }}
+          - name: VERIFIER_RPC_ADDR
+            valueFrom:
+              configMapKeyRef:
+                key: verifierRpcAddr
+                name: {{ .Chart.Name }}
+          - name: BUCKET
+            valueFrom:
+              configMapKeyRef:
+                key: bucket
+                name: {{ .Chart.Name }}
+          - name: LOG_LEVEL
+            valueFrom:
+              configMapKeyRef:
+                key: logLevel
+                name: {{ .Chart.Name }}
+          - name: BLOCKCHAIN_URL
+            valueFrom:
+              secretKeyRef:
+                key: blockchainUrl
+                name: {{ .Chart.Name }}
+          - name: SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: secret
+          - name: KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: key
+          - name: VERIFIER_RPC_ADDR
+            value: verifier:50055
+          - name: OUTPUT_DIR
+            value: /opt/mnt/
+          - name: MANAGER_RPC_ADDR
+            value: manager:50051
+        ports:
+          - containerPort: 80
+            protocol: TCP
+        resources:
+          requests: {}
