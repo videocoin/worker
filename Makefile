@@ -41,11 +41,9 @@ build-alpine:
 	go build -o bin/$(SERVICE_NAME) --ldflags '-w -linkmode external -extldflags "-static"' cmd/main.go
 
 
-docker: deps
+docker:
 	@echo "==> Docker building..."
-	docker build -t $(IMAGE_TAG) -t $(LATEST) . --squash
-	docker push $(IMAGE_TAG)
-	docker push $(LATEST)
+	docker build -t $(IMAGE_TAG) -t $(LATEST) .
 
 package:
 	cd cmd && xgo --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
@@ -63,4 +61,6 @@ deploy:
 	@cd ./deploy && ./deploy.sh
 
 	
-publish: package store clean
+push:
+	docker push $(IMAGE_TAG)
+	docker push $(LATEST)
