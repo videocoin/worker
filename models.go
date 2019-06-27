@@ -5,14 +5,14 @@ import (
 	"math/big"
 	"os/exec"
 
-	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
-	"github.com/videocoin/cloud-pkg/streamManager"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/grafov/m3u8"
 	"github.com/sirupsen/logrus"
+	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
+	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
+	"github.com/videocoin/cloud-pkg/streamManager"
 )
 
 // Byte constants
@@ -39,6 +39,7 @@ type (
 		stopChan        chan struct{}
 		Wallet          common.Address
 		Playlist        *m3u8.MediaPlaylist
+		PipelineId      string
 	}
 
 	// Service primary reciever for service

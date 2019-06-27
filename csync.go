@@ -79,6 +79,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						StreamHash:      workOrder.StreamHash,
 						cmd:             cmd,
 						stopChan:        stop,
+						PipelineId:      workOrder.PipelineId,
 					}
 
 				}
@@ -193,7 +194,12 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	if balance.Balance <= 0 {
+	resp, err := s.manager.Get(context.Background(), &manager_v1.JobRequest{PipelineId: job.PipelineId})
+	if err != nil {
+		s.log.Warnf("failed to get current job status: %s", err.Error())
+	}
+
+	if balance.Balance <= 0 || resp.Status == workorder_v1.WorkOrderStatusNew /* job has been reset */ {
 		_ = job.cmd.Process.Kill()
 		job.stopChan <- struct{}{}
 	}
