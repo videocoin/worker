@@ -199,7 +199,7 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		s.log.Warnf("failed to get current job status: %s", err.Error())
 	}
 
-	if balance.Balance <= 0 || resp.Status == workorder_v1.WorkOrderStatusNew /* job has been reset */ {
+	if balance.Balance <= 0 || resp.Status == workorder_v1.WorkOrderStatusComplete /* job has been reset */ {
 		_ = job.cmd.Process.Kill()
 		job.stopChan <- struct{}{}
 	}
