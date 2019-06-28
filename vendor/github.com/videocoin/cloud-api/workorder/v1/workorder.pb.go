@@ -100,24 +100,22 @@ func (IngestStatus) EnumDescriptor() ([]byte, []int) {
 }
 
 type WorkOrder struct {
-	Id                   uint32          `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	PipelineId           string          `protobuf:"bytes,2,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
-	TranscoderId         string          `protobuf:"bytes,3,opt,name=transcoder_id,json=transcoderId,proto3" json:"transcoder_id,omitempty"`
-	ProfileId            v1.ProfileId    `protobuf:"varint,4,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
-	ClientAddress        string          `protobuf:"bytes,5,opt,name=client_address,json=clientAddress,proto3" json:"client_address,omitempty"`
-	StreamAddress        string          `protobuf:"bytes,6,opt,name=stream_address,json=streamAddress,proto3" json:"stream_address,omitempty"`
-	StreamId             int64           `protobuf:"varint,7,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
-	TranscodeInputUrl    string          `protobuf:"bytes,8,opt,name=transcode_input_url,json=transcodeInputUrl,proto3" json:"transcode_input_url,omitempty"`
-	IngestInputUrl       string          `protobuf:"bytes,9,opt,name=ingest_input_url,json=ingestInputUrl,proto3" json:"ingest_input_url,omitempty"`
-	TranscodeOutputUrl   string          `protobuf:"bytes,10,opt,name=transcode_output_url,json=transcodeOutputUrl,proto3" json:"transcode_output_url,omitempty"`
-	Status               WorkOrderStatus `protobuf:"varint,11,opt,name=status,proto3,enum=cloud.api.workorder.v1.WorkOrderStatus" json:"status,omitempty"`
-	Chunks               []byte          `protobuf:"bytes,12,opt,name=chunks,proto3" json:"chunks,omitempty" gorm:"chunks;type:json"sql:"type:json"`
-	CreatedAt            int64           `protobuf:"varint,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt            int64           `protobuf:"varint,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Worker               []byte          `protobuf:"bytes,15,opt,name=worker,proto3" json:"worker,omitempty" gorm:"worker;type:binary(32);DEFAULT:NULL"sql:"type:binary(32);DEFAULT:null"`
-	Refunded             bool            `protobuf:"varint,20,opt,name=refunded,proto3" json:"refunded,omitempty"`
-	IngestStatus         IngestStatus    `protobuf:"varint,21,opt,name=ingest_status,json=ingestStatus,proto3,enum=cloud.api.workorder.v1.IngestStatus" json:"ingest_status,omitempty"`
-	StreamHash           string          `protobuf:"bytes,22,opt,name=stream_hash,json=streamHash,proto3" json:"stream_hash,omitempty"`
+	Id                   string          `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" gorm:"type:uuid;primary_key"`
+	Chunks               []byte          `protobuf:"bytes,2,opt,name=chunks,proto3" json:"chunks,omitempty" gorm:"chunks;type:json"sql:"type:json"`
+	Worker               []byte          `protobuf:"bytes,3,opt,name=worker,proto3" json:"worker,omitempty" gorm:"worker;type:binary(32);DEFAULT:NULL"sql:"type:binary(32);DEFAULT:null"`
+	PipelineId           string          `protobuf:"bytes,4,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
+	TranscoderId         string          `protobuf:"bytes,5,opt,name=transcoder_id,json=transcoderId,proto3" json:"transcoder_id,omitempty"`
+	ProfileId            v1.ProfileId    `protobuf:"varint,6,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
+	ClientAddress        string          `protobuf:"bytes,7,opt,name=client_address,json=clientAddress,proto3" json:"client_address,omitempty"`
+	StreamAddress        string          `protobuf:"bytes,8,opt,name=stream_address,json=streamAddress,proto3" json:"stream_address,omitempty"`
+	StreamId             int64           `protobuf:"varint,9,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
+	TranscodeInputUrl    string          `protobuf:"bytes,10,opt,name=transcode_input_url,json=transcodeInputUrl,proto3" json:"transcode_input_url,omitempty"`
+	IngestInputUrl       string          `protobuf:"bytes,11,opt,name=ingest_input_url,json=ingestInputUrl,proto3" json:"ingest_input_url,omitempty"`
+	TranscodeOutputUrl   string          `protobuf:"bytes,12,opt,name=transcode_output_url,json=transcodeOutputUrl,proto3" json:"transcode_output_url,omitempty"`
+	Status               WorkOrderStatus `protobuf:"varint,13,opt,name=status,proto3,enum=cloud.api.workorder.v1.WorkOrderStatus" json:"status,omitempty"`
+	CreatedAt            int64           `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Refunded             bool            `protobuf:"varint,16,opt,name=refunded,proto3" json:"refunded,omitempty"`
+	IngestStatus         IngestStatus    `protobuf:"varint,17,opt,name=ingest_status,json=ingestStatus,proto3,enum=cloud.api.workorder.v1.IngestStatus" json:"ingest_status,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -156,11 +154,25 @@ func (m *WorkOrder) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_WorkOrder proto.InternalMessageInfo
 
-func (m *WorkOrder) GetId() uint32 {
+func (m *WorkOrder) GetId() string {
 	if m != nil {
 		return m.Id
 	}
-	return 0
+	return ""
+}
+
+func (m *WorkOrder) GetChunks() []byte {
+	if m != nil {
+		return m.Chunks
+	}
+	return nil
+}
+
+func (m *WorkOrder) GetWorker() []byte {
+	if m != nil {
+		return m.Worker
+	}
+	return nil
 }
 
 func (m *WorkOrder) GetPipelineId() string {
@@ -233,32 +245,11 @@ func (m *WorkOrder) GetStatus() WorkOrderStatus {
 	return WorkOrderStatusNone
 }
 
-func (m *WorkOrder) GetChunks() []byte {
-	if m != nil {
-		return m.Chunks
-	}
-	return nil
-}
-
 func (m *WorkOrder) GetCreatedAt() int64 {
 	if m != nil {
 		return m.CreatedAt
 	}
 	return 0
-}
-
-func (m *WorkOrder) GetUpdatedAt() int64 {
-	if m != nil {
-		return m.UpdatedAt
-	}
-	return 0
-}
-
-func (m *WorkOrder) GetWorker() []byte {
-	if m != nil {
-		return m.Worker
-	}
-	return nil
 }
 
 func (m *WorkOrder) GetRefunded() bool {
@@ -275,19 +266,12 @@ func (m *WorkOrder) GetIngestStatus() IngestStatus {
 	return IngestStatusNone
 }
 
-func (m *WorkOrder) GetStreamHash() string {
-	if m != nil {
-		return m.StreamHash
-	}
-	return ""
-}
-
 func (*WorkOrder) XXX_MessageName() string {
 	return "cloud.api.workorder.v1.WorkOrder"
 }
 
 type JobProfile struct {
-	Id                   uint32          `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id                   string          `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" gorm:"type:uuid;primary_key"`
 	PipelineId           string          `protobuf:"bytes,2,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
 	ProfileId            v1.ProfileId    `protobuf:"varint,3,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
 	IngestInputUrl       string          `protobuf:"bytes,4,opt,name=ingest_input_url,json=ingestInputUrl,proto3" json:"ingest_input_url,omitempty"`
@@ -335,11 +319,11 @@ func (m *JobProfile) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_JobProfile proto.InternalMessageInfo
 
-func (m *JobProfile) GetId() uint32 {
+func (m *JobProfile) GetId() string {
 	if m != nil {
 		return m.Id
 	}
-	return 0
+	return ""
 }
 
 func (m *JobProfile) GetPipelineId() string {
@@ -478,67 +462,66 @@ func init() {
 }
 
 var fileDescriptor_7ef37cf3188837f0 = []byte{
-	// 947 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0xcd, 0x6e, 0xdb, 0x46,
-	0x10, 0xc7, 0x43, 0xc9, 0x96, 0xa5, 0xb1, 0xa4, 0x30, 0x1b, 0x59, 0x66, 0x98, 0x46, 0x66, 0x95,
-	0xb6, 0x61, 0x8c, 0x5a, 0x8a, 0x9d, 0x5e, 0xea, 0x1c, 0x02, 0xb9, 0x75, 0x50, 0x15, 0x46, 0x62,
-	0xa8, 0x31, 0x0a, 0xf4, 0x22, 0x50, 0xdc, 0xb5, 0xb4, 0x36, 0xbd, 0xcb, 0x2e, 0x49, 0x19, 0x7e,
-	0x83, 0x42, 0xef, 0xa0, 0x53, 0xfb, 0x14, 0x3d, 0xf5, 0x98, 0x53, 0xd1, 0xbe, 0x40, 0x50, 0x38,
-	0x87, 0x02, 0x3d, 0xe6, 0x09, 0x0a, 0x2e, 0x29, 0x4a, 0xa2, 0xe5, 0x00, 0xce, 0x6d, 0x77, 0xfe,
-	0xbf, 0x19, 0xce, 0xce, 0x07, 0x08, 0x9f, 0x9c, 0x73, 0x71, 0xca, 0x05, 0x26, 0xa2, 0x39, 0xdc,
-	0x6e, 0x26, 0x97, 0x86, 0x2b, 0xb8, 0xcf, 0x51, 0xd5, 0x76, 0x78, 0x80, 0x1b, 0x96, 0x4b, 0x1b,
-	0x53, 0x69, 0xb8, 0xad, 0x6f, 0xf5, 0xa9, 0x3f, 0x08, 0x7a, 0x0d, 0x9b, 0x9f, 0x35, 0xfb, 0xbc,
-	0xcf, 0x9b, 0x12, 0xef, 0x05, 0xc7, 0xf2, 0x26, 0x2f, 0xf2, 0x14, 0x85, 0xd1, 0xbf, 0x9e, 0xc1,
-	0x87, 0x14, 0x13, 0x6e, 0x73, 0xca, 0x9a, 0x32, 0xf6, 0x96, 0xe5, 0xd2, 0xd0, 0xfb, 0x98, 0x3a,
-	0xc4, 0x0b, 0x53, 0x98, 0x9c, 0x23, 0xd7, 0xfa, 0x9f, 0x39, 0x28, 0xfc, 0xc8, 0xc5, 0xe9, 0xab,
-	0xf0, 0xd3, 0xa8, 0x0c, 0x19, 0x8a, 0x35, 0xc5, 0x50, 0xcc, 0x52, 0x27, 0x43, 0x31, 0xda, 0x80,
-	0x55, 0x97, 0xba, 0xc4, 0xa1, 0x8c, 0x74, 0x29, 0xd6, 0x32, 0x86, 0x62, 0x16, 0x3a, 0x30, 0x31,
-	0xb5, 0x31, 0x7a, 0x08, 0x25, 0x5f, 0x58, 0xcc, 0xb3, 0x39, 0x26, 0x22, 0x44, 0xb2, 0x12, 0x29,
-	0x4e, 0x8d, 0x6d, 0x8c, 0x9e, 0x03, 0xc4, 0x5f, 0x0d, 0x89, 0x25, 0x43, 0x31, 0xcb, 0x3b, 0x46,
-	0x63, 0xfa, 0xf4, 0x24, 0xa5, 0xe1, 0x76, 0xe3, 0x30, 0x3a, 0xb7, 0x71, 0xa7, 0xe0, 0x4e, 0x8e,
-	0xe8, 0x73, 0x28, 0xdb, 0x0e, 0x25, 0xcc, 0xef, 0x5a, 0x18, 0x0b, 0xe2, 0x79, 0xda, 0xb2, 0xfc,
-	0x4c, 0x29, 0xb2, 0xb6, 0x22, 0x63, 0x88, 0x79, 0xbe, 0x20, 0xd6, 0x59, 0x82, 0xe5, 0x22, 0x2c,
-	0xb2, 0x4e, 0xb0, 0xfb, 0x50, 0x88, 0x31, 0x8a, 0xb5, 0x15, 0x43, 0x31, 0xb3, 0x9d, 0x7c, 0x64,
-	0x68, 0x63, 0xd4, 0x80, 0xbb, 0x49, 0xee, 0x5d, 0xca, 0xdc, 0xc0, 0xef, 0x06, 0xc2, 0xd1, 0xf2,
-	0x32, 0xd0, 0x9d, 0x44, 0x6a, 0x87, 0xca, 0x91, 0x70, 0x90, 0x09, 0x2a, 0x65, 0x7d, 0xe2, 0xf9,
-	0x33, 0x70, 0x41, 0xc2, 0xe5, 0xc8, 0x9e, 0x90, 0x4f, 0xa0, 0x32, 0x8d, 0xcc, 0x03, 0x7f, 0x42,
-	0x83, 0xa4, 0x51, 0xa2, 0xbd, 0x92, 0x52, 0xe8, 0xf1, 0x1c, 0x72, 0x9e, 0x6f, 0xf9, 0x81, 0xa7,
-	0xad, 0xca, 0x9a, 0x3d, 0x6a, 0x2c, 0x1e, 0x97, 0x46, 0xd2, 0xc0, 0x1f, 0x24, 0xde, 0x89, 0xdd,
-	0xd0, 0x1e, 0xe4, 0xec, 0x41, 0xc0, 0x4e, 0x3d, 0xad, 0x68, 0x28, 0x66, 0x71, 0x6f, 0xf3, 0xfd,
-	0xdb, 0x8d, 0x2f, 0xfa, 0x5c, 0x9c, 0xed, 0xd6, 0x23, 0xfb, 0x33, 0xff, 0xc2, 0x25, 0xbb, 0x27,
-	0x1e, 0x67, 0x75, 0xef, 0x67, 0x67, 0xb7, 0x3e, 0xbd, 0x76, 0x62, 0x4f, 0xf4, 0x00, 0xc0, 0x16,
-	0xc4, 0xf2, 0x09, 0xee, 0x5a, 0xbe, 0x56, 0x92, 0xe5, 0x2a, 0xc4, 0x96, 0x96, 0x1f, 0xca, 0x81,
-	0x8b, 0x27, 0x72, 0x39, 0x92, 0x63, 0x4b, 0xcb, 0x47, 0x03, 0xc8, 0x85, 0x99, 0x12, 0xa1, 0xdd,
-	0x96, 0x19, 0x1c, 0xbe, 0x7f, 0xbb, 0x71, 0x10, 0x65, 0x10, 0xd9, 0xa3, 0x0c, 0x7a, 0x94, 0x59,
-	0xe2, 0xc2, 0x7c, 0xba, 0xf3, 0xf8, 0xd9, 0xb7, 0xfb, 0x2f, 0x5a, 0x47, 0x07, 0xaf, 0x77, 0x5f,
-	0x1e, 0x1d, 0x1c, 0xcc, 0x24, 0xb5, 0x80, 0x60, 0x81, 0xe3, 0xd4, 0x3b, 0x71, 0x7c, 0xa4, 0x43,
-	0x5e, 0x90, 0xe3, 0x80, 0x61, 0x82, 0xb5, 0x8a, 0xa1, 0x98, 0xf9, 0x4e, 0x72, 0x47, 0x6d, 0x28,
-	0xc5, 0x4d, 0x8a, 0xeb, 0xb9, 0x26, 0xeb, 0xf9, 0xd9, 0x75, 0xf5, 0x6c, 0x4b, 0x38, 0x2e, 0x66,
-	0x91, 0xce, 0xdc, 0xc2, 0x8d, 0x88, 0x87, 0x67, 0x60, 0x79, 0x03, 0xad, 0x1a, 0x6d, 0x44, 0x64,
-	0xfa, 0xce, 0xf2, 0x06, 0xf5, 0xbf, 0xb3, 0x00, 0xdf, 0xf3, 0x5e, 0x3c, 0xc7, 0x37, 0xdf, 0xa8,
-	0xf9, 0x65, 0xc9, 0xde, 0x7c, 0x59, 0x16, 0x4d, 0xe4, 0xd2, 0x8d, 0x26, 0x72, 0xf9, 0xda, 0x89,
-	0xbc, 0xba, 0x88, 0xb9, 0x45, 0x8b, 0xf8, 0xc1, 0x0d, 0xbb, 0xba, 0xa5, 0xf9, 0x45, 0x5b, 0x3a,
-	0x1d, 0xfe, 0xc2, 0xc7, 0x0d, 0xff, 0x95, 0xa6, 0xc3, 0xc7, 0x36, 0xbd, 0xfe, 0x1a, 0x56, 0xa7,
-	0x2d, 0xf5, 0xd0, 0x3e, 0x14, 0x4f, 0x78, 0xaf, 0x3b, 0xe9, 0x84, 0xa6, 0x18, 0x59, 0x73, 0x75,
-	0xa7, 0x7e, 0x5d, 0xe0, 0xa9, 0x6b, 0x67, 0xf5, 0x64, 0x1a, 0x66, 0xf3, 0xdf, 0x0c, 0xdc, 0x4e,
-	0x25, 0x8f, 0x3e, 0x85, 0x25, 0xc6, 0x19, 0x51, 0x6f, 0xe9, 0xeb, 0xa3, 0xb1, 0x71, 0x37, 0x25,
-	0xbf, 0xe4, 0x8c, 0xa0, 0x0d, 0xc8, 0x32, 0x72, 0xae, 0x2a, 0x7a, 0x75, 0x34, 0x36, 0x50, 0x9a,
-	0x20, 0xe7, 0xe8, 0x11, 0xac, 0xb8, 0x84, 0x61, 0xca, 0xfa, 0x6a, 0x46, 0xd7, 0x47, 0x63, 0xa3,
-	0x9a, 0x82, 0x0e, 0x23, 0x15, 0x6d, 0xc9, 0x51, 0xb3, 0x89, 0xe7, 0x85, 0x6c, 0x56, 0x7f, 0x30,
-	0x1a, 0x1b, 0xf7, 0xd2, 0x6c, 0x02, 0xa0, 0x87, 0xb0, 0x2c, 0x88, 0x85, 0x2f, 0xd4, 0x25, 0x5d,
-	0x1b, 0x8d, 0x8d, 0x4a, 0xba, 0xf0, 0xa1, 0x86, 0x1e, 0x43, 0xde, 0xe6, 0x67, 0xae, 0x43, 0x7c,
-	0xa2, 0x2e, 0xeb, 0xf7, 0x47, 0x63, 0x63, 0x3d, 0xc5, 0x7d, 0x13, 0xcb, 0xc8, 0x84, 0x15, 0xdb,
-	0x62, 0x36, 0x71, 0xb0, 0x9a, 0x5b, 0x4c, 0x4a, 0x95, 0x84, 0x23, 0x93, 0x3b, 0xb6, 0xa8, 0x43,
-	0xb0, 0xba, 0xa2, 0xdf, 0x1b, 0x8d, 0x8d, 0xb5, 0x14, 0xf8, 0x42, 0x8a, 0xfa, 0xfa, 0x2f, 0xbf,
-	0xd6, 0x6e, 0xfd, 0xfe, 0x5b, 0x2d, 0x5d, 0xd5, 0xcd, 0xff, 0x14, 0x28, 0xce, 0xb6, 0x17, 0x7d,
-	0x09, 0x68, 0x6e, 0x36, 0xba, 0x71, 0xd1, 0x2b, 0xa3, 0xb1, 0xa1, 0xce, 0x92, 0xb2, 0xe2, 0x4f,
-	0xa0, 0x32, 0x4f, 0x5b, 0xb6, 0x4f, 0x87, 0x64, 0xd2, 0x82, 0x59, 0xbe, 0x25, 0x15, 0xf4, 0x15,
-	0x54, 0xe7, 0x3d, 0x28, 0x8b, 0x7d, 0x32, 0x51, 0xed, 0x66, 0x7d, 0xda, 0xb1, 0x16, 0xfe, 0x7b,
-	0xe6, 0xbd, 0x88, 0x10, 0x5c, 0xa8, 0x59, 0x7d, 0x6d, 0x34, 0x36, 0xee, 0xcc, 0xba, 0xec, 0x87,
-	0x82, 0x5e, 0x89, 0xdf, 0x3b, 0xf7, 0xb6, 0x3d, 0xed, 0xcd, 0x65, 0x4d, 0xf9, 0xeb, 0xb2, 0xa6,
-	0xfc, 0x73, 0x59, 0x53, 0xfe, 0x78, 0x57, 0x53, 0xde, 0xbc, 0xab, 0x29, 0x3f, 0x65, 0x86, 0xdb,
-	0xbd, 0x9c, 0xfc, 0xe5, 0x3f, 0xfd, 0x3f, 0x00, 0x00, 0xff, 0xff, 0x47, 0xd8, 0xcb, 0x0f, 0x94,
-	0x08, 0x00, 0x00,
+	// 944 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x95, 0xcf, 0x6e, 0xdb, 0x46,
+	0x10, 0xc6, 0x43, 0xc9, 0xd6, 0x9f, 0x91, 0xec, 0xd2, 0x1b, 0xc5, 0x66, 0x98, 0x44, 0x62, 0x95,
+	0xb6, 0x51, 0x8c, 0x5a, 0xb2, 0x9d, 0x5e, 0x6a, 0x1f, 0x02, 0xbb, 0x75, 0x00, 0x15, 0x46, 0x62,
+	0xa8, 0x31, 0x0a, 0xf4, 0x22, 0x50, 0xdc, 0xb5, 0xbc, 0x36, 0xb5, 0xcb, 0x2e, 0x49, 0x19, 0x7a,
+	0x83, 0x42, 0xef, 0xa0, 0x53, 0xfb, 0x00, 0x3d, 0xf7, 0xd4, 0x63, 0x8e, 0x7d, 0x02, 0xa3, 0x70,
+	0x0e, 0x05, 0x7a, 0x74, 0x5f, 0xa0, 0xe0, 0x92, 0xa2, 0x24, 0x5a, 0x06, 0x6a, 0xdf, 0x76, 0xe7,
+	0xfb, 0xcd, 0x70, 0x67, 0xe6, 0xb3, 0x05, 0x4f, 0x2f, 0xb8, 0x38, 0xe7, 0x02, 0x13, 0xd1, 0xe8,
+	0x6f, 0x35, 0xe2, 0x4b, 0xdd, 0x11, 0xdc, 0xe3, 0x68, 0xd5, 0xb2, 0xb9, 0x8f, 0xeb, 0xa6, 0x43,
+	0xeb, 0x13, 0xa9, 0xbf, 0xa5, 0x6f, 0x74, 0xa9, 0x77, 0xea, 0x77, 0xea, 0x16, 0xef, 0x35, 0xba,
+	0xbc, 0xcb, 0x1b, 0x12, 0xef, 0xf8, 0x27, 0xf2, 0x26, 0x2f, 0xf2, 0x14, 0x96, 0xd1, 0xbf, 0x9e,
+	0xc2, 0xfb, 0x14, 0x13, 0x6e, 0x71, 0xca, 0x1a, 0xb2, 0xf6, 0x86, 0xe9, 0xd0, 0x20, 0xfb, 0x84,
+	0xda, 0xc4, 0x0d, 0x9e, 0x30, 0x3e, 0x87, 0xa9, 0xd5, 0xdf, 0x32, 0x90, 0xff, 0x81, 0x8b, 0xf3,
+	0x77, 0xc1, 0xa7, 0xd1, 0x26, 0xa4, 0x28, 0xd6, 0x14, 0x43, 0xa9, 0xe5, 0xf7, 0x8d, 0xeb, 0xcb,
+	0xca, 0xd3, 0x2e, 0x17, 0xbd, 0x9d, 0xaa, 0x37, 0x70, 0xc8, 0x8e, 0xef, 0x53, 0xbc, 0xeb, 0x08,
+	0xda, 0x33, 0xc5, 0xa0, 0x7d, 0x4e, 0x06, 0xd5, 0x56, 0x8a, 0x62, 0xb4, 0x0f, 0x19, 0xeb, 0xd4,
+	0x67, 0xe7, 0xae, 0x96, 0x32, 0x94, 0x5a, 0x71, 0x7f, 0xfd, 0xfa, 0xb2, 0xf2, 0x45, 0x98, 0x15,
+	0xc6, 0x77, 0x65, 0xf2, 0x99, 0xcb, 0x59, 0xd5, 0xfd, 0xc9, 0x8e, 0x6a, 0xc9, 0x6b, 0x2b, 0xca,
+	0x44, 0xa7, 0x90, 0x09, 0xba, 0x27, 0x42, 0x4b, 0xcb, 0x1a, 0x47, 0xd7, 0x97, 0x95, 0xc3, 0xb0,
+	0x46, 0x18, 0x0f, 0x6b, 0x74, 0x28, 0x33, 0xc5, 0xa0, 0xf6, 0x6a, 0xfb, 0xe5, 0xee, 0xb7, 0x07,
+	0x6f, 0xf6, 0x8e, 0x0f, 0xdf, 0xef, 0xbc, 0x3d, 0x3e, 0x3c, 0x9c, 0x2a, 0x3b, 0x87, 0x60, 0xbe,
+	0x6d, 0x57, 0x5b, 0x51, 0x7d, 0x54, 0x81, 0x82, 0x43, 0x1d, 0x62, 0x53, 0x46, 0xda, 0x14, 0x6b,
+	0x0b, 0x41, 0xa3, 0x2d, 0x18, 0x87, 0x9a, 0x18, 0x3d, 0x87, 0x25, 0x4f, 0x98, 0xcc, 0xb5, 0x38,
+	0x26, 0x22, 0x40, 0x16, 0x25, 0x52, 0x9c, 0x04, 0x9b, 0x18, 0xbd, 0x06, 0x88, 0xa6, 0x18, 0x10,
+	0x19, 0x43, 0xa9, 0x2d, 0x6f, 0x1b, 0xf5, 0xc9, 0x2a, 0xe3, 0x11, 0xf7, 0xb7, 0xea, 0x47, 0xe1,
+	0xb9, 0x89, 0x5b, 0x79, 0x67, 0x7c, 0x44, 0x9f, 0xc3, 0xb2, 0x65, 0x53, 0xc2, 0xbc, 0xb6, 0x89,
+	0xb1, 0x20, 0xae, 0xab, 0x65, 0xe5, 0x67, 0x96, 0xc2, 0xe8, 0x5e, 0x18, 0x0c, 0x30, 0xd7, 0x13,
+	0xc4, 0xec, 0xc5, 0x58, 0x2e, 0xc4, 0xc2, 0xe8, 0x18, 0x7b, 0x02, 0xf9, 0x08, 0xa3, 0x58, 0xcb,
+	0x1b, 0x4a, 0x2d, 0xdd, 0xca, 0x85, 0x81, 0x26, 0x46, 0x75, 0x78, 0x18, 0xbf, 0xbd, 0x4d, 0x99,
+	0xe3, 0x7b, 0x6d, 0x5f, 0xd8, 0x1a, 0xc8, 0x42, 0x2b, 0xb1, 0xd4, 0x0c, 0x94, 0x63, 0x61, 0xa3,
+	0x1a, 0xa8, 0x94, 0x75, 0x89, 0xeb, 0x4d, 0xc1, 0x05, 0x09, 0x2f, 0x87, 0xf1, 0x98, 0xdc, 0x84,
+	0xd2, 0xa4, 0x32, 0xf7, 0xbd, 0x31, 0x5d, 0x94, 0x34, 0x8a, 0xb5, 0x77, 0x52, 0x0a, 0x32, 0x5e,
+	0x43, 0xc6, 0xf5, 0x4c, 0xcf, 0x77, 0xb5, 0x25, 0x39, 0xb3, 0x17, 0xf5, 0xf9, 0xf6, 0xaf, 0xc7,
+	0x86, 0xfc, 0x5e, 0xe2, 0xad, 0x28, 0x0d, 0x3d, 0x03, 0xb0, 0x04, 0x31, 0x3d, 0x82, 0xdb, 0xa6,
+	0xa7, 0x2d, 0xcb, 0x56, 0xf3, 0x51, 0x64, 0xcf, 0x43, 0x3a, 0xe4, 0x04, 0x39, 0xf1, 0x19, 0x26,
+	0x58, 0x53, 0x0d, 0xa5, 0x96, 0x6b, 0xc5, 0x77, 0xd4, 0x84, 0xa5, 0xa8, 0xaf, 0xe8, 0x09, 0x2b,
+	0xf2, 0x09, 0x9f, 0xdd, 0xf6, 0x84, 0xa6, 0x84, 0xa3, 0xef, 0x17, 0xe9, 0xd4, 0xad, 0xfa, 0x6f,
+	0x1a, 0xe0, 0x3b, 0xde, 0x89, 0x36, 0x7b, 0x8f, 0xbf, 0x99, 0x84, 0x0b, 0x53, 0x37, 0x5c, 0x38,
+	0x6b, 0xb0, 0xf4, 0xdd, 0x0d, 0x36, 0x6f, 0x8b, 0x0b, 0x77, 0xda, 0xe2, 0xe2, 0xad, 0x5b, 0xbc,
+	0x69, 0xde, 0xcc, 0x3c, 0xf3, 0xce, 0xb8, 0x32, 0x9b, 0x70, 0xe5, 0xff, 0x74, 0xf6, 0xc4, 0x30,
+	0xf9, 0xfb, 0x19, 0xe6, 0xc6, 0xd6, 0xe1, 0xde, 0x5b, 0x7f, 0x0f, 0x85, 0xc9, 0xd2, 0x5d, 0x74,
+	0x00, 0xc5, 0x33, 0xde, 0x69, 0x8f, 0x37, 0xa1, 0x29, 0x46, 0xba, 0x56, 0xd8, 0xae, 0xde, 0x56,
+	0x78, 0x92, 0xda, 0x2a, 0x9c, 0x4d, 0xca, 0xac, 0xff, 0x9d, 0x82, 0x4f, 0x12, 0x8f, 0x47, 0x9f,
+	0xc2, 0x02, 0xe3, 0x8c, 0xa8, 0x0f, 0xf4, 0xb5, 0xe1, 0xc8, 0x78, 0x98, 0x90, 0xdf, 0x72, 0x46,
+	0x50, 0x05, 0xd2, 0x8c, 0x5c, 0xa8, 0x8a, 0xbe, 0x3a, 0x1c, 0x19, 0x28, 0x49, 0x90, 0x0b, 0xf4,
+	0x02, 0xb2, 0x0e, 0x61, 0x98, 0xb2, 0xae, 0x9a, 0xd2, 0xf5, 0xe1, 0xc8, 0x58, 0x4d, 0x40, 0x47,
+	0xa1, 0x8a, 0x36, 0xa4, 0xd5, 0x2c, 0xe2, 0xba, 0x01, 0x9b, 0xd6, 0x9f, 0x0d, 0x47, 0xc6, 0xe3,
+	0x24, 0x1b, 0x03, 0xe8, 0x39, 0x2c, 0x0a, 0x62, 0xe2, 0x81, 0xba, 0xa0, 0x6b, 0xc3, 0x91, 0x51,
+	0x4a, 0x0e, 0x3e, 0xd0, 0xd0, 0x4b, 0xc8, 0x59, 0xbc, 0xe7, 0xd8, 0xc4, 0x23, 0xea, 0xa2, 0xfe,
+	0x64, 0x38, 0x32, 0xd6, 0x12, 0xdc, 0x37, 0x91, 0x8c, 0x6a, 0x90, 0xb5, 0x4c, 0x66, 0x11, 0x1b,
+	0xab, 0x99, 0xf9, 0xa4, 0x54, 0x49, 0x60, 0x99, 0xcc, 0x89, 0x49, 0x6d, 0x82, 0xd5, 0xac, 0xfe,
+	0x78, 0x38, 0x32, 0x1e, 0x25, 0xc0, 0x37, 0x52, 0xd4, 0xd7, 0x7e, 0xfe, 0xa5, 0xfc, 0xe0, 0xf7,
+	0x5f, 0xcb, 0xc9, 0xa9, 0xae, 0xff, 0xa3, 0x40, 0x71, 0x7a, 0xbd, 0xe8, 0x4b, 0x40, 0x33, 0xde,
+	0x68, 0x47, 0x43, 0x2f, 0x0d, 0x47, 0x86, 0x3a, 0x4d, 0xca, 0x89, 0x6f, 0x42, 0x69, 0x96, 0x36,
+	0x2d, 0x8f, 0xf6, 0xc9, 0x78, 0x05, 0xd3, 0xfc, 0x9e, 0x54, 0xd0, 0x57, 0xb0, 0x3a, 0x9b, 0x41,
+	0x59, 0x94, 0x93, 0x0a, 0x67, 0x37, 0x9d, 0xd3, 0x8c, 0xb4, 0xe0, 0xff, 0xf5, 0x6c, 0x16, 0x11,
+	0x82, 0x0b, 0x35, 0xad, 0x3f, 0x1a, 0x8e, 0x8c, 0x95, 0xe9, 0x94, 0x83, 0x40, 0xd0, 0x4b, 0x51,
+	0xbf, 0x33, 0xbd, 0xed, 0x6b, 0x1f, 0xae, 0xca, 0xca, 0x9f, 0x57, 0x65, 0xe5, 0xaf, 0xab, 0xb2,
+	0xf2, 0xc7, 0xc7, 0xb2, 0xf2, 0xe1, 0x63, 0x59, 0xf9, 0x31, 0xd5, 0xdf, 0xea, 0x64, 0xe4, 0xcf,
+	0xfe, 0xab, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0xd0, 0x3e, 0x6d, 0xb5, 0x98, 0x08, 0x00, 0x00,
 }
 
 func (m *WorkOrder) Marshal() (dAtA []byte, err error) {
@@ -556,92 +539,88 @@ func (m *WorkOrder) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		dAtA[i] = 0x8
+	if len(m.Id) > 0 {
+		dAtA[i] = 0xa
 		i++
-		i = encodeVarintWorkorder(dAtA, i, uint64(m.Id))
+		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.Id)))
+		i += copy(dAtA[i:], m.Id)
+	}
+	if len(m.Chunks) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.Chunks)))
+		i += copy(dAtA[i:], m.Chunks)
+	}
+	if len(m.Worker) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.Worker)))
+		i += copy(dAtA[i:], m.Worker)
 	}
 	if len(m.PipelineId) > 0 {
-		dAtA[i] = 0x12
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.PipelineId)))
 		i += copy(dAtA[i:], m.PipelineId)
 	}
 	if len(m.TranscoderId) > 0 {
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.TranscoderId)))
 		i += copy(dAtA[i:], m.TranscoderId)
 	}
 	if m.ProfileId != 0 {
-		dAtA[i] = 0x20
+		dAtA[i] = 0x30
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(m.ProfileId))
 	}
 	if len(m.ClientAddress) > 0 {
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.ClientAddress)))
 		i += copy(dAtA[i:], m.ClientAddress)
 	}
 	if len(m.StreamAddress) > 0 {
-		dAtA[i] = 0x32
+		dAtA[i] = 0x42
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.StreamAddress)))
 		i += copy(dAtA[i:], m.StreamAddress)
 	}
 	if m.StreamId != 0 {
-		dAtA[i] = 0x38
+		dAtA[i] = 0x48
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(m.StreamId))
 	}
 	if len(m.TranscodeInputUrl) > 0 {
-		dAtA[i] = 0x42
+		dAtA[i] = 0x52
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.TranscodeInputUrl)))
 		i += copy(dAtA[i:], m.TranscodeInputUrl)
 	}
 	if len(m.IngestInputUrl) > 0 {
-		dAtA[i] = 0x4a
+		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.IngestInputUrl)))
 		i += copy(dAtA[i:], m.IngestInputUrl)
 	}
 	if len(m.TranscodeOutputUrl) > 0 {
-		dAtA[i] = 0x52
+		dAtA[i] = 0x62
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.TranscodeOutputUrl)))
 		i += copy(dAtA[i:], m.TranscodeOutputUrl)
 	}
 	if m.Status != 0 {
-		dAtA[i] = 0x58
+		dAtA[i] = 0x68
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(m.Status))
 	}
-	if len(m.Chunks) > 0 {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.Chunks)))
-		i += copy(dAtA[i:], m.Chunks)
-	}
 	if m.CreatedAt != 0 {
-		dAtA[i] = 0x68
+		dAtA[i] = 0x70
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(m.CreatedAt))
 	}
-	if m.UpdatedAt != 0 {
-		dAtA[i] = 0x70
-		i++
-		i = encodeVarintWorkorder(dAtA, i, uint64(m.UpdatedAt))
-	}
-	if len(m.Worker) > 0 {
-		dAtA[i] = 0x7a
-		i++
-		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.Worker)))
-		i += copy(dAtA[i:], m.Worker)
-	}
 	if m.Refunded {
-		dAtA[i] = 0xa0
+		dAtA[i] = 0x80
 		i++
 		dAtA[i] = 0x1
 		i++
@@ -653,19 +632,11 @@ func (m *WorkOrder) MarshalTo(dAtA []byte) (int, error) {
 		i++
 	}
 	if m.IngestStatus != 0 {
-		dAtA[i] = 0xa8
+		dAtA[i] = 0x88
 		i++
 		dAtA[i] = 0x1
 		i++
 		i = encodeVarintWorkorder(dAtA, i, uint64(m.IngestStatus))
-	}
-	if len(m.StreamHash) > 0 {
-		dAtA[i] = 0xb2
-		i++
-		dAtA[i] = 0x1
-		i++
-		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.StreamHash)))
-		i += copy(dAtA[i:], m.StreamHash)
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -688,10 +659,11 @@ func (m *JobProfile) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		dAtA[i] = 0x8
+	if len(m.Id) > 0 {
+		dAtA[i] = 0xa
 		i++
-		i = encodeVarintWorkorder(dAtA, i, uint64(m.Id))
+		i = encodeVarintWorkorder(dAtA, i, uint64(len(m.Id)))
+		i += copy(dAtA[i:], m.Id)
 	}
 	if len(m.PipelineId) > 0 {
 		dAtA[i] = 0x12
@@ -797,8 +769,17 @@ func (m *WorkOrder) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovWorkorder(uint64(m.Id))
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovWorkorder(uint64(l))
+	}
+	l = len(m.Chunks)
+	if l > 0 {
+		n += 1 + l + sovWorkorder(uint64(l))
+	}
+	l = len(m.Worker)
+	if l > 0 {
+		n += 1 + l + sovWorkorder(uint64(l))
 	}
 	l = len(m.PipelineId)
 	if l > 0 {
@@ -837,29 +818,14 @@ func (m *WorkOrder) Size() (n int) {
 	if m.Status != 0 {
 		n += 1 + sovWorkorder(uint64(m.Status))
 	}
-	l = len(m.Chunks)
-	if l > 0 {
-		n += 1 + l + sovWorkorder(uint64(l))
-	}
 	if m.CreatedAt != 0 {
 		n += 1 + sovWorkorder(uint64(m.CreatedAt))
-	}
-	if m.UpdatedAt != 0 {
-		n += 1 + sovWorkorder(uint64(m.UpdatedAt))
-	}
-	l = len(m.Worker)
-	if l > 0 {
-		n += 1 + l + sovWorkorder(uint64(l))
 	}
 	if m.Refunded {
 		n += 3
 	}
 	if m.IngestStatus != 0 {
 		n += 2 + sovWorkorder(uint64(m.IngestStatus))
-	}
-	l = len(m.StreamHash)
-	if l > 0 {
-		n += 2 + l + sovWorkorder(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -873,8 +839,9 @@ func (m *JobProfile) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovWorkorder(uint64(m.Id))
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovWorkorder(uint64(l))
 	}
 	l = len(m.PipelineId)
 	if l > 0 {
@@ -975,10 +942,10 @@ func (m *WorkOrder) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
-			m.Id = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowWorkorder
@@ -988,272 +955,22 @@ func (m *WorkOrder) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= (uint32(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PipelineId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthWorkorder
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PipelineId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TranscoderId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthWorkorder
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TranscoderId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ProfileId", wireType)
-			}
-			m.ProfileId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ProfileId |= (v1.ProfileId(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClientAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthWorkorder
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClientAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StreamAddress", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthWorkorder
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.StreamAddress = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StreamId", wireType)
-			}
-			m.StreamId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.StreamId |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TranscodeInputUrl", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthWorkorder
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TranscodeInputUrl = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IngestInputUrl", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthWorkorder
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IngestInputUrl = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TranscodeOutputUrl", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthWorkorder
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TranscodeOutputUrl = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 11:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			}
-			m.Status = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Status |= (WorkOrderStatus(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Chunks", wireType)
 			}
@@ -1284,45 +1001,7 @@ func (m *WorkOrder) Unmarshal(dAtA []byte) error {
 				m.Chunks = []byte{}
 			}
 			iNdEx = postIndex
-		case 13:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
-			}
-			m.CreatedAt = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.CreatedAt |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 14:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UpdatedAt", wireType)
-			}
-			m.UpdatedAt = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.UpdatedAt |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 15:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Worker", wireType)
 			}
@@ -1353,48 +1032,9 @@ func (m *WorkOrder) Unmarshal(dAtA []byte) error {
 				m.Worker = []byte{}
 			}
 			iNdEx = postIndex
-		case 20:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Refunded", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Refunded = bool(v != 0)
-		case 21:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IngestStatus", wireType)
-			}
-			m.IngestStatus = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowWorkorder
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.IngestStatus |= (IngestStatus(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 22:
+		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StreamHash", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PipelineId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -1419,8 +1059,297 @@ func (m *WorkOrder) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.StreamHash = string(dAtA[iNdEx:postIndex])
+			m.PipelineId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TranscoderId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TranscoderId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProfileId", wireType)
+			}
+			m.ProfileId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ProfileId |= (v1.ProfileId(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClientAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StreamAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.StreamAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StreamId", wireType)
+			}
+			m.StreamId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StreamId |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TranscodeInputUrl", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TranscodeInputUrl = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IngestInputUrl", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IngestInputUrl = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TranscodeOutputUrl", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TranscodeOutputUrl = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 13:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= (WorkOrderStatus(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 14:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
+			}
+			m.CreatedAt = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CreatedAt |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 16:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Refunded", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Refunded = bool(v != 0)
+		case 17:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IngestStatus", wireType)
+			}
+			m.IngestStatus = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWorkorder
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.IngestStatus |= (IngestStatus(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWorkorder(dAtA[iNdEx:])
@@ -1473,10 +1402,10 @@ func (m *JobProfile) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
-			m.Id = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowWorkorder
@@ -1486,11 +1415,21 @@ func (m *JobProfile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= (uint32(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWorkorder
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PipelineId", wireType)

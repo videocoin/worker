@@ -37,28 +37,37 @@ enum IngestStatus {
 }
 
 message WorkOrder {
-    uint32 id = 1;
-    string pipeline_id = 2;
-    string transcoder_id = 3;
-    cloud.api.profiles.v1.ProfileId profile_id = 4;
-    string client_address = 5;
-    string stream_address = 6;
-    int64 stream_id = 7;
-    string transcode_input_url = 8;
-    string ingest_input_url = 9;
-    string transcode_output_url =10;
-    WorkOrderStatus status = 11;
-    bytes chunks = 12 [ (gogoproto.moretags) = "gorm:\"chunks;type:json\"sql:\"type:json\"" ];
-    int64 created_at = 13;
-    int64 updated_at = 14;
-    bytes worker = 15 [ (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" ];
-    bool refunded = 20;
-    IngestStatus ingest_status = 21;
-    string stream_hash = 22;
+    string id = 1 [ 
+        (gogoproto.moretags) = "gorm:\"type:uuid;primary_key\"" 
+    ];
+
+    bytes chunks = 2 [ 
+        (gogoproto.moretags) = "gorm:\"chunks;type:json\"sql:\"type:json\"" 
+    ];
+
+    bytes worker = 3 [ 
+        (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" 
+    ];
+
+    string pipeline_id = 4;
+    string transcoder_id = 5;
+    cloud.api.profiles.v1.ProfileId profile_id = 6;
+    string client_address = 7;
+    string stream_address = 8;
+    int64 stream_id = 9;
+    string transcode_input_url = 10;
+    string ingest_input_url = 11;
+    string transcode_output_url =12;
+    WorkOrderStatus status = 13;
+    int64 created_at = 14;
+    bool refunded = 16;
+    IngestStatus ingest_status = 17;
 }
 
 message JobProfile {
-	uint32 id = 1;
+    string id = 1 [ 
+        (gogoproto.moretags) = "gorm:\"type:uuid;primary_key\"" 
+    ];
 	string pipeline_id = 2;
     cloud.api.profiles.v1.ProfileId profile_id = 3;
 	string ingest_input_url = 4;

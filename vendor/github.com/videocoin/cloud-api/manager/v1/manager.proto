@@ -28,32 +28,25 @@ service ManagerService {
 
   rpc Run(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
     option (google.api.http) = {
-      post: "/api/v1/job/{pipeline_id}/run"
+      post: "/api/v1/job/{id}/run"
     };
   };
 
   rpc Stop(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
     option (google.api.http) = {
-      post: "/api/v1/job/{pipeline_id}/stop"
+      post: "/api/v1/job/{id}/stop"
     };
   };
 
   rpc Get(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
     option (google.api.http) = {
-      get: "/api/v1/job/{pipeline_id}"
+      get: "/api/v1/job/{id}"
     };
   };
 
   rpc Update(UpdateJobRequest) returns (cloud.api.workorder.v1.JobProfile) {
     option (google.api.http) = {
-      put: "/api/v1/job/{pipeline_id}"
-      body: "*"
-    };
-  };
-
-  rpc StopStream(StopStreamRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/stream/stop/{stream_hash}"
+      put: "/api/v1/job/{id}"
       body: "*"
     };
   };
@@ -64,15 +57,9 @@ service ManagerService {
     };
   }
 
-  rpc GetStream(StreamRequest) returns (cloud.api.workorder.v1.JobProfile) {
+  rpc UpdateStatus(StreamStatusRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      get: "/api/v1/stream/{stream_id}"
-    };
-  };
-
-  rpc UpdateStreamStatus(StreamStatusRequest) returns (google.protobuf.Empty){
-    option (google.api.http) = {
-      post: "/api/v1/stream/{stream_hash}/{status}"
+      post: "/api/v1/job/{id}/{status}"
       body: "*"
     };
   };
@@ -135,10 +122,6 @@ message UpdateProfileRequest {
   cloud.api.profiles.v1.ProfileId profile_id = 2;
 }
 
-message Heartbeat {
-  string id = 1;
-}
-
 message ProfileRequest {
   cloud.api.profiles.v1.ProfileId profile_id = 2;
 }
@@ -177,8 +160,8 @@ message TranscoderStatusRequest {
 }
 
 message StreamStatusRequest {
-  string transcoder_id = 1;
-  string stream_hash = 2;
+  string id = 1;
+  string transcoder_id = 2;
   cloud.api.workorder.v1.WorkOrderStatus status = 3;
   bool refunded = 4;
   cloud.api.workorder.v1.IngestStatus ingest_status = 5;
@@ -189,21 +172,15 @@ message JobResponse {
 }
 
 message JobRequest {
-  string pipeline_id = 1;
+  string id = 1;
   cloud.api.profiles.v1.ProfileId profile_id = 3;
 }
 
 message UpdateJobRequest {
-  string pipeline_id = 1;
+  string id = 1;
   cloud.api.profiles.v1.ProfileId profile_id = 2;
   string client_address = 3;
   int64 stream_id = 4;
   string stream_address = 5;
 }
 
-message StreamRequest {
-  int64 stream_id = 1;
-}
-message StopStreamRequest {
-  string stream_hash = 1;
-}

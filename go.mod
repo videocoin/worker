@@ -19,10 +19,9 @@ require (
 	github.com/kisielk/errcheck v1.2.0 // indirect
 	github.com/kr/pty v1.1.5 // indirect
 	github.com/rogpeppe/fastuuid v1.1.0 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v2.18.12+incompatible
 	github.com/sirupsen/logrus v1.4.2
-	github.com/videocoin/cloud-api v0.1.18
+	github.com/videocoin/cloud-api v0.0.24
 	github.com/videocoin/cloud-pkg v0.0.2
 	go.opencensus.io v0.22.0 // indirect
 	golang.org/x/crypto v0.0.0-20190617133340-57b3e21c3d56 // indirect
@@ -38,6 +37,5 @@ require (
 	google.golang.org/appengine v1.6.1 // indirect
 	google.golang.org/genproto v0.0.0-20190611190212-a7e196e89fd3 // indirect
 	google.golang.org/grpc v1.21.1
-	gopkg.in/yaml.v2 v2.2.2 // indirect
 	honnef.co/go/tools v0.0.0-20190614002413-cb51c254f01b // indirect
 )

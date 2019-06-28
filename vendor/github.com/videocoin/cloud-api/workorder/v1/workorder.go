@@ -2,7 +2,10 @@ package v1
 
 import (
 	fmt "fmt"
+	"time"
 
+	"github.com/jinzhu/gorm"
+	uuid "github.com/satori/go.uuid"
 	profiles_v1 "github.com/videocoin/cloud-api/profiles/v1"
 )
 
@@ -34,4 +37,15 @@ func (w *WorkOrder) CheckErrs() []error {
 	}
 
 	return errs
+}
+
+func (w *WorkOrder) BeforeCreate(scope *gorm.Scope) error {
+	uuid := uuid.NewV4()
+
+	err := scope.SetColumn("id", uuid.String())
+	if err != nil {
+		return err
+	}
+
+	return scope.SetColumn("created_at", time.Now().Unix())
 }
