@@ -44,8 +44,8 @@ build-alpine:
 docker:
 	@echo "==> Docker building..."
 	docker build -t $(IMAGE_TAG) -t $(LATEST) .
-	docker push $(IMAGE_TAG)
-	docker push $(LATEST)
+	gcloud docker -- push $(IMAGE_TAG)
+	gcloud docker -- push $(LATEST)
 
 package:
 	cd cmd && xgo --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
