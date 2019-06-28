@@ -26,12 +26,12 @@ const (
 type (
 	// Job used to queue up chunk work
 	Job struct {
+		Id              string
 		Bitrate         uint32
 		InputChunkName  string
 		OutputChunkName string
 		ChunksDir       string
 		StreamAddress   string
-		StreamHash      string
 		StreamID        *big.Int
 		InputID         *big.Int
 		OutputID        *big.Int
@@ -39,7 +39,6 @@ type (
 		stopChan        chan struct{}
 		Wallet          common.Address
 		Playlist        *m3u8.MediaPlaylist
-		PipelineId      string
 	}
 
 	// Service primary reciever for service

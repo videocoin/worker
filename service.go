@@ -179,7 +179,7 @@ func (s *Service) pollForWork(uid string) {
 }
 
 func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error {
-	dir := path.Join(s.cfg.OutputDir, a.Workorder.StreamHash)
+	dir := path.Join(s.cfg.OutputDir, a.Workorder.Id)
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	cmd := buildCmd(a.Workorder.TranscodeInputUrl, dir, a.Profile)
@@ -194,7 +194,7 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 
 	go s.syncDir(stopChan, cmd, a.Workorder, fullDir, a.Profile.Bitrate)
 
-	if err := s.generatePlaylist(a.Workorder.StreamHash, m3u8, a.Profile.Bitrate); err != nil {
+	if err := s.generatePlaylist(a.Workorder.Id, m3u8, a.Profile.Bitrate); err != nil {
 		return err
 	}
 
@@ -202,7 +202,7 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 		stopChan,
 		a.Workorder.TranscodeInputUrl,
 		a.Workorder.StreamAddress,
-		a.Workorder.StreamHash,
+		a.Workorder.Id,
 		uid,
 	)
 
@@ -214,7 +214,7 @@ func (s *Service) transcode(
 	stop chan struct{},
 	streamurl string,
 	contractAddr string,
-	streamHash string,
+	Id string,
 	uid string,
 ) {
 	s.waitForStreamReady(streamurl)

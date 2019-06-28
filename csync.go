@@ -66,6 +66,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 
 					// Add job to the job channel to be worked on later
 					jobChan <- Job{
+						Id:              workOrder.Id,
 						ChunksDir:       dir,
 						InputChunkName:  chunk,
 						Bitrate:         bitrate,
@@ -76,10 +77,8 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						Wallet:          walletHex,
 						StreamID:        big.NewInt(workOrder.StreamId),
 						StreamAddress:   workOrder.StreamAddress,
-						StreamHash:      workOrder.StreamHash,
 						cmd:             cmd,
 						stopChan:        stop,
-						PipelineId:      workOrder.PipelineId,
 					}
 
 				}
@@ -115,7 +114,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 // handleChunk Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) handleChunk(job *Job) error {
 	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
-	uploadPath := fmt.Sprintf("%s/%d", job.StreamHash, job.Bitrate)
+	uploadPath := fmt.Sprintf("%s/%d", job.Id, job.Bitrate)
 
 	if job.InputChunkName == "0.ts" {
 		duration, err := s.duration(chunkLoc)
@@ -155,8 +154,8 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
-	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
+	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.Id, job.InputChunkName)
+	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.Id, job.Bitrate, job.OutputChunkName)
 
 	go s.verify(tx, job, inputChunk, outputChunk)
 
@@ -194,7 +193,7 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	resp, err := s.manager.Get(context.Background(), &manager_v1.JobRequest{PipelineId: job.PipelineId})
+	resp, err := s.manager.Get(context.Background(), &manager_v1.JobRequest{Id: job.Id})
 	if err != nil {
 		s.log.Warnf("failed to get current job status: %s", err.Error())
 	}
@@ -212,7 +211,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 		time.Sleep(1 * time.Second)
 	}
 
-	s.updateStatus(workOrder.StreamHash, workorder_v1.WorkOrderStatusReady)
+	s.updateStatus(workOrder.Id, workorder_v1.WorkOrderStatusReady)
 
 	for {
 		for len(jobChan) < 2 {
@@ -234,10 +233,10 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 	}
 }
 
-func (s *Service) updateStatus(streamHash string, status workorder_v1.WorkOrderStatus) {
-	_, err := s.manager.UpdateStreamStatus(s.ctx, &manager_v1.StreamStatusRequest{
-		StreamHash: streamHash,
-		Status:     status,
+func (s *Service) updateStatus(Id string, status workorder_v1.WorkOrderStatus) {
+	_, err := s.manager.UpdateStatus(s.ctx, &manager_v1.StreamStatusRequest{
+		Id:     Id,
+		Status: status,
 	})
 
 	if err != nil {
