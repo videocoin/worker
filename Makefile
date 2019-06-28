@@ -44,6 +44,8 @@ build-alpine:
 docker:
 	@echo "==> Docker building..."
 	docker build -t $(IMAGE_TAG) -t $(LATEST) .
+	docker push $(IMAGE_TAG)
+	docker push $(LATEST)
 
 package:
 	cd cmd && xgo --targets=linux/amd64 -dest ../release -out $(SERVICE_NAME) .
@@ -53,14 +55,14 @@ package:
 store:
 	gsutil -m cp release/$(VERSION)_$(SERVICE_NAME)_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/$(SERVICE_NAME)/
 	gsutil -m cp gs://${RELEASE_BUCKET}/$(SERVICE_NAME)/$(VERSION)_$(SERVICE_NAME)_linux_amd64.tar.bz2 gs://${RELEASE_BUCKET}/$(SERVICE_NAME)/latest_$(SERVICE_NAME)_linux_amd64.tar.bz2
-	
+
 clean:
 	rm -rf release/*
 
 deploy:
 	@cd ./deploy && ./deploy.sh
 
-	
+
 push:
 	docker push $(IMAGE_TAG)
 	docker push $(LATEST)
