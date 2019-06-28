@@ -199,7 +199,7 @@ func request_ManagerService_Health_0(ctx context.Context, marshaler runtime.Mars
 }
 
 func request_ManagerService_UpdateStatus_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq StreamStatusRequest
+	var protoReq UpdateJobRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -360,47 +360,6 @@ func request_ManagerService_RegisterTranscoder_0(ctx context.Context, marshaler 
 	}
 
 	msg, err := client.RegisterTranscoder(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func request_ManagerService_UpdateTranscoderStatus_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq TranscoderStatusRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		e   int32
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["transcoder_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "transcoder_id")
-	}
-
-	protoReq.TranscoderId, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "transcoder_id", err)
-	}
-
-	val, ok = pathParams["status"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "status")
-	}
-
-	e, err = runtime.Enum(val, v1_1.TranscoderStatus_value)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "status", err)
-	}
-
-	protoReq.Status = v1_1.TranscoderStatus(e)
-
-	msg, err := client.UpdateTranscoderStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -712,26 +671,6 @@ func RegisterManagerServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
-	mux.Handle("POST", pattern_ManagerService_UpdateTranscoderStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_ManagerService_UpdateTranscoderStatus_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_ManagerService_UpdateTranscoderStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_ManagerService_GetWork_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -782,8 +721,6 @@ var (
 
 	pattern_ManagerService_RegisterTranscoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "transcoders"}, ""))
 
-	pattern_ManagerService_UpdateTranscoderStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "transcoder", "transcoder_id", "status"}, ""))
-
 	pattern_ManagerService_GetWork_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "work"}, ""))
 )
 
@@ -813,8 +750,6 @@ var (
 	forward_ManagerService_GetProfile_0 = runtime.ForwardResponseMessage
 
 	forward_ManagerService_RegisterTranscoder_0 = runtime.ForwardResponseMessage
-
-	forward_ManagerService_UpdateTranscoderStatus_0 = runtime.ForwardResponseMessage
 
 	forward_ManagerService_GetWork_0 = runtime.ForwardResponseMessage
 )

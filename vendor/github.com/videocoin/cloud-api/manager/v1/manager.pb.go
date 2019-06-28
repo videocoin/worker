@@ -33,65 +33,6 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-type UpdateProfileRequest struct {
-	StreamId             int64        `protobuf:"varint,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
-	ProfileId            v1.ProfileId `protobuf:"varint,2,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
-}
-
-func (m *UpdateProfileRequest) Reset()         { *m = UpdateProfileRequest{} }
-func (m *UpdateProfileRequest) String() string { return proto.CompactTextString(m) }
-func (*UpdateProfileRequest) ProtoMessage()    {}
-func (*UpdateProfileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{0}
-}
-func (m *UpdateProfileRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *UpdateProfileRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_UpdateProfileRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *UpdateProfileRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateProfileRequest.Merge(m, src)
-}
-func (m *UpdateProfileRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *UpdateProfileRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateProfileRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateProfileRequest proto.InternalMessageInfo
-
-func (m *UpdateProfileRequest) GetStreamId() int64 {
-	if m != nil {
-		return m.StreamId
-	}
-	return 0
-}
-
-func (m *UpdateProfileRequest) GetProfileId() v1.ProfileId {
-	if m != nil {
-		return m.ProfileId
-	}
-	return v1.ProfileIdNone
-}
-
-func (*UpdateProfileRequest) XXX_MessageName() string {
-	return "cloud.api.manager.v1.UpdateProfileRequest"
-}
-
 type ProfileRequest struct {
 	ProfileId            v1.ProfileId `protobuf:"varint,2,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
@@ -103,7 +44,7 @@ func (m *ProfileRequest) Reset()         { *m = ProfileRequest{} }
 func (m *ProfileRequest) String() string { return proto.CompactTextString(m) }
 func (*ProfileRequest) ProtoMessage()    {}
 func (*ProfileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{1}
+	return fileDescriptor_e02ccd723715ff49, []int{0}
 }
 func (m *ProfileRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -154,7 +95,7 @@ func (m *CheckBalanceRequest) Reset()         { *m = CheckBalanceRequest{} }
 func (m *CheckBalanceRequest) String() string { return proto.CompactTextString(m) }
 func (*CheckBalanceRequest) ProtoMessage()    {}
 func (*CheckBalanceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{2}
+	return fileDescriptor_e02ccd723715ff49, []int{1}
 }
 func (m *CheckBalanceRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -205,7 +146,7 @@ func (m *CheckBalanceResponse) Reset()         { *m = CheckBalanceResponse{} }
 func (m *CheckBalanceResponse) String() string { return proto.CompactTextString(m) }
 func (*CheckBalanceResponse) ProtoMessage()    {}
 func (*CheckBalanceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{3}
+	return fileDescriptor_e02ccd723715ff49, []int{2}
 }
 func (m *CheckBalanceResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -257,7 +198,7 @@ func (m *ContractAddrRequest) Reset()         { *m = ContractAddrRequest{} }
 func (m *ContractAddrRequest) String() string { return proto.CompactTextString(m) }
 func (*ContractAddrRequest) ProtoMessage()    {}
 func (*ContractAddrRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{4}
+	return fileDescriptor_e02ccd723715ff49, []int{3}
 }
 func (m *ContractAddrRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -319,7 +260,7 @@ func (m *VerifyChunkRequest) Reset()         { *m = VerifyChunkRequest{} }
 func (m *VerifyChunkRequest) String() string { return proto.CompactTextString(m) }
 func (*VerifyChunkRequest) ProtoMessage()    {}
 func (*VerifyChunkRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{5}
+	return fileDescriptor_e02ccd723715ff49, []int{4}
 }
 func (m *VerifyChunkRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -401,7 +342,7 @@ func (m *ChunkCreatedRequest) Reset()         { *m = ChunkCreatedRequest{} }
 func (m *ChunkCreatedRequest) String() string { return proto.CompactTextString(m) }
 func (*ChunkCreatedRequest) ProtoMessage()    {}
 func (*ChunkCreatedRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{6}
+	return fileDescriptor_e02ccd723715ff49, []int{5}
 }
 func (m *ChunkCreatedRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -474,7 +415,7 @@ func (m *TranscoderStatusRequest) Reset()         { *m = TranscoderStatusRequest
 func (m *TranscoderStatusRequest) String() string { return proto.CompactTextString(m) }
 func (*TranscoderStatusRequest) ProtoMessage()    {}
 func (*TranscoderStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{7}
+	return fileDescriptor_e02ccd723715ff49, []int{6}
 }
 func (m *TranscoderStatusRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -521,140 +462,6 @@ func (*TranscoderStatusRequest) XXX_MessageName() string {
 	return "cloud.api.manager.v1.TranscoderStatusRequest"
 }
 
-type StreamStatusRequest struct {
-	Id                   string              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	TranscoderId         string              `protobuf:"bytes,2,opt,name=transcoder_id,json=transcoderId,proto3" json:"transcoder_id,omitempty"`
-	Status               v12.WorkOrderStatus `protobuf:"varint,3,opt,name=status,proto3,enum=cloud.api.workorder.v1.WorkOrderStatus" json:"status,omitempty"`
-	Refunded             bool                `protobuf:"varint,4,opt,name=refunded,proto3" json:"refunded,omitempty"`
-	IngestStatus         v12.IngestStatus    `protobuf:"varint,5,opt,name=ingest_status,json=ingestStatus,proto3,enum=cloud.api.workorder.v1.IngestStatus" json:"ingest_status,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
-}
-
-func (m *StreamStatusRequest) Reset()         { *m = StreamStatusRequest{} }
-func (m *StreamStatusRequest) String() string { return proto.CompactTextString(m) }
-func (*StreamStatusRequest) ProtoMessage()    {}
-func (*StreamStatusRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{8}
-}
-func (m *StreamStatusRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *StreamStatusRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_StreamStatusRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *StreamStatusRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StreamStatusRequest.Merge(m, src)
-}
-func (m *StreamStatusRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *StreamStatusRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_StreamStatusRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_StreamStatusRequest proto.InternalMessageInfo
-
-func (m *StreamStatusRequest) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
-}
-
-func (m *StreamStatusRequest) GetTranscoderId() string {
-	if m != nil {
-		return m.TranscoderId
-	}
-	return ""
-}
-
-func (m *StreamStatusRequest) GetStatus() v12.WorkOrderStatus {
-	if m != nil {
-		return m.Status
-	}
-	return v12.WorkOrderStatusNone
-}
-
-func (m *StreamStatusRequest) GetRefunded() bool {
-	if m != nil {
-		return m.Refunded
-	}
-	return false
-}
-
-func (m *StreamStatusRequest) GetIngestStatus() v12.IngestStatus {
-	if m != nil {
-		return m.IngestStatus
-	}
-	return v12.IngestStatusNone
-}
-
-func (*StreamStatusRequest) XXX_MessageName() string {
-	return "cloud.api.manager.v1.StreamStatusRequest"
-}
-
-type JobResponse struct {
-	RtmpInputUrl         string   `protobuf:"bytes,1,opt,name=rtmp_input_url,json=rtmpInputUrl,proto3" json:"rtmp_input_url,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *JobResponse) Reset()         { *m = JobResponse{} }
-func (m *JobResponse) String() string { return proto.CompactTextString(m) }
-func (*JobResponse) ProtoMessage()    {}
-func (*JobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{9}
-}
-func (m *JobResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *JobResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_JobResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *JobResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_JobResponse.Merge(m, src)
-}
-func (m *JobResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *JobResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_JobResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_JobResponse proto.InternalMessageInfo
-
-func (m *JobResponse) GetRtmpInputUrl() string {
-	if m != nil {
-		return m.RtmpInputUrl
-	}
-	return ""
-}
-
-func (*JobResponse) XXX_MessageName() string {
-	return "cloud.api.manager.v1.JobResponse"
-}
-
 type JobRequest struct {
 	Id                   string       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	ProfileId            v1.ProfileId `protobuf:"varint,3,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
@@ -667,7 +474,7 @@ func (m *JobRequest) Reset()         { *m = JobRequest{} }
 func (m *JobRequest) String() string { return proto.CompactTextString(m) }
 func (*JobRequest) ProtoMessage()    {}
 func (*JobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{10}
+	return fileDescriptor_e02ccd723715ff49, []int{7}
 }
 func (m *JobRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -715,21 +522,23 @@ func (*JobRequest) XXX_MessageName() string {
 }
 
 type UpdateJobRequest struct {
-	Id                   string       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ProfileId            v1.ProfileId `protobuf:"varint,2,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
-	ClientAddress        string       `protobuf:"bytes,3,opt,name=client_address,json=clientAddress,proto3" json:"client_address,omitempty"`
-	StreamId             int64        `protobuf:"varint,4,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
-	StreamAddress        string       `protobuf:"bytes,5,opt,name=stream_address,json=streamAddress,proto3" json:"stream_address,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+	Id                   string              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ProfileId            v1.ProfileId        `protobuf:"varint,2,opt,name=profile_id,json=profileId,proto3,enum=cloud.api.profiles.v1.ProfileId" json:"profile_id,omitempty"`
+	ClientAddress        string              `protobuf:"bytes,3,opt,name=client_address,json=clientAddress,proto3" json:"client_address,omitempty"`
+	StreamId             int64               `protobuf:"varint,4,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
+	StreamAddress        string              `protobuf:"bytes,5,opt,name=stream_address,json=streamAddress,proto3" json:"stream_address,omitempty"`
+	Status               v12.WorkOrderStatus `protobuf:"varint,6,opt,name=status,proto3,enum=cloud.api.workorder.v1.WorkOrderStatus" json:"status,omitempty"`
+	IngestStatus         v12.IngestStatus    `protobuf:"varint,7,opt,name=ingest_status,json=ingestStatus,proto3,enum=cloud.api.workorder.v1.IngestStatus" json:"ingest_status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_unrecognized     []byte              `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
 }
 
 func (m *UpdateJobRequest) Reset()         { *m = UpdateJobRequest{} }
 func (m *UpdateJobRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateJobRequest) ProtoMessage()    {}
 func (*UpdateJobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e02ccd723715ff49, []int{11}
+	return fileDescriptor_e02ccd723715ff49, []int{8}
 }
 func (m *UpdateJobRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -793,12 +602,24 @@ func (m *UpdateJobRequest) GetStreamAddress() string {
 	return ""
 }
 
+func (m *UpdateJobRequest) GetStatus() v12.WorkOrderStatus {
+	if m != nil {
+		return m.Status
+	}
+	return v12.WorkOrderStatusNone
+}
+
+func (m *UpdateJobRequest) GetIngestStatus() v12.IngestStatus {
+	if m != nil {
+		return m.IngestStatus
+	}
+	return v12.IngestStatusNone
+}
+
 func (*UpdateJobRequest) XXX_MessageName() string {
 	return "cloud.api.manager.v1.UpdateJobRequest"
 }
 func init() {
-	proto.RegisterType((*UpdateProfileRequest)(nil), "cloud.api.manager.v1.UpdateProfileRequest")
-	golang_proto.RegisterType((*UpdateProfileRequest)(nil), "cloud.api.manager.v1.UpdateProfileRequest")
 	proto.RegisterType((*ProfileRequest)(nil), "cloud.api.manager.v1.ProfileRequest")
 	golang_proto.RegisterType((*ProfileRequest)(nil), "cloud.api.manager.v1.ProfileRequest")
 	proto.RegisterType((*CheckBalanceRequest)(nil), "cloud.api.manager.v1.CheckBalanceRequest")
@@ -813,10 +634,6 @@ func init() {
 	golang_proto.RegisterType((*ChunkCreatedRequest)(nil), "cloud.api.manager.v1.ChunkCreatedRequest")
 	proto.RegisterType((*TranscoderStatusRequest)(nil), "cloud.api.manager.v1.TranscoderStatusRequest")
 	golang_proto.RegisterType((*TranscoderStatusRequest)(nil), "cloud.api.manager.v1.TranscoderStatusRequest")
-	proto.RegisterType((*StreamStatusRequest)(nil), "cloud.api.manager.v1.StreamStatusRequest")
-	golang_proto.RegisterType((*StreamStatusRequest)(nil), "cloud.api.manager.v1.StreamStatusRequest")
-	proto.RegisterType((*JobResponse)(nil), "cloud.api.manager.v1.JobResponse")
-	golang_proto.RegisterType((*JobResponse)(nil), "cloud.api.manager.v1.JobResponse")
 	proto.RegisterType((*JobRequest)(nil), "cloud.api.manager.v1.JobRequest")
 	golang_proto.RegisterType((*JobRequest)(nil), "cloud.api.manager.v1.JobRequest")
 	proto.RegisterType((*UpdateJobRequest)(nil), "cloud.api.manager.v1.UpdateJobRequest")
@@ -827,82 +644,75 @@ func init() { proto.RegisterFile("manager/v1/manager.proto", fileDescriptor_e02c
 func init() { golang_proto.RegisterFile("manager/v1/manager.proto", fileDescriptor_e02ccd723715ff49) }
 
 var fileDescriptor_e02ccd723715ff49 = []byte{
-	// 1196 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x96, 0xef, 0x6e, 0x1b, 0x45,
-	0x10, 0xc0, 0x75, 0x76, 0x92, 0x26, 0x13, 0xdb, 0x8d, 0x36, 0x6e, 0xeb, 0x3a, 0xc5, 0xb5, 0xae,
-	0x69, 0x49, 0x83, 0x72, 0x87, 0x9b, 0x4f, 0x80, 0x50, 0x49, 0x03, 0x0a, 0xae, 0x84, 0x0a, 0x17,
-	0x0a, 0x12, 0x02, 0x99, 0xf3, 0xdd, 0xc6, 0xbe, 0xd8, 0xbe, 0xbd, 0xee, 0xee, 0x39, 0x94, 0xa8,
-	0x1f, 0xe0, 0x0d, 0x10, 0x7c, 0xe4, 0x25, 0x78, 0x83, 0x7e, 0xec, 0x27, 0x84, 0xc4, 0x0b, 0xa0,
-	0x94, 0x27, 0xe0, 0x09, 0xd0, 0xed, 0xee, 0xf9, 0xce, 0x7f, 0xae, 0x71, 0xd5, 0x7c, 0xbb, 0x9d,
-	0x9b, 0x99, 0xdf, 0xcc, 0xee, 0xce, 0xec, 0x40, 0x65, 0x60, 0xfb, 0x76, 0x07, 0x53, 0x73, 0xd8,
-	0x30, 0xd5, 0xa7, 0x11, 0x50, 0xc2, 0x09, 0x2a, 0x3b, 0x7d, 0x12, 0xba, 0x86, 0x1d, 0x78, 0x46,
-	0xfc, 0x63, 0xd8, 0xa8, 0x9a, 0x1d, 0x8f, 0x77, 0xc3, 0xb6, 0xe1, 0x90, 0x81, 0x39, 0xf4, 0x5c,
-	0x4c, 0x1c, 0xe2, 0xf9, 0xa6, 0x50, 0xdd, 0xb1, 0x03, 0xcf, 0xa4, 0x81, 0x63, 0x76, 0xb1, 0xdd,
-	0xe7, 0x5d, 0xe9, 0xa6, 0xba, 0xd1, 0x21, 0xa4, 0xd3, 0xc7, 0xa6, 0x58, 0xb5, 0xc3, 0x23, 0x13,
-	0x0f, 0x02, 0xfe, 0x54, 0xfd, 0xbc, 0xa1, 0x7e, 0x46, 0x96, 0xb6, 0xef, 0x13, 0x6e, 0x73, 0x8f,
-	0xf8, 0x4c, 0xfd, 0xdd, 0x49, 0xb1, 0x3a, 0xa4, 0x43, 0x12, 0x1f, 0xd1, 0x4a, 0x2c, 0xc4, 0x97,
-	0x52, 0x7f, 0xef, 0x9c, 0xd0, 0x02, 0x4a, 0x8e, 0xbc, 0x3e, 0x66, 0x51, 0xaa, 0xf1, 0xb7, 0x32,
-	0xfd, 0xe0, 0x1c, 0xd3, 0x13, 0x42, 0x7b, 0x84, 0xba, 0x72, 0x9b, 0x46, 0x0b, 0x65, 0xfc, 0xe1,
-	0x39, 0xc6, 0x9c, 0xda, 0x3e, 0x73, 0x88, 0xb2, 0x4e, 0x56, 0xd2, 0x5c, 0xe7, 0x50, 0x7e, 0x1c,
-	0xb8, 0x36, 0xc7, 0x9f, 0xcb, 0x98, 0x2c, 0xfc, 0x24, 0xc4, 0x8c, 0xa3, 0x0d, 0x58, 0x61, 0x9c,
-	0x62, 0x7b, 0xd0, 0xf2, 0xdc, 0x8a, 0x56, 0xd7, 0xb6, 0xf2, 0xd6, 0xb2, 0x14, 0x34, 0x5d, 0x74,
-	0x1f, 0x40, 0xa5, 0x10, 0xfd, 0xcd, 0xd5, 0xb5, 0xad, 0xd2, 0xbd, 0xba, 0x91, 0x9c, 0xd8, 0x28,
-	0xbf, 0x61, 0xc3, 0x50, 0x7e, 0x9b, 0xae, 0xb5, 0x12, 0xc4, 0x9f, 0xfa, 0x17, 0x50, 0x9a, 0xe0,
-	0xbd, 0xb1, 0xcb, 0x8f, 0x60, 0x7d, 0xbf, 0x8b, 0x9d, 0xde, 0x03, 0xbb, 0x6f, 0xfb, 0xce, 0xc8,
-	0xef, 0x5d, 0x58, 0x73, 0x88, 0xcf, 0xa9, 0xed, 0xf0, 0x96, 0xed, 0xba, 0x14, 0x33, 0x26, 0xd2,
-	0x59, 0xb1, 0x2e, 0xc7, 0xf2, 0x3d, 0x29, 0xd6, 0xdf, 0x85, 0xf2, 0xb8, 0x07, 0x16, 0x10, 0x9f,
-	0x61, 0x54, 0x81, 0x4b, 0x6d, 0x29, 0x12, 0x96, 0x9a, 0x15, 0x2f, 0x75, 0x1b, 0xd6, 0xf7, 0x53,
-	0x4e, 0x62, 0xe6, 0x4d, 0x58, 0x0d, 0xbc, 0x00, 0xf7, 0x3d, 0x1f, 0xc7, 0xbb, 0xb7, 0x62, 0x41,
-	0x2c, 0x6a, 0xba, 0x33, 0x83, 0xca, 0xcd, 0x0e, 0xea, 0xb9, 0x06, 0xe8, 0x2b, 0x4c, 0xbd, 0xa3,
-	0xa7, 0xfb, 0xdd, 0xd0, 0xef, 0xcd, 0x75, 0x3c, 0x77, 0xe0, 0x32, 0x23, 0x21, 0x75, 0x70, 0xcb,
-	0x89, 0x6c, 0xe2, 0x0d, 0x5d, 0xb0, 0x8a, 0x52, 0x2c, 0x3c, 0x49, 0x3d, 0x8a, 0x59, 0xd8, 0xe7,
-	0x89, 0x5e, 0x5e, 0xea, 0x49, 0x71, 0xac, 0x77, 0x0b, 0x8a, 0x5d, 0x9b, 0x75, 0x5b, 0xae, 0xc7,
-	0xb8, 0xd8, 0x86, 0x85, 0xba, 0xb6, 0xb5, 0x68, 0x15, 0x22, 0xe1, 0xc7, 0x4a, 0x26, 0x76, 0xc9,
-	0xe3, 0xd4, 0xe6, 0xb8, 0xb2, 0x58, 0xd7, 0xb6, 0x8a, 0x56, 0xbc, 0xd4, 0x7f, 0xd7, 0xa2, 0xa3,
-	0x09, 0xfd, 0xde, 0x3e, 0xc5, 0x36, 0xc7, 0xee, 0x9b, 0xe4, 0x90, 0x9f, 0x33, 0x87, 0xfc, 0x64,
-	0x0e, 0xa9, 0xf0, 0x16, 0xc6, 0xc3, 0xfb, 0x49, 0x83, 0x6b, 0x5f, 0x8e, 0xca, 0xe2, 0x90, 0xdb,
-	0x3c, 0x64, 0x71, 0x88, 0xb7, 0xa0, 0x98, 0x54, 0x4c, 0x72, 0x96, 0x85, 0x44, 0xd8, 0x74, 0xd1,
-	0x1e, 0x2c, 0x31, 0x61, 0xa5, 0xae, 0xed, 0xdd, 0xd4, 0xb5, 0x4d, 0xd5, 0xdb, 0xb0, 0x61, 0x4c,
-	0x61, 0x94, 0xa1, 0xfe, 0x9f, 0x06, 0xeb, 0x87, 0x22, 0xf5, 0x71, 0x7e, 0x09, 0x72, 0x23, 0x68,
-	0xce, 0x73, 0xa7, 0xe3, 0xc9, 0xcd, 0x88, 0xe7, 0xfe, 0x28, 0x9e, 0xbc, 0x88, 0xe7, 0xed, 0x54,
-	0x3c, 0x49, 0xf7, 0x18, 0x36, 0x8c, 0xaf, 0x09, 0xed, 0x3d, 0xa2, 0x53, 0xd1, 0xa0, 0x2a, 0x2c,
-	0x53, 0x7c, 0x14, 0xfa, 0x2e, 0x76, 0xc5, 0x66, 0x2d, 0x5b, 0xa3, 0x35, 0x6a, 0x42, 0xd1, 0xf3,
-	0x3b, 0x98, 0xf1, 0x96, 0x62, 0x2c, 0x0a, 0xc6, 0x66, 0x16, 0xa3, 0x29, 0x94, 0x15, 0xa0, 0xe0,
-	0xa5, 0x56, 0xfa, 0x2e, 0xac, 0x3e, 0x24, 0xed, 0x51, 0x99, 0x6d, 0x42, 0x89, 0xf2, 0x41, 0xd0,
-	0xf2, 0xfc, 0x20, 0xe4, 0xad, 0x90, 0xf6, 0xe3, 0xcd, 0x8e, 0xa4, 0xcd, 0x48, 0xf8, 0x98, 0xf6,
-	0xf5, 0xef, 0x00, 0x84, 0xd1, 0xec, 0xfd, 0x19, 0xef, 0x22, 0xf9, 0xd7, 0xef, 0x22, 0x7f, 0x6a,
-	0xb0, 0x26, 0xfb, 0xe1, 0xdc, 0x94, 0xd7, 0xef, 0x55, 0xe8, 0x36, 0x94, 0x9c, 0xbe, 0x87, 0xfd,
-	0xa4, 0xfa, 0xf3, 0xc2, 0x79, 0x51, 0x4a, 0x55, 0xed, 0x8f, 0x17, 0xc8, 0xc2, 0x44, 0x81, 0xdc,
-	0x86, 0x92, 0xfa, 0x19, 0xfb, 0x58, 0x94, 0x3e, 0xa4, 0x54, 0xf9, 0xb8, 0xf7, 0x47, 0x11, 0x4a,
-	0x9f, 0xc9, 0x07, 0xf4, 0x10, 0xd3, 0xa1, 0xe7, 0x60, 0x74, 0x0c, 0x4b, 0xb2, 0x12, 0x51, 0x3a,
-	0xe8, 0xe4, 0x95, 0x35, 0x92, 0xd4, 0xab, 0x7a, 0xd6, 0xb9, 0x3e, 0x24, 0x6d, 0x95, 0x9a, 0x5e,
-	0xfd, 0xf9, 0xef, 0x7f, 0x7f, 0xcd, 0x95, 0xf5, 0xcb, 0xe2, 0x21, 0x1d, 0x36, 0xcc, 0x63, 0xd2,
-	0x36, 0x7d, 0x7c, 0xf2, 0xbe, 0xb6, 0x8d, 0x3c, 0xc8, 0x5b, 0xa1, 0x7f, 0x41, 0xa0, 0x1b, 0x02,
-	0x74, 0x55, 0x2f, 0xa7, 0x41, 0xa7, 0x9e, 0xfb, 0xcc, 0xa4, 0xa1, 0x8f, 0x7a, 0xb0, 0x70, 0xc8,
-	0x49, 0x70, 0x41, 0xac, 0xb7, 0x04, 0xeb, 0x9a, 0x7e, 0x65, 0x8a, 0xc5, 0x22, 0x08, 0x86, 0xfc,
-	0x01, 0xe6, 0x17, 0xc4, 0xaa, 0x08, 0x16, 0x42, 0x6b, 0x93, 0x2c, 0xf4, 0x04, 0x96, 0xe4, 0x6d,
-	0x44, 0x77, 0x66, 0x93, 0x26, 0xef, 0xea, 0x5c, 0xbc, 0x0d, 0xc1, 0xbb, 0x52, 0x9d, 0xe2, 0x45,
-	0x27, 0xf6, 0x08, 0x96, 0x3e, 0x15, 0x13, 0x14, 0xba, 0x6a, 0xc8, 0xf9, 0xc8, 0x88, 0x07, 0x1f,
-	0xe3, 0x93, 0x68, 0x78, 0xaa, 0x6e, 0xa4, 0x10, 0x34, 0x70, 0x0c, 0xa9, 0xae, 0x8a, 0x7a, 0x4d,
-	0xf8, 0x06, 0xb4, 0xac, 0xe6, 0xb0, 0x1f, 0xd1, 0x09, 0x14, 0x64, 0x94, 0x52, 0x03, 0xdd, 0x9d,
-	0x9d, 0xc9, 0x8c, 0xf6, 0x57, 0xcd, 0x88, 0x40, 0xdf, 0x14, 0x90, 0x9a, 0x7e, 0x7d, 0xea, 0x70,
-	0x4e, 0x65, 0x57, 0x12, 0x99, 0x1c, 0xc3, 0x6a, 0xea, 0xe5, 0x44, 0x5b, 0xb3, 0xb9, 0xd3, 0x8f,
-	0x6b, 0x26, 0xf6, 0xba, 0xc0, 0xae, 0xeb, 0xa5, 0x18, 0x3b, 0x14, 0xb6, 0x11, 0x8b, 0x41, 0x21,
-	0xfd, 0xc4, 0x65, 0x25, 0x39, 0xe3, 0x19, 0xcc, 0xa4, 0xd5, 0x05, 0xad, 0x9a, 0xdc, 0x40, 0xf9,
-	0xc0, 0x39, 0xd2, 0x3a, 0x82, 0xfe, 0xa2, 0x45, 0xd4, 0x64, 0x62, 0xc9, 0xa6, 0x4e, 0xcd, 0x45,
-	0xd5, 0xed, 0x79, 0x54, 0x65, 0x67, 0xd6, 0xb7, 0x45, 0x24, 0x9b, 0x48, 0x8f, 0x23, 0x51, 0xf3,
-	0x8f, 0x79, 0x3a, 0x39, 0xc5, 0x3c, 0x43, 0xdf, 0xc3, 0xea, 0x01, 0xe6, 0xea, 0xa6, 0xb1, 0xcc,
-	0x3b, 0x74, 0xf3, 0xd5, 0xed, 0x92, 0x4d, 0xd7, 0x44, 0xac, 0x85, 0x7e, 0x00, 0x48, 0x08, 0x68,
-	0x73, 0x76, 0x1e, 0xe3, 0xd3, 0x65, 0xb5, 0xf6, 0x6a, 0x5c, 0x7c, 0xa1, 0xd0, 0x8d, 0x09, 0x9a,
-	0x79, 0x9a, 0x34, 0xfa, 0xa8, 0x1a, 0x91, 0x85, 0x3b, 0x1e, 0xe3, 0x98, 0x26, 0x2f, 0x39, 0xba,
-	0x35, 0xc7, 0x73, 0x9f, 0x79, 0xc8, 0x35, 0x01, 0xae, 0xe8, 0xeb, 0x31, 0x38, 0xf1, 0xc0, 0xa2,
-	0x23, 0xfe, 0x4d, 0x83, 0xab, 0xb2, 0x7a, 0x26, 0x67, 0x07, 0xb4, 0x33, 0x3b, 0xf3, 0x8c, 0x51,
-	0x26, 0x33, 0x82, 0x5d, 0x11, 0xc1, 0x8e, 0xfe, 0xce, 0x74, 0x04, 0xe6, 0xe9, 0xd8, 0xb0, 0x91,
-	0x54, 0x17, 0xfa, 0x16, 0x2e, 0x1d, 0x60, 0x1e, 0xcd, 0x0f, 0x99, 0x27, 0x9c, 0xbd, 0x2d, 0x7b,
-	0x8c, 0x79, 0x1d, 0x7f, 0x80, 0x7d, 0xae, 0x97, 0x05, 0xbc, 0x84, 0x0a, 0x31, 0x3c, 0x6a, 0x59,
-	0x0f, 0x2a, 0x2f, 0xce, 0x6a, 0xda, 0x5f, 0x67, 0x35, 0xed, 0x9f, 0xb3, 0x9a, 0xf6, 0xfc, 0x65,
-	0x4d, 0x7b, 0xf1, 0xb2, 0xa6, 0x7d, 0x93, 0x1b, 0x36, 0xda, 0x4b, 0x02, 0xb2, 0xfb, 0x7f, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0x5e, 0xac, 0x80, 0x6e, 0x38, 0x0e, 0x00, 0x00,
+	// 1081 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x96, 0x5f, 0x6f, 0x1b, 0x45,
+	0x10, 0xc0, 0x75, 0x76, 0xe2, 0x34, 0x13, 0xdb, 0x89, 0x36, 0x69, 0xeb, 0x3a, 0xc1, 0xb5, 0x2e,
+	0x69, 0x49, 0x22, 0xf5, 0x0e, 0x97, 0x27, 0x40, 0xa8, 0xa4, 0x01, 0x05, 0x57, 0x42, 0x05, 0x87,
+	0x3f, 0x12, 0x02, 0x85, 0xf3, 0xdd, 0xc6, 0xde, 0xd8, 0xb9, 0xbd, 0xee, 0xee, 0xb9, 0x94, 0xa8,
+	0x0f, 0xf0, 0x0d, 0x10, 0x0f, 0xbc, 0xf0, 0x61, 0xfa, 0xd8, 0x47, 0x24, 0xde, 0x78, 0x42, 0x29,
+	0x1f, 0x04, 0xdd, 0xfe, 0xf1, 0x5d, 0xfc, 0xa7, 0x71, 0x45, 0xde, 0x6e, 0x67, 0x67, 0xe6, 0x37,
+	0xbb, 0x33, 0x7b, 0x33, 0x50, 0x39, 0xf5, 0x42, 0xaf, 0x83, 0x99, 0x3b, 0x68, 0xb8, 0xfa, 0xd3,
+	0x89, 0x18, 0x15, 0x14, 0xad, 0xf9, 0x7d, 0x1a, 0x07, 0x8e, 0x17, 0x11, 0xc7, 0x6c, 0x0c, 0x1a,
+	0x55, 0xb7, 0x43, 0x44, 0x37, 0x6e, 0x3b, 0x3e, 0x3d, 0x75, 0x07, 0x24, 0xc0, 0xd4, 0xa7, 0x24,
+	0x74, 0xa5, 0xea, 0x3d, 0x2f, 0x22, 0x2e, 0x8b, 0x7c, 0xb7, 0x8b, 0xbd, 0xbe, 0xe8, 0x2a, 0x37,
+	0xd5, 0xf5, 0x0e, 0xa5, 0x9d, 0x3e, 0x76, 0xe5, 0xaa, 0x1d, 0x1f, 0xbb, 0xf8, 0x34, 0x12, 0xcf,
+	0xf4, 0xe6, 0x86, 0xde, 0x4c, 0x2c, 0xbd, 0x30, 0xa4, 0xc2, 0x13, 0x84, 0x86, 0x5c, 0xef, 0xde,
+	0xcb, 0xb0, 0x3a, 0xb4, 0x43, 0x53, 0x1f, 0xc9, 0x4a, 0x2e, 0xe4, 0x97, 0x56, 0x7f, 0xef, 0x92,
+	0xd0, 0x22, 0x46, 0x8f, 0x49, 0x1f, 0xf3, 0xe4, 0xa8, 0xe6, 0x5b, 0x9b, 0x7e, 0x70, 0x89, 0xe9,
+	0x53, 0xca, 0x7a, 0x94, 0x05, 0xea, 0x9a, 0x86, 0x0b, 0x6d, 0xfc, 0xe1, 0x25, 0xc6, 0x82, 0x79,
+	0x21, 0xf7, 0xa9, 0xb6, 0x4e, 0x57, 0xca, 0xdc, 0xfe, 0x02, 0xca, 0x9f, 0xab, 0x68, 0x5a, 0xf8,
+	0x49, 0x8c, 0xb9, 0x40, 0x0f, 0x00, 0x74, 0x7c, 0x47, 0x24, 0xa8, 0xe4, 0xea, 0xd6, 0x76, 0xf9,
+	0x7e, 0xdd, 0x49, 0xd3, 0x31, 0x0c, 0x7e, 0xd0, 0x70, 0xb4, 0x69, 0x33, 0x68, 0x2d, 0x46, 0xe6,
+	0xd3, 0xfe, 0x08, 0x56, 0xf7, 0xbb, 0xd8, 0xef, 0x3d, 0xf4, 0xfa, 0x5e, 0xe8, 0x0f, 0xfd, 0xee,
+	0xc0, 0x8a, 0x4f, 0x43, 0xc1, 0x3c, 0x5f, 0x1c, 0x79, 0x41, 0xc0, 0x30, 0xe7, 0x15, 0xab, 0x6e,
+	0x6d, 0x2f, 0xb6, 0x96, 0x8d, 0x7c, 0x4f, 0x89, 0xed, 0x77, 0x60, 0xed, 0xa2, 0x07, 0x1e, 0xd1,
+	0x90, 0x63, 0x54, 0x81, 0x85, 0xb6, 0x12, 0x49, 0x4b, 0xab, 0x65, 0x96, 0xb6, 0x07, 0xab, 0xfb,
+	0x19, 0x27, 0x86, 0x79, 0x1b, 0x96, 0x22, 0x12, 0xe1, 0x3e, 0x09, 0xe5, 0x61, 0x14, 0x0e, 0x8c,
+	0xa8, 0x19, 0x4c, 0x0c, 0x2a, 0x37, 0x39, 0xa8, 0x17, 0x16, 0xa0, 0xaf, 0x31, 0x23, 0xc7, 0xcf,
+	0xf6, 0xbb, 0x71, 0xd8, 0x33, 0x88, 0x75, 0x58, 0xe4, 0x82, 0x61, 0xef, 0xd4, 0x00, 0xf2, 0xad,
+	0x6b, 0x4a, 0xd0, 0x0c, 0xd0, 0x5d, 0x58, 0xe6, 0x34, 0x66, 0x3e, 0x3e, 0xf2, 0x13, 0x1b, 0x73,
+	0xa1, 0x73, 0xad, 0x92, 0x12, 0x4b, 0x4f, 0x4a, 0x8f, 0x61, 0x1e, 0xf7, 0x45, 0xaa, 0x97, 0x57,
+	0x7a, 0x4a, 0x6c, 0xf4, 0x36, 0xa1, 0xd4, 0xf5, 0x78, 0xf7, 0x28, 0x20, 0x5c, 0xc8, 0x6b, 0x98,
+	0xab, 0x5b, 0xdb, 0xf3, 0xad, 0x62, 0x22, 0xfc, 0x58, 0xcb, 0xe4, 0x2d, 0x11, 0xc1, 0x3c, 0x81,
+	0x2b, 0xf3, 0x75, 0x6b, 0xbb, 0xd4, 0x32, 0x4b, 0xfb, 0x0f, 0x2b, 0x49, 0x4d, 0x1c, 0xf6, 0xf6,
+	0x19, 0xf6, 0x04, 0x0e, 0xfe, 0xcf, 0x19, 0xf2, 0x33, 0x9e, 0x21, 0x3f, 0x7a, 0x86, 0x4c, 0x78,
+	0x73, 0x17, 0xc3, 0xfb, 0xd9, 0x82, 0x9b, 0x5f, 0x0e, 0x0b, 0xf4, 0x50, 0x78, 0x22, 0xe6, 0x26,
+	0xc4, 0x4d, 0x28, 0xa5, 0xb5, 0x9b, 0xe6, 0xb2, 0x98, 0x0a, 0x9b, 0x01, 0xda, 0x83, 0x02, 0x97,
+	0x56, 0xba, 0x6c, 0x77, 0x32, 0x65, 0x9b, 0xa9, 0xfc, 0x41, 0xc3, 0x19, 0xc3, 0x68, 0x43, 0xfb,
+	0x7b, 0x80, 0x47, 0xb4, 0x6d, 0xa8, 0x65, 0xc8, 0x0d, 0x51, 0x39, 0x12, 0x8c, 0xbc, 0x8d, 0xfc,
+	0x9b, 0xbf, 0x8d, 0xbf, 0x73, 0xb0, 0xf2, 0x55, 0x14, 0x78, 0x02, 0xcf, 0x4c, 0x79, 0xf3, 0x17,
+	0x88, 0xee, 0x40, 0xd9, 0xef, 0x13, 0x1c, 0xa6, 0x35, 0x9d, 0x97, 0xce, 0x4b, 0x4a, 0xaa, 0x2b,
+	0xfa, 0x62, 0xda, 0xe7, 0x46, 0xd2, 0x7e, 0x07, 0xca, 0x7a, 0xd3, 0xf8, 0x98, 0x57, 0x3e, 0x94,
+	0xd4, 0xf8, 0x78, 0x30, 0xbc, 0xf2, 0x82, 0x8c, 0xf3, 0xed, 0x4c, 0x9c, 0xe9, 0xaf, 0x6a, 0xd0,
+	0x70, 0xbe, 0xa1, 0xac, 0xf7, 0x98, 0x8d, 0x5d, 0x38, 0x6a, 0x42, 0x89, 0x84, 0x1d, 0xcc, 0xc5,
+	0x91, 0xf6, 0xb3, 0x20, 0xfd, 0x6c, 0x4d, 0xf3, 0xd3, 0x94, 0xca, 0xda, 0x49, 0x91, 0x64, 0x56,
+	0xf7, 0x7f, 0x2f, 0x42, 0xf9, 0x33, 0xd5, 0x2c, 0x0e, 0x31, 0x1b, 0x10, 0x1f, 0xa3, 0x13, 0x28,
+	0xa8, 0x5a, 0x47, 0xd9, 0x0b, 0x4c, 0x3b, 0x8a, 0x93, 0xa6, 0xa1, 0x6a, 0x4f, 0x43, 0x3e, 0xa2,
+	0x6d, 0x7d, 0xcd, 0x76, 0xf5, 0x97, 0xbf, 0xfe, 0xfd, 0x2d, 0xb7, 0x66, 0x2f, 0xcb, 0xa6, 0x31,
+	0x68, 0xb8, 0x27, 0xb4, 0xed, 0x86, 0xf8, 0xe9, 0xfb, 0xd6, 0x2e, 0x22, 0x90, 0x6f, 0xc5, 0xe1,
+	0x15, 0x81, 0x36, 0x24, 0xe8, 0x86, 0xbd, 0x96, 0x05, 0x9d, 0x91, 0xe0, 0xb9, 0xcb, 0xe2, 0x10,
+	0xf5, 0x60, 0xee, 0x50, 0xd0, 0xe8, 0x8a, 0x58, 0x6f, 0x49, 0xd6, 0x4d, 0xfb, 0xfa, 0x18, 0x8b,
+	0x27, 0x10, 0x0c, 0xf9, 0x03, 0x2c, 0xae, 0x88, 0x55, 0x91, 0x2c, 0x84, 0x56, 0x46, 0x59, 0xe8,
+	0x09, 0x14, 0xd4, 0xcb, 0x40, 0x77, 0x27, 0x93, 0x46, 0xdf, 0xcd, 0x4c, 0xbc, 0x75, 0xc9, 0xbb,
+	0x5e, 0x1d, 0xe3, 0x25, 0x19, 0x7b, 0x0c, 0x85, 0x4f, 0xe5, 0xb4, 0x80, 0x6e, 0x38, 0x6a, 0x16,
+	0x70, 0x4c, 0x93, 0x77, 0x3e, 0x49, 0x06, 0x85, 0xea, 0x7a, 0x06, 0xc1, 0x22, 0xdf, 0x51, 0xea,
+	0xaa, 0xde, 0xec, 0x15, 0xe9, 0x1b, 0xd0, 0x35, 0x3d, 0x73, 0xfc, 0x84, 0x04, 0x14, 0x55, 0x94,
+	0x4a, 0x63, 0xe6, 0x93, 0x4c, 0xc1, 0xdb, 0x5b, 0x92, 0x50, 0xb3, 0x6f, 0x8d, 0x65, 0xe6, 0x4c,
+	0xbd, 0x16, 0x79, 0x8c, 0x13, 0x58, 0xca, 0x34, 0x26, 0xb4, 0x3d, 0x19, 0x3a, 0xde, 0xbb, 0xa6,
+	0x62, 0x6f, 0x49, 0xec, 0xaa, 0x5d, 0x36, 0xd8, 0x81, 0xb4, 0x4d, 0x58, 0x1c, 0x8a, 0xd9, 0x0e,
+	0x82, 0x76, 0x26, 0xc3, 0x26, 0x74, 0x99, 0xa9, 0xb4, 0xba, 0xa4, 0x55, 0xd3, 0xf2, 0x53, 0xfd,
+	0xc3, 0x57, 0xd6, 0x09, 0xf4, 0x57, 0x2b, 0xa1, 0xa6, 0x03, 0xc1, 0x74, 0xea, 0xd8, 0xd8, 0x51,
+	0xdd, 0x9d, 0x45, 0x55, 0xcd, 0x17, 0xf6, 0xae, 0x8c, 0x64, 0x0b, 0xd9, 0x26, 0x12, 0x3d, 0x5e,
+	0xb8, 0x67, 0xa3, 0x43, 0xc2, 0x73, 0xf4, 0x03, 0x2c, 0x1d, 0x60, 0xa1, 0xcb, 0x8c, 0x4f, 0x2d,
+	0xa0, 0xdb, 0xaf, 0xff, 0x6f, 0xf3, 0xf1, 0x07, 0x61, 0xb4, 0xd0, 0x8f, 0x00, 0x29, 0x01, 0x6d,
+	0x4d, 0x3e, 0xc7, 0xc5, 0xe1, 0xad, 0x5a, 0x7b, 0x3d, 0xce, 0x14, 0x14, 0xda, 0x18, 0xa1, 0xb9,
+	0x67, 0x69, 0xc7, 0x49, 0x9e, 0x22, 0x6a, 0xe1, 0x0e, 0xe1, 0x02, 0xb3, 0xb4, 0x51, 0xa2, 0xcd,
+	0x19, 0xba, 0xe9, 0xd4, 0x24, 0xd7, 0x24, 0xb8, 0x62, 0xaf, 0x1a, 0x70, 0xea, 0x81, 0x27, 0x29,
+	0xfe, 0x0e, 0x16, 0x0e, 0xb0, 0x48, 0x9a, 0xc4, 0xd4, 0xab, 0x9c, 0xce, 0xdf, 0xe3, 0x9c, 0x74,
+	0xc2, 0x53, 0x1c, 0x0a, 0x7b, 0x4d, 0x72, 0xca, 0xa8, 0x68, 0x38, 0xc9, 0x8f, 0xe1, 0x61, 0xe5,
+	0xe5, 0x79, 0xcd, 0xfa, 0xf3, 0xbc, 0x66, 0xfd, 0x73, 0x5e, 0xb3, 0x5e, 0xbc, 0xaa, 0x59, 0x2f,
+	0x5f, 0xd5, 0xac, 0x6f, 0x73, 0x83, 0x46, 0xbb, 0x20, 0x21, 0xef, 0xfe, 0x17, 0x00, 0x00, 0xff,
+	0xff, 0x5b, 0xd7, 0xb4, 0x1c, 0x8a, 0x0c, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -923,14 +733,13 @@ type ManagerServiceClient interface {
 	Get(ctx context.Context, in *JobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
 	Update(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*v12.JobProfile, error)
 	Health(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*rpc.HealthStatus, error)
-	UpdateStatus(ctx context.Context, in *StreamStatusRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	UpdateStatus(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	VerifyChunk(ctx context.Context, in *VerifyChunkRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	ChunkCreated(ctx context.Context, in *ChunkCreatedRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	CheckBalance(ctx context.Context, in *CheckBalanceRequest, opts ...grpc.CallOption) (*CheckBalanceResponse, error)
 	GetProfiles(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*v1.Profiles, error)
 	GetProfile(ctx context.Context, in *ProfileRequest, opts ...grpc.CallOption) (*v1.Profile, error)
 	RegisterTranscoder(ctx context.Context, in *v11.Transcoder, opts ...grpc.CallOption) (*types.Empty, error)
-	UpdateTranscoderStatus(ctx context.Context, in *TranscoderStatusRequest, opts ...grpc.CallOption) (*types.Empty, error)
 	GetWork(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*v11.Assignment, error)
 }
 
@@ -996,7 +805,7 @@ func (c *managerServiceClient) Health(ctx context.Context, in *types.Empty, opts
 	return out, nil
 }
 
-func (c *managerServiceClient) UpdateStatus(ctx context.Context, in *StreamStatusRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+func (c *managerServiceClient) UpdateStatus(ctx context.Context, in *UpdateJobRequest, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/UpdateStatus", in, out, opts...)
 	if err != nil {
@@ -1059,15 +868,6 @@ func (c *managerServiceClient) RegisterTranscoder(ctx context.Context, in *v11.T
 	return out, nil
 }
 
-func (c *managerServiceClient) UpdateTranscoderStatus(ctx context.Context, in *TranscoderStatusRequest, opts ...grpc.CallOption) (*types.Empty, error) {
-	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/UpdateTranscoderStatus", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *managerServiceClient) GetWork(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*v11.Assignment, error) {
 	out := new(v11.Assignment)
 	err := c.cc.Invoke(ctx, "/cloud.api.manager.v1.ManagerService/GetWork", in, out, opts...)
@@ -1085,14 +885,13 @@ type ManagerServiceServer interface {
 	Get(context.Context, *JobRequest) (*v12.JobProfile, error)
 	Update(context.Context, *UpdateJobRequest) (*v12.JobProfile, error)
 	Health(context.Context, *types.Empty) (*rpc.HealthStatus, error)
-	UpdateStatus(context.Context, *StreamStatusRequest) (*types.Empty, error)
+	UpdateStatus(context.Context, *UpdateJobRequest) (*types.Empty, error)
 	VerifyChunk(context.Context, *VerifyChunkRequest) (*types.Empty, error)
 	ChunkCreated(context.Context, *ChunkCreatedRequest) (*types.Empty, error)
 	CheckBalance(context.Context, *CheckBalanceRequest) (*CheckBalanceResponse, error)
 	GetProfiles(context.Context, *types.Empty) (*v1.Profiles, error)
 	GetProfile(context.Context, *ProfileRequest) (*v1.Profile, error)
 	RegisterTranscoder(context.Context, *v11.Transcoder) (*types.Empty, error)
-	UpdateTranscoderStatus(context.Context, *TranscoderStatusRequest) (*types.Empty, error)
 	GetWork(context.Context, *types.Empty) (*v11.Assignment, error)
 }
 
@@ -1209,7 +1008,7 @@ func _ManagerService_Health_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _ManagerService_UpdateStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StreamStatusRequest)
+	in := new(UpdateJobRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1221,7 +1020,7 @@ func _ManagerService_UpdateStatus_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/cloud.api.manager.v1.ManagerService/UpdateStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServiceServer).UpdateStatus(ctx, req.(*StreamStatusRequest))
+		return srv.(ManagerServiceServer).UpdateStatus(ctx, req.(*UpdateJobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1334,24 +1133,6 @@ func _ManagerService_RegisterTranscoder_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ManagerService_UpdateTranscoderStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TranscoderStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ManagerServiceServer).UpdateTranscoderStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.manager.v1.ManagerService/UpdateTranscoderStatus",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ManagerServiceServer).UpdateTranscoderStatus(ctx, req.(*TranscoderStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ManagerService_GetWork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(types.Empty)
 	if err := dec(in); err != nil {
@@ -1427,47 +1208,12 @@ var _ManagerService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _ManagerService_RegisterTranscoder_Handler,
 		},
 		{
-			MethodName: "UpdateTranscoderStatus",
-			Handler:    _ManagerService_UpdateTranscoderStatus_Handler,
-		},
-		{
 			MethodName: "GetWork",
 			Handler:    _ManagerService_GetWork_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "manager/v1/manager.proto",
-}
-
-func (m *UpdateProfileRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UpdateProfileRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.StreamId != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintManager(dAtA, i, uint64(m.StreamId))
-	}
-	if m.ProfileId != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintManager(dAtA, i, uint64(m.ProfileId))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
 }
 
 func (m *ProfileRequest) Marshal() (dAtA []byte, err error) {
@@ -1702,86 +1448,6 @@ func (m *TranscoderStatusRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *StreamStatusRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *StreamStatusRequest) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Id) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintManager(dAtA, i, uint64(len(m.Id)))
-		i += copy(dAtA[i:], m.Id)
-	}
-	if len(m.TranscoderId) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintManager(dAtA, i, uint64(len(m.TranscoderId)))
-		i += copy(dAtA[i:], m.TranscoderId)
-	}
-	if m.Status != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintManager(dAtA, i, uint64(m.Status))
-	}
-	if m.Refunded {
-		dAtA[i] = 0x20
-		i++
-		if m.Refunded {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i++
-	}
-	if m.IngestStatus != 0 {
-		dAtA[i] = 0x28
-		i++
-		i = encodeVarintManager(dAtA, i, uint64(m.IngestStatus))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *JobResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *JobResponse) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.RtmpInputUrl) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintManager(dAtA, i, uint64(len(m.RtmpInputUrl)))
-		i += copy(dAtA[i:], m.RtmpInputUrl)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
 func (m *JobRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1857,6 +1523,16 @@ func (m *UpdateJobRequest) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintManager(dAtA, i, uint64(len(m.StreamAddress)))
 		i += copy(dAtA[i:], m.StreamAddress)
 	}
+	if m.Status != 0 {
+		dAtA[i] = 0x30
+		i++
+		i = encodeVarintManager(dAtA, i, uint64(m.Status))
+	}
+	if m.IngestStatus != 0 {
+		dAtA[i] = 0x38
+		i++
+		i = encodeVarintManager(dAtA, i, uint64(m.IngestStatus))
+	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
@@ -1872,24 +1548,6 @@ func encodeVarintManager(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func (m *UpdateProfileRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.StreamId != 0 {
-		n += 1 + sovManager(uint64(m.StreamId))
-	}
-	if m.ProfileId != 0 {
-		n += 1 + sovManager(uint64(m.ProfileId))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
 func (m *ProfileRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2026,51 +1684,6 @@ func (m *TranscoderStatusRequest) Size() (n int) {
 	return n
 }
 
-func (m *StreamStatusRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Id)
-	if l > 0 {
-		n += 1 + l + sovManager(uint64(l))
-	}
-	l = len(m.TranscoderId)
-	if l > 0 {
-		n += 1 + l + sovManager(uint64(l))
-	}
-	if m.Status != 0 {
-		n += 1 + sovManager(uint64(m.Status))
-	}
-	if m.Refunded {
-		n += 2
-	}
-	if m.IngestStatus != 0 {
-		n += 1 + sovManager(uint64(m.IngestStatus))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *JobResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.RtmpInputUrl)
-	if l > 0 {
-		n += 1 + l + sovManager(uint64(l))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
 func (m *JobRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2114,6 +1727,12 @@ func (m *UpdateJobRequest) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovManager(uint64(l))
 	}
+	if m.Status != 0 {
+		n += 1 + sovManager(uint64(m.Status))
+	}
+	if m.IngestStatus != 0 {
+		n += 1 + sovManager(uint64(m.IngestStatus))
+	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
 	}
@@ -2132,95 +1751,6 @@ func sovManager(x uint64) (n int) {
 }
 func sozManager(x uint64) (n int) {
 	return sovManager(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *UpdateProfileRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowManager
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UpdateProfileRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UpdateProfileRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StreamId", wireType)
-			}
-			m.StreamId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.StreamId |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ProfileId", wireType)
-			}
-			m.ProfileId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ProfileId |= (v1.ProfileId(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipManager(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthManager
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
 }
 func (m *ProfileRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -2915,253 +2445,6 @@ func (m *TranscoderStatusRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *StreamStatusRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowManager
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: StreamStatusRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: StreamStatusRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthManager
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Id = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TranscoderId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthManager
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TranscoderId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			}
-			m.Status = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Status |= (v12.WorkOrderStatus(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Refunded", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Refunded = bool(v != 0)
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IngestStatus", wireType)
-			}
-			m.IngestStatus = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.IngestStatus |= (v12.IngestStatus(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipManager(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthManager
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *JobResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowManager
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: JobResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: JobResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RtmpInputUrl", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowManager
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthManager
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RtmpInputUrl = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipManager(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthManager
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *JobRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3415,6 +2698,44 @@ func (m *UpdateJobRequest) Unmarshal(dAtA []byte) error {
 			}
 			m.StreamAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManager
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= (v12.WorkOrderStatus(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IngestStatus", wireType)
+			}
+			m.IngestStatus = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowManager
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.IngestStatus |= (v12.IngestStatus(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipManager(dAtA[iNdEx:])

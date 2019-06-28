@@ -57,7 +57,7 @@ service ManagerService {
     };
   }
 
-  rpc UpdateStatus(StreamStatusRequest) returns (google.protobuf.Empty){
+  rpc UpdateStatus(UpdateJobRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
       post: "/api/v1/job/{id}/{status}"
       body: "*"
@@ -104,12 +104,6 @@ service ManagerService {
     };
   }; 
 
-  rpc UpdateTranscoderStatus(TranscoderStatusRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/transcoder/{transcoder_id}/{status}"
-    };
-  }; 
-
   rpc GetWork(google.protobuf.Empty) returns (cloud.api.transcoder.v1.Assignment) {
     option (google.api.http) = {
       get: "/api/v1/work"
@@ -117,10 +111,6 @@ service ManagerService {
   };
 }
 
-message UpdateProfileRequest {
-  int64 stream_id = 1;
-  cloud.api.profiles.v1.ProfileId profile_id = 2;
-}
 
 message ProfileRequest {
   cloud.api.profiles.v1.ProfileId profile_id = 2;
@@ -159,17 +149,6 @@ message TranscoderStatusRequest {
   cloud.api.transcoder.v1.TranscoderStatus status = 2;
 }
 
-message StreamStatusRequest {
-  string id = 1;
-  string transcoder_id = 2;
-  cloud.api.workorder.v1.WorkOrderStatus status = 3;
-  bool refunded = 4;
-  cloud.api.workorder.v1.IngestStatus ingest_status = 5;
-}
-
-message JobResponse {
-  string rtmp_input_url = 1;
-}
 
 message JobRequest {
   string id = 1;
@@ -182,5 +161,7 @@ message UpdateJobRequest {
   string client_address = 3;
   int64 stream_id = 4;
   string stream_address = 5;
+  cloud.api.workorder.v1.WorkOrderStatus status = 6;
+  cloud.api.workorder.v1.IngestStatus ingest_status = 7;
 }
 

@@ -228,8 +228,6 @@ func (s *Service) transcode(
 
 	stop <- struct{}{}
 
-	s.manager.UpdateTranscoderStatus(s.ctx, &manager_v1.TranscoderStatusRequest{TranscoderId: uid, Status: transcoder_v1.TranscoderStatusAvailable})
-
 	s.log.Info("transcode complete")
 
 }

@@ -234,7 +234,7 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 }
 
 func (s *Service) updateStatus(Id string, status workorder_v1.WorkOrderStatus) {
-	_, err := s.manager.UpdateStatus(s.ctx, &manager_v1.StreamStatusRequest{
+	_, err := s.manager.UpdateStatus(s.ctx, &manager_v1.UpdateJobRequest{
 		Id:     Id,
 		Status: status,
 	})
