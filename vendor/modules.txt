@@ -1,4 +1,4 @@
-# cloud.google.com/go v0.40.0
+# cloud.google.com/go v0.41.0
 cloud.google.com/go/compute/metadata
 # github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
 github.com/StackExchange/wmi
@@ -69,13 +69,13 @@ github.com/golang/snappy
 github.com/google/uuid
 # github.com/grafov/m3u8 v0.6.1
 github.com/grafov/m3u8
-# github.com/grpc-ecosystem/grpc-gateway v1.9.2
+# github.com/grpc-ecosystem/grpc-gateway v1.9.3
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/grpc-ecosystem/grpc-gateway/internal
 # github.com/hashicorp/golang-lru v0.5.1
 github.com/hashicorp/golang-lru/simplelru
-# github.com/jinzhu/gorm v1.9.9
+# github.com/jinzhu/gorm v1.9.10
 github.com/jinzhu/gorm
 # github.com/jinzhu/inflection v1.0.0
 github.com/jinzhu/inflection
@@ -110,12 +110,12 @@ github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
-# github.com/videocoin/cloud-api v0.0.27
+# github.com/videocoin/cloud-api v0.0.28
+github.com/videocoin/cloud-api/jobs/v1
 github.com/videocoin/cloud-api/manager/v1
 github.com/videocoin/cloud-api/profiles/v1
 github.com/videocoin/cloud-api/transcoder/v1
 github.com/videocoin/cloud-api/verifier/v1
-github.com/videocoin/cloud-api/workorder/v1
 github.com/videocoin/cloud-api/rpc
 # github.com/videocoin/cloud-pkg v0.0.2
 github.com/videocoin/cloud-pkg/bcops
@@ -139,11 +139,11 @@ go.opencensus.io/trace/internal
 go.opencensus.io/trace/tracestate
 go.opencensus.io/resource
 go.opencensus.io
-# golang.org/x/crypto v0.0.0-20190617133340-57b3e21c3d56
+# golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 golang.org/x/crypto/sha3
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
-# golang.org/x/net v0.0.0-20190613194153-d28f0bde5980
+# golang.org/x/net v0.0.0-20190628185345-da137c7871d7
 golang.org/x/net/context
 golang.org/x/net/trace
 golang.org/x/net/websocket
@@ -159,7 +159,7 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20190616124812-15dcb6c0061f
+# golang.org/x/sys v0.0.0-20190626221950-04f50cda93cb
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 golang.org/x/sys/cpu
@@ -168,7 +168,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/transform
-# google.golang.org/api v0.6.0
+# google.golang.org/api v0.7.0
 google.golang.org/api/storage/v1
 google.golang.org/api/gensupport
 google.golang.org/api/googleapi
@@ -189,7 +189,7 @@ google.golang.org/appengine/internal/base
 google.golang.org/appengine/internal/datastore
 google.golang.org/appengine/internal/log
 google.golang.org/appengine/internal/remote_api
-# google.golang.org/genproto v0.0.0-20190611190212-a7e196e89fd3
+# google.golang.org/genproto v0.0.0-20190627203621-eb59cef1c072
 google.golang.org/genproto/googleapis/api/httpbody
 google.golang.org/genproto/protobuf/field_mask
 google.golang.org/genproto/googleapis/rpc/status

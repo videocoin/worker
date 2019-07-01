@@ -8,7 +8,7 @@ import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/videocoin/cloud-api/profiles/v1/profiles.proto";
-import "github.com/videocoin/cloud-api/workorder/v1/workorder.proto";
+import "github.com/videocoin/cloud-api/jobs/v1/job.proto";
 import "github.com/videocoin/cloud-api/transcoder/v1/transcoder.proto";
 
 option go_package = "v1";
@@ -19,32 +19,32 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.messagename_all) = true;
 
 service ManagerService {
-  rpc Create(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+  rpc Create(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
       post: "/api/v1/job/new"
       body: "*"
     };
   };
 
-  rpc Run(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+  rpc Run(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
       post: "/api/v1/job/{id}/run"
     };
   };
 
-  rpc Stop(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+  rpc Stop(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
       post: "/api/v1/job/{id}/stop"
     };
   };
 
-  rpc Get(JobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+  rpc Get(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
       get: "/api/v1/job/{id}"
     };
   };
 
-  rpc Update(UpdateJobRequest) returns (cloud.api.workorder.v1.JobProfile) {
+  rpc Update(UpdateJobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
       put: "/api/v1/job/{id}"
       body: "*"
@@ -161,7 +161,7 @@ message UpdateJobRequest {
   string client_address = 3;
   int64 stream_id = 4;
   string stream_address = 5;
-  cloud.api.workorder.v1.WorkOrderStatus status = 6;
-  cloud.api.workorder.v1.IngestStatus ingest_status = 7;
+  cloud.api.jobs.v1.JobStatus status = 6;
+  cloud.api.jobs.v1.InputStatus input_status = 7;
 }
 

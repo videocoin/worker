@@ -10,12 +10,12 @@ import (
 )
 
 // CheckErrs used to ensure a job is valid before passing to transcoder
-func (w *WorkOrder) CheckErrs() []error {
+func (j *Job) CheckErrs() []error {
 	var errs = make([]error, 0)
 
 	err := fmt.Errorf("invalid profile")
 	for _, p := range []profiles_v1.ProfileId{profiles_v1.ProfileIdFHD, profiles_v1.ProfileIdHD, profiles_v1.ProfileIdSD} {
-		if p == w.ProfileId {
+		if p == j.ProfileId {
 			err = nil
 		}
 	}
@@ -24,22 +24,22 @@ func (w *WorkOrder) CheckErrs() []error {
 		errs = append(errs, err)
 	}
 
-	if w.ClientAddress == "" {
+	if j.ClientAddress == "" {
 		errs = append(errs, fmt.Errorf("invalid client address"))
 	}
 
-	if w.StreamId <= 0 {
+	if j.StreamId <= 0 {
 		errs = append(errs, fmt.Errorf("invalid stream id"))
 	}
 
-	if w.StreamAddress == "" {
+	if j.StreamAddress == "" {
 		errs = append(errs, fmt.Errorf("invalid stream address"))
 	}
 
 	return errs
 }
 
-func (w *WorkOrder) BeforeCreate(scope *gorm.Scope) error {
+func (j *Job) BeforeCreate(scope *gorm.Scope) error {
 	uuid := uuid.NewV4()
 
 	err := scope.SetColumn("id", uuid.String())

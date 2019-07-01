@@ -16,9 +16,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
+	v1_0 "github.com/videocoin/cloud-api/jobs/v1"
 	"github.com/videocoin/cloud-api/profiles/v1"
 	v1_1 "github.com/videocoin/cloud-api/transcoder/v1"
-	v1_0 "github.com/videocoin/cloud-api/workorder/v1"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -234,13 +234,13 @@ func request_ManagerService_UpdateStatus_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "status")
 	}
 
-	e, err = runtime.Enum(val, v1_0.WorkOrderStatus_value)
+	e, err = runtime.Enum(val, v1_0.JobStatus_value)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "status", err)
 	}
 
-	protoReq.Status = v1_0.WorkOrderStatus(e)
+	protoReq.Status = v1_0.JobStatus(e)
 
 	msg, err := client.UpdateStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
