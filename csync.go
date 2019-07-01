@@ -229,7 +229,6 @@ func (s *Service) process(ch chan Task, job *jobs_v1.Job) {
 		if err := s.handleChunk(&t); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}
-
 	}
 }
 
