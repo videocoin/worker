@@ -13,17 +13,17 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fsnotify/fsnotify"
+	jobs_v1 "github.com/videocoin/cloud-api/jobs/v1"
 	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
-	workorder_v1 "github.com/videocoin/cloud-api/workorder/v1"
 
 	"github.com/grafov/m3u8"
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorder_v1.WorkOrder, dir string, bitrate uint32) {
-	var jobChan = make(chan Job, 10)
-	go s.process(jobChan, workOrder)
+func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, dir string, bitrate uint32) {
+	var ch = make(chan Task, 10)
+	go s.process(ch, job)
 
 	playlist, err := m3u8.NewMediaPlaylist(100, 200)
 	if err != nil {
@@ -41,7 +41,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 
 	done := make(chan struct{})
 
-	walletHex := common.HexToAddress(workOrder.StreamAddress)
+	walletHex := common.HexToAddress(job.StreamAddress)
 
 	written := make(map[string]bool)
 
@@ -65,8 +65,8 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 					chunkNum := getChunkNum(chunk)
 
 					// Add job to the job channel to be worked on later
-					jobChan <- Job{
-						Id:              workOrder.Id,
+					ch <- Task{
+						Id:              job.Id,
 						ChunksDir:       dir,
 						InputChunkName:  chunk,
 						Bitrate:         bitrate,
@@ -75,8 +75,8 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 						InputID:         chunkNum,
 						OutputChunkName: fmt.Sprintf("%d.ts", chunkNum),
 						Wallet:          walletHex,
-						StreamID:        big.NewInt(workOrder.StreamId),
-						StreamAddress:   workOrder.StreamAddress,
+						StreamID:        big.NewInt(job.StreamId),
+						StreamAddress:   job.StreamAddress,
 						cmd:             cmd,
 						stopChan:        stop,
 					}
@@ -97,7 +97,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 					s.log.Errorf("failed to remove dir [ %s ]: %s", dir, err.Error())
 				}
 				watcher.Close()
-				close(jobChan)
+				close(ch)
 
 			}
 		}
@@ -112,17 +112,17 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 }
 
 // handleChunk Appends to playlist, generates chunk id, calls verifier, uploads result
-func (s *Service) handleChunk(job *Job) error {
-	chunkLoc := path.Join(job.ChunksDir, job.InputChunkName)
-	uploadPath := fmt.Sprintf("%s/%d", job.Id, job.Bitrate)
+func (s *Service) handleChunk(task *Task) error {
+	chunkLoc := path.Join(task.ChunksDir, task.InputChunkName)
+	uploadPath := fmt.Sprintf("%s/%d", task.Id, task.Bitrate)
 
-	if job.InputChunkName == "0.ts" {
+	if task.InputChunkName == "0.ts" {
 		duration, err := s.duration(chunkLoc)
 		if err != nil {
 			duration = 2.0
 		}
 
-		job.Playlist.TargetDuration = duration
+		task.Playlist.TargetDuration = duration
 	}
 
 	duration, err := s.duration(chunkLoc)
@@ -130,7 +130,7 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	if err = job.Playlist.Append(job.OutputChunkName, duration, ""); err != nil {
+	if err = task.Playlist.Append(task.OutputChunkName, duration, ""); err != nil {
 		return err
 	}
 
@@ -140,24 +140,24 @@ func (s *Service) handleChunk(job *Job) error {
 	}
 
 	// Upload chunk
-	if err = s.upload(path.Join(uploadPath, job.OutputChunkName), chunk); err != nil {
+	if err = s.upload(path.Join(uploadPath, task.OutputChunkName), chunk); err != nil {
 		return err
 	}
 
 	// Upload playlist
-	if err = s.upload(path.Join(uploadPath, "index.m3u8"), job.Playlist.Encode()); err != nil {
+	if err = s.upload(path.Join(uploadPath, "index.m3u8"), task.Playlist.Encode()); err != nil {
 		return err
 	}
 
-	tx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
+	tx, err := s.submitProof(task.StreamAddress, task.Bitrate, task.InputID, task.OutputID)
 	if err != nil {
 		return err
 	}
 
-	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.Id, job.InputChunkName)
-	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.Id, job.Bitrate, job.OutputChunkName)
+	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, task.Id, task.InputChunkName)
+	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, task.Id, task.Bitrate, task.OutputChunkName)
 
-	go s.verify(tx, job, inputChunk, outputChunk)
+	go s.verify(tx, task, inputChunk, outputChunk)
 
 	return nil
 }
@@ -173,13 +173,13 @@ func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunk
 }
 
 // verifyChunk calls verifier with input and output chunk urls
-func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL string) error {
+func (s *Service) verify(tx *types.Transaction, task *Task, localFile, outputURL string) error {
 	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
 		TxHash:         tx.Hash().Hex(),
-		StreamId:       job.StreamID.Int64(),
-		Bitrate:        job.Bitrate,
-		InputId:        job.InputID.Uint64(),
-		OutputId:       job.OutputID.Uint64(),
+		StreamId:       task.StreamID.Int64(),
+		Bitrate:        task.Bitrate,
+		InputId:        task.InputID.Uint64(),
+		OutputId:       task.OutputID.Uint64(),
 		SourceChunkUrl: localFile,
 		ResultChunkUrl: outputURL,
 	})
@@ -188,52 +188,52 @@ func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL s
 		s.log.Errorf("failed to call verifier: %s", err.Error())
 	}
 
-	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: job.StreamAddress})
+	balance, err := s.manager.CheckBalance(context.Background(), &manager_v1.CheckBalanceRequest{ContractAddress: task.StreamAddress})
 	if err != nil {
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	resp, err := s.manager.Get(context.Background(), &manager_v1.JobRequest{Id: job.Id})
+	resp, err := s.manager.Get(context.Background(), &manager_v1.JobRequest{Id: task.Id})
 	if err != nil {
 		s.log.Warnf("failed to get current job status: %s", err.Error())
 	}
 
-	if balance.Balance <= 0 || resp.Status == workorder_v1.WorkOrderStatusComplete /* job has been reset */ {
-		_ = job.cmd.Process.Kill()
-		job.stopChan <- struct{}{}
+	if balance.Balance <= 0 || resp.Status == jobs_v1.JobStatusCompleted /* job has been reset */ {
+		_ = task.cmd.Process.Kill()
+		task.stopChan <- struct{}{}
 	}
 
 	return err
 }
 
-func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
-	for len(jobChan) < 2 {
+func (s *Service) process(ch chan Task, job *jobs_v1.Job) {
+	for len(ch) < 2 {
 		time.Sleep(1 * time.Second)
 	}
 
-	s.updateStatus(workOrder.Id, workorder_v1.WorkOrderStatusReady)
+	s.updateStatus(job.Id, jobs_v1.JobStatusReady)
 
 	for {
-		for len(jobChan) < 2 {
+		for len(ch) < 2 {
 			time.Sleep(500 * time.Millisecond)
 		}
 
-		j := <-jobChan
+		t := <-ch
 
 		go func() {
-			if err := s.chunkCreated(&j); err != nil {
+			if err := s.chunkCreated(&t); err != nil {
 				s.log.Errorf("failed to register chunk: %s", err.Error())
 			}
 		}()
 
-		if err := s.handleChunk(&j); err != nil {
+		if err := s.handleChunk(&t); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}
 
 	}
 }
 
-func (s *Service) updateStatus(Id string, status workorder_v1.WorkOrderStatus) {
+func (s *Service) updateStatus(Id string, status jobs_v1.JobStatus) {
 	_, err := s.manager.UpdateStatus(s.ctx, &manager_v1.UpdateJobRequest{
 		Id:     Id,
 		Status: status,
@@ -244,12 +244,12 @@ func (s *Service) updateStatus(Id string, status workorder_v1.WorkOrderStatus) {
 	}
 }
 
-func (s *Service) chunkCreated(j *Job) error {
+func (s *Service) chunkCreated(t *Task) error {
 	_, err := s.manager.ChunkCreated(s.ctx, &manager_v1.ChunkCreatedRequest{
-		StreamId:      j.StreamID.Int64(),
-		SourceChunkId: j.InputID.Int64(),
-		ResultChunkId: j.OutputID.Int64(),
-		Bitrate:       j.Bitrate,
+		StreamId:      t.StreamID.Int64(),
+		SourceChunkId: t.InputID.Int64(),
+		ResultChunkId: t.OutputID.Int64(),
+		Bitrate:       t.Bitrate,
 	})
 
 	return err

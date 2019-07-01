@@ -24,8 +24,8 @@ const (
 )
 
 type (
-	// Job used to queue up chunk work
-	Job struct {
+	// Task used to queue up chunk work
+	Task struct {
 		Id              string
 		Bitrate         uint32
 		InputChunkName  string

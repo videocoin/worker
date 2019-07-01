@@ -179,10 +179,10 @@ func (s *Service) pollForWork(uid string) {
 }
 
 func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error {
-	dir := path.Join(s.cfg.OutputDir, a.Workorder.Id)
+	dir := path.Join(s.cfg.OutputDir, a.Job.Id)
 	m3u8 := path.Join(dir, "index.m3u8")
 
-	cmd := buildCmd(a.Workorder.TranscodeInputUrl, dir, a.Profile)
+	cmd := buildCmd(a.Job.TranscodeInputUrl, dir, a.Profile)
 	var stopChan = make(chan struct{})
 
 	fullDir := fmt.Sprintf("%s/%d", dir, a.Profile.Bitrate)
@@ -192,17 +192,17 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 		return err
 	}
 
-	go s.syncDir(stopChan, cmd, a.Workorder, fullDir, a.Profile.Bitrate)
+	go s.syncDir(stopChan, cmd, a.Job, fullDir, a.Profile.Bitrate)
 
-	if err := s.generatePlaylist(a.Workorder.Id, m3u8, a.Profile.Bitrate); err != nil {
+	if err := s.generatePlaylist(a.Job.Id, m3u8, a.Profile.Bitrate); err != nil {
 		return err
 	}
 
 	s.transcode(cmd,
 		stopChan,
-		a.Workorder.TranscodeInputUrl,
-		a.Workorder.StreamAddress,
-		a.Workorder.Id,
+		a.Job.TranscodeInputUrl,
+		a.Job.StreamAddress,
+		a.Job.Id,
 		uid,
 	)
 
