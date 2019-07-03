@@ -211,6 +211,7 @@ func (s *Service) process(ch chan Task, job *jobs_v1.Job) {
 		time.Sleep(1 * time.Second)
 	}
 
+	s.log.Infof("updating status: id: %s", job.Id)
 	s.updateStatus(job.Id, jobs_v1.JobStatusReady)
 
 	for {
@@ -232,14 +233,14 @@ func (s *Service) process(ch chan Task, job *jobs_v1.Job) {
 	}
 }
 
-func (s *Service) updateStatus(Id string, status jobs_v1.JobStatus) {
+func (s *Service) updateStatus(id string, status jobs_v1.JobStatus) {
 	_, err := s.manager.UpdateStatus(s.ctx, &manager_v1.UpdateJobRequest{
-		Id:     Id,
+		Id:     id,
 		Status: status,
 	})
 
 	if err != nil {
-		s.log.Errorf("failed to update stream status: %s", err.Error())
+		s.log.Errorf("failed to update stream status: %s with id: %s", err.Error(), id)
 	}
 }
 
