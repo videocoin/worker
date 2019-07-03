@@ -44,6 +44,7 @@ service ManagerService {
     };
   };
 
+
   rpc Update(UpdateJobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
       put: "/api/v1/job/{id}"
@@ -60,21 +61,6 @@ service ManagerService {
   rpc UpdateStatus(UpdateJobRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
       post: "/api/v1/job/{id}/{status}"
-      body: "*"
-    };
-  };
-
-  rpc VerifyChunk(VerifyChunkRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/verify"
-      body: "*"
-    };
-  };
-
-
-  rpc ChunkCreated(ChunkCreatedRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/chunk_created"
       body: "*"
     };
   };
@@ -97,18 +83,21 @@ service ManagerService {
     };
   };
 
-  rpc RegisterTranscoder(cloud.api.transcoder.v1.Transcoder) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/transcoders"
-      body: "*"
-    };
-  }; 
 
   rpc GetWork(google.protobuf.Empty) returns (cloud.api.transcoder.v1.Assignment) {
     option (google.api.http) = {
       get: "/api/v1/work"
     };
   };
+
+  rpc GetByStreamId(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {};
+
+  rpc VerifyChunk(VerifyChunkRequest) returns (google.protobuf.Empty) {};
+
+  rpc ChunkCreated(ChunkCreatedRequest) returns (google.protobuf.Empty) {};
+
+  rpc RegisterTranscoder(cloud.api.transcoder.v1.Transcoder) returns (google.protobuf.Empty) {};
+
 }
 
 
@@ -152,16 +141,19 @@ message TranscoderStatusRequest {
 
 message JobRequest {
   string id = 1;
-  cloud.api.profiles.v1.ProfileId profile_id = 3;
+  string pipeline_id = 2;
+  int64 stream_id = 3;
+  cloud.api.profiles.v1.ProfileId profile_id = 4;
 }
 
 message UpdateJobRequest {
   string id = 1;
   cloud.api.profiles.v1.ProfileId profile_id = 2;
-  string client_address = 3;
-  int64 stream_id = 4;
-  string stream_address = 5;
-  cloud.api.jobs.v1.JobStatus status = 6;
-  cloud.api.jobs.v1.InputStatus input_status = 7;
+  string pipeline_id = 3;
+  string client_address = 4;
+  int64 stream_id = 5;
+  string stream_address = 6;
+  cloud.api.jobs.v1.JobStatus status = 7;
+  cloud.api.jobs.v1.InputStatus input_status = 8;
 }
 

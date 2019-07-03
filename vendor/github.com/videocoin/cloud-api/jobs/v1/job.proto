@@ -37,16 +37,16 @@ enum InputStatus {
 }
 
 message Job {
-    string id = 1 [ 
-        (gogoproto.moretags) = "gorm:\"type:uuid;primary_key\"" 
+    string id = 1 [
+        (gogoproto.moretags) = "gorm:\"type:char(36);\""
     ];
 
-    bytes chunks = 2 [ 
-        (gogoproto.moretags) = "gorm:\"chunks;type:json\"sql:\"type:json\"" 
+    bytes chunks = 2 [
+        (gogoproto.moretags) = "gorm:\"chunks;type:json\"sql:\"type:json\""
     ];
 
-    bytes worker = 3 [ 
-        (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\"" 
+    bytes worker = 3 [
+        (gogoproto.moretags) = "gorm:\"worker;type:binary(32);DEFAULT:NULL\"sql:\"type:binary(32);DEFAULT:null\""
     ];
 
     string pipeline_id = 4;
@@ -73,7 +73,7 @@ message JobProfile {
 
     int64 stream_id = 7;
     string stream_address = 8;
-    
+
     JobStatus status = 9;
     InputStatus input_status = 10;
 }
