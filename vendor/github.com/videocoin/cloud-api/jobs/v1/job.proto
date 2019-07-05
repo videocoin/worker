@@ -64,6 +64,11 @@ message Job {
     InputStatus input_status = 17;
 }
 
+message Jobs {
+    repeated Job jobs = 1;
+}
+
+
 message JobProfile {
     string id = 1;
     string pipeline_id = 2;

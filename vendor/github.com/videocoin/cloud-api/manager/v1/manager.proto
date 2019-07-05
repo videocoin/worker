@@ -21,33 +21,33 @@ option (gogoproto.messagename_all) = true;
 service ManagerService {
   rpc Create(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
-      post: "/api/v1/job/new"
+      post: "/api/v1/jobs/new"
       body: "*"
     };
   };
 
   rpc Run(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
-      post: "/api/v1/job/{id}/run"
+      post: "/api/v1/jobs/{id}/run"
     };
   };
 
   rpc Stop(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
-      post: "/api/v1/job/{id}/stop"
+      post: "/api/v1/jobs/{id}/stop"
     };
   };
 
   rpc Get(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
-      get: "/api/v1/job/{id}"
+      get: "/api/v1/jobs/{id}"
     };
   };
 
 
   rpc Update(UpdateJobRequest) returns (cloud.api.jobs.v1.JobProfile) {
     option (google.api.http) = {
-      put: "/api/v1/job/{id}"
+      put: "/api/v1/jobs/{id}"
       body: "*"
     };
   };
@@ -60,7 +60,7 @@ service ManagerService {
 
   rpc UpdateStatus(UpdateJobRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/v1/job/{id}/{status}"
+      post: "/api/v1/jobs/{id}/{status}"
       body: "*"
     };
   };
@@ -89,6 +89,9 @@ service ManagerService {
       get: "/api/v1/work"
     };
   };
+
+
+  rpc GetAllJobsByPipelineId(JobRequest) returns (cloud.api.jobs.v1.JobProfiles) {};
 
   rpc GetByStreamId(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {};
 

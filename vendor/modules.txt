@@ -110,7 +110,7 @@ github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
-# github.com/videocoin/cloud-api v0.1.22-0.20190702235012-4655e5db1580
+# github.com/videocoin/cloud-api v0.1.128
 github.com/videocoin/cloud-api/jobs/v1
 github.com/videocoin/cloud-api/manager/v1
 github.com/videocoin/cloud-api/profiles/v1
