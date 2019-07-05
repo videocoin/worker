@@ -206,6 +206,13 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 		uid,
 	)
 
+	instance, err := s.createStreamInstance(a.Job.StreamAddress)
+	if err != nil {
+		return err
+	}
+
+	instance.Refund(s.bcAuth)
+
 	return nil
 }
 
@@ -269,8 +276,8 @@ func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
 		s.log.Errorf("failed to create new stream instance: %s", err.Error())
 		return nil, err
 	}
-
 	return streamInstance, nil
+
 }
 
 func (s *Service) wait() {
