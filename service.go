@@ -122,7 +122,9 @@ func Start() error {
 
 	s.register(uid)
 
-	s.pollForWork(uid)
+	s.log.Infof("transcoder_id: %s", uid)
+
+	s.pollForWork()
 
 	return nil
 }
@@ -163,7 +165,7 @@ func (s *Service) register(uid string) {
 	}
 }
 
-func (s *Service) pollForWork(uid string) {
+func (s *Service) pollForWork() {
 	s.log.Info("polling for work")
 	ticker := time.NewTicker(5 * time.Second)
 	for range ticker.C {
@@ -174,11 +176,11 @@ func (s *Service) pollForWork(uid string) {
 
 		s.log.Info("work found")
 
-		s.handleTranscode(assignment, uid)
+		s.handleTranscode(assignment)
 	}
 }
 
-func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error {
+func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 	dir := path.Join(s.cfg.OutputDir, a.Job.Id)
 	m3u8 := path.Join(dir, "index.m3u8")
 
