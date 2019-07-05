@@ -201,9 +201,6 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 	s.transcode(cmd,
 		stopChan,
 		a.Job.TranscodeInputUrl,
-		a.Job.StreamAddress,
-		a.Job.Id,
-		uid,
 	)
 
 	instance, err := s.createStreamInstance(a.Job.StreamAddress)
@@ -220,9 +217,6 @@ func (s *Service) transcode(
 	cmd *exec.Cmd,
 	stop chan struct{},
 	streamurl string,
-	contractAddr string,
-	Id string,
-	uid string,
 ) {
 	s.waitForStreamReady(streamurl)
 
