@@ -25,7 +25,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, workOrder *workorde
 	var jobChan = make(chan Job, 10)
 	go s.process(jobChan, workOrder)
 
-	playlist, err := m3u8.NewMediaPlaylist(100, 200)
+	playlist, err := m3u8.NewMediaPlaylist(1000, 2000)
 	if err != nil {
 		s.log.Errorf("failed to generate new media playlist: %s", err.Error())
 		return
