@@ -12,6 +12,8 @@ import (
 	types "github.com/gogo/protobuf/types"
 	rpc "github.com/videocoin/cloud-api/rpc"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -196,6 +198,17 @@ func (c *verifierServiceClient) Health(ctx context.Context, in *types.Empty, opt
 type VerifierServiceServer interface {
 	Verify(context.Context, *VerifyRequest) (*types.Empty, error)
 	Health(context.Context, *types.Empty) (*rpc.HealthStatus, error)
+}
+
+// UnimplementedVerifierServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedVerifierServiceServer struct {
+}
+
+func (*UnimplementedVerifierServiceServer) Verify(ctx context.Context, req *VerifyRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Verify not implemented")
+}
+func (*UnimplementedVerifierServiceServer) Health(ctx context.Context, req *types.Empty) (*rpc.HealthStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
 }
 
 func RegisterVerifierServiceServer(s *grpc.Server, srv VerifierServiceServer) {
