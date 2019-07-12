@@ -149,6 +149,11 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
+	_, err = s.streamManager.AddInputChunkId(s.bcAuth, job.StreamID, job.InputID)
+	if err != nil {
+		return err
+	}
+
 	tx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
 		return err
