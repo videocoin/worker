@@ -176,6 +176,11 @@ func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunk
 		return nil, err
 	}
 
+	_, err = streamInstance.AddInputChunkId(s.bcAuth, inputChunkID)
+	if err != nil {
+		s.log.Errorf("faild to add input chunk from streamInstance: %s", err.Error())
+	}
+
 	return streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
 }
 
