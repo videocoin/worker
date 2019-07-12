@@ -149,22 +149,24 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	_, err = s.streamManager.AddInputChunkId(s.bcAuth, job.StreamID, job.InputID)
+	addInputTx, err := s.streamManager.AddInputChunkId(s.bcAuth, job.StreamID, job.InputID)
 	if err != nil {
 		return err
 	}
 
-	s.log.Infof("AddInputChunkId() auth: %v stream_id: %d inpud_id: %d", s.bcAuth, job.StreamID, job.InputID)
+	s.log.Infof("AddInputChunkId TX: %x", addInputTx.Hash())
 
-	tx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
+	submitProofTx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
 		return err
 	}
+
+	s.log.Infof("submitProof TX: %x", submitProofTx.Hash())
 
 	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
 
-	go s.verify(tx, job, inputChunk, outputChunk)
+	go s.verify(submitProofTx, job, inputChunk, outputChunk)
 
 	return nil
 }
