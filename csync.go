@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fsnotify/fsnotify"
@@ -148,6 +149,21 @@ func (s *Service) handleChunk(task *Task) error {
 	if err = s.upload(path.Join(uploadPath, "index.m3u8"), task.Playlist.Encode()); err != nil {
 		return err
 	}
+
+	addInputTx, err := s.streamManager.AddInputChunkId(s.bcAuth, task.StreamID, task.InputID)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		s.log.Infof("waiting for AddInputChunkTX: [ %x ] to be mined", addInputTx.Hash())
+		rcp, err := bind.WaitMined(context.Background(), nil, addInputTx)
+		if err != nil {
+			s.log.Errorf("failed to wait for tx: %s", err.Error())
+		} else {
+			s.log.Infof("WaitBind() receipt: %v", rcp)
+		}
+	}()
 
 	tx, err := s.submitProof(task.StreamAddress, task.Bitrate, task.InputID, task.OutputID)
 	if err != nil {
