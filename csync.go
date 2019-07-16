@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fsnotify/fsnotify"
 	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
 	workorder_v1 "github.com/videocoin/cloud-api/workorder/v1"
-	"github.com/videocoin/go-videocoin-backup/accounts/abi/bind"
 
 	"github.com/grafov/m3u8"
 )
