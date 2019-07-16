@@ -24,7 +24,6 @@ import (
 	transcoder_v1 "github.com/videocoin/cloud-api/transcoder/v1"
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
 	bc "github.com/videocoin/cloud-pkg/bcops"
-	"github.com/videocoin/cloud-pkg/stream"
 	"github.com/videocoin/cloud-pkg/streamManager"
 	"github.com/videocoin/cloud-pkg/uuid4"
 	"google.golang.org/grpc"
@@ -205,12 +204,13 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 		a.Job.TranscodeInputUrl,
 	)
 
-	instance, err := s.createStreamInstance(a.Job.StreamAddress)
+	_, err = s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
+		ContractAddress: a.Job.StreamAddress,
+	})
+
 	if err != nil {
 		return err
 	}
-
-	instance.Refund(s.bcAuth)
 
 	return nil
 }
@@ -263,16 +263,6 @@ func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.C
 	cmd := exec.Command("ffmpeg", process...)
 
 	return cmd
-
-}
-
-func (s *Service) createStreamInstance(addr string) (*stream.Stream, error) {
-	streamInstance, err := stream.NewStream(common.HexToAddress(addr), s.bcClient)
-	if err != nil {
-		s.log.Errorf("failed to create new stream instance: %s", err.Error())
-		return nil, err
-	}
-	return streamInstance, nil
 
 }
 

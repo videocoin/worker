@@ -10,9 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fsnotify/fsnotify"
 	jobs_v1 "github.com/videocoin/cloud-api/jobs/v1"
 	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
@@ -150,22 +148,11 @@ func (s *Service) handleChunk(task *Task) error {
 		return err
 	}
 
-	addInputTx, err := s.streamManager.AddInputChunkId(s.bcAuth, task.StreamID, task.InputID)
-	if err != nil {
-		return err
-	}
+	_, err = s.manager.AddInputChunkId(context.Background(), &manager_v1.AddInputChunkIdRequest{
+		ContractAddress: task.StreamAddress,
+		InputChunkId:    task.InputID.Int64(),
+	})
 
-	go func() {
-		s.log.Infof("waiting for AddInputChunkTX: [ %x ] to be mined", addInputTx.Hash())
-		rcp, err := bind.WaitMined(context.Background(), nil, addInputTx)
-		if err != nil {
-			s.log.Errorf("failed to wait for tx: %s", err.Error())
-		} else {
-			s.log.Infof("WaitBind() receipt: %v", rcp)
-		}
-	}()
-
-	tx, err := s.submitProof(task.StreamAddress, task.Bitrate, task.InputID, task.OutputID)
 	if err != nil {
 		return err
 	}
@@ -173,31 +160,21 @@ func (s *Service) handleChunk(task *Task) error {
 	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, task.Id, task.InputChunkName)
 	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, task.Id, task.Bitrate, task.OutputChunkName)
 
-	go s.verify(tx, task, inputChunk, outputChunk)
+	go s.verify(task, inputChunk, outputChunk)
 
 	return nil
 }
 
-// SubmitProof registers work (output chunk)
-func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
-	streamInstance, err := s.createStreamInstance(contractAddress)
-	if err != nil {
-		return nil, err
-	}
-
-	return streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
-}
-
 // verifyChunk calls verifier with input and output chunk urls
-func (s *Service) verify(tx *types.Transaction, task *Task, localFile, outputURL string) error {
+func (s *Service) verify(task *Task, localFile, outputURL string) error {
 	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
-		TxHash:         tx.Hash().Hex(),
-		StreamId:       task.StreamID.Int64(),
-		Bitrate:        task.Bitrate,
-		InputId:        task.InputID.Uint64(),
-		OutputId:       task.OutputID.Uint64(),
-		SourceChunkUrl: localFile,
-		ResultChunkUrl: outputURL,
+		StreamId:        task.StreamID.Int64(),
+		Bitrate:         task.Bitrate,
+		InputId:         task.InputID.Uint64(),
+		OutputId:        task.OutputID.Uint64(),
+		SourceChunkUrl:  localFile,
+		ResultChunkUrl:  outputURL,
+		ContractAddress: task.StreamAddress,
 	})
 
 	if err != nil {
