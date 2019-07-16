@@ -11,6 +11,7 @@ import (
 	golang_proto "github.com/golang/protobuf/proto"
 	io "io"
 	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -364,14 +365,7 @@ func (m *Profile) Size() (n int) {
 }
 
 func sovProfiles(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
+	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozProfiles(x uint64) (n int) {
 	return sovProfiles(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -391,7 +385,7 @@ func (m *Profiles) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -419,7 +413,7 @@ func (m *Profiles) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -428,6 +422,9 @@ func (m *Profiles) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthProfiles
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthProfiles
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -443,6 +440,9 @@ func (m *Profiles) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthProfiles
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthProfiles
 			}
 			if (iNdEx + skippy) > l {
@@ -473,7 +473,7 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -501,7 +501,7 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= (int32(b) & 0x7F) << shift
+				m.Id |= int32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -520,7 +520,7 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -530,6 +530,9 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthProfiles
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthProfiles
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -549,7 +552,7 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Bitrate |= (uint32(b) & 0x7F) << shift
+				m.Bitrate |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -568,7 +571,7 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Width |= (uint32(b) & 0x7F) << shift
+				m.Width |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -591,6 +594,9 @@ func (m *Profile) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthProfiles
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthProfiles
 			}
 			if (iNdEx + skippy) > l {
@@ -660,8 +666,11 @@ func skipProfiles(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthProfiles
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthProfiles
 			}
 			return iNdEx, nil
@@ -692,6 +701,9 @@ func skipProfiles(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthProfiles
+				}
 			}
 			return iNdEx, nil
 		case 4:

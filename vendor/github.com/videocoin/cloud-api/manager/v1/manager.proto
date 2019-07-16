@@ -90,15 +90,13 @@ service ManagerService {
     };
   };
 
-
+  rpc SubmitProof(SubmitProofRequest) returns (SubmitProofResponse) {};
+  rpc VerifyProof(VerifyProofRequest) returns (google.protobuf.Empty) {};
+  rpc EscrowRefund(EscrowRefundRequest) returns (google.protobuf.Empty) {};
+  rpc AddInputChunkId(AddInputChunkIdRequest) returns (google.protobuf.Empty) {};
   rpc GetAllJobsByPipelineId(JobRequest) returns (cloud.api.jobs.v1.JobProfiles) {};
-
   rpc GetByStreamId(JobRequest) returns (cloud.api.jobs.v1.JobProfile) {};
-
-  rpc VerifyChunk(VerifyChunkRequest) returns (google.protobuf.Empty) {};
-
   rpc ChunkCreated(ChunkCreatedRequest) returns (google.protobuf.Empty) {};
-
   rpc RegisterTranscoder(cloud.api.transcoder.v1.Transcoder) returns (google.protobuf.Empty) {};
 
 }
@@ -160,3 +158,31 @@ message UpdateJobRequest {
   cloud.api.jobs.v1.InputStatus input_status = 8;
 }
 
+message SubmitProofRequest {
+  string contract_address = 1;
+  int64 bitrate = 2;
+  int64 input_chunk_id = 3;
+  int64 output_chunk_id = 5;
+}
+
+message SubmitProofResponse {
+  bytes tx = 1;
+}
+
+message VerifyProofRequest {
+  string contract_address = 1;
+  int64 bitrate = 2;
+  int64 input_chunk_id = 3;
+  int64 output_chunk_id = 4;
+  int64 distance = 5;
+  int64 stream_id = 6;
+}
+
+message EscrowRefundRequest {
+  string contract_address = 1;
+}
+
+message AddInputChunkIdRequest {
+  string contract_address = 1;
+  int64 input_chunk_id = 2;
+}

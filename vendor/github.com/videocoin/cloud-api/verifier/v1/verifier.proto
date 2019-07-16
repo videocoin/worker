@@ -33,5 +33,5 @@ message VerifyRequest {
     uint64 output_id = 4;
     string source_chunk_url = 5;
     string result_chunk_url = 6;
-    string tx_hash = 7;
+    string contract_address = 7;
 }
