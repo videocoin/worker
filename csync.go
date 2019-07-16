@@ -16,6 +16,7 @@ import (
 	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
 	workorder_v1 "github.com/videocoin/cloud-api/workorder/v1"
+	"github.com/videocoin/go-videocoin-backup/accounts/abi/bind"
 
 	"github.com/grafov/m3u8"
 )
@@ -160,6 +161,16 @@ func (s *Service) handleChunk(job *Job) error {
 	if err != nil {
 		return err
 	}
+
+	go func() {
+		s.log.Infof("waiting for AddInputChunkTX: [ %x ] to be mined", addInputTx.Hash())
+		rcp, err := bind.WaitMined(context.Background(), nil, addInputTx)
+		if err != nil {
+			s.log.Errorf("failed to wait for tx: %s", err.Error())
+		} else {
+			s.log.Infof("WaitBind() receipt: %v", rcp)
+		}
+	}()
 
 	s.log.Infof("submitProof TX: %x", submitProofTx.Hash())
 
