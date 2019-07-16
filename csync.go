@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fsnotify/fsnotify"
@@ -161,16 +160,6 @@ func (s *Service) handleChunk(job *Job) error {
 	if err != nil {
 		return err
 	}
-
-	go func() {
-		s.log.Infof("waiting for AddInputChunkTX: [ %x ] to be mined", addInputTx.Hash())
-		rcp, err := bind.WaitMined(context.Background(), nil, addInputTx)
-		if err != nil {
-			s.log.Errorf("failed to wait for tx: %s", err.Error())
-		} else {
-			s.log.Infof("WaitBind() receipt: %v", rcp)
-		}
-	}()
 
 	s.log.Infof("submitProof TX: %x", submitProofTx.Hash())
 
