@@ -213,12 +213,6 @@ func (s *Service) process(ch chan Task, job *jobs_v1.Job) {
 
 		t := <-ch
 
-		go func() {
-			if err := s.chunkCreated(&t); err != nil {
-				s.log.Errorf("failed to register chunk: %s", err.Error())
-			}
-		}()
-
 		if err := s.handleChunk(&t); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}
@@ -234,15 +228,4 @@ func (s *Service) updateStatus(id string, status jobs_v1.JobStatus) {
 	if err != nil {
 		s.log.Errorf("failed to update stream status: %s with id: %s", err.Error(), id)
 	}
-}
-
-func (s *Service) chunkCreated(t *Task) error {
-	_, err := s.manager.ChunkCreated(s.ctx, &manager_v1.ChunkCreatedRequest{
-		StreamId:      t.StreamID.Int64(),
-		SourceChunkId: t.InputID.Int64(),
-		ResultChunkId: t.OutputID.Int64(),
-		Bitrate:       t.Bitrate,
-	})
-
-	return err
 }
