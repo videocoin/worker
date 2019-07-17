@@ -151,6 +151,7 @@ func (s *Service) handleChunk(task *Task) error {
 	_, err = s.manager.AddInputChunkId(context.Background(), &manager_v1.AddInputChunkIdRequest{
 		ContractAddress: task.StreamAddress,
 		InputChunkId:    task.InputID.Int64(),
+		StreamId:        task.StreamID.Int64(),
 	})
 
 	if err != nil {
