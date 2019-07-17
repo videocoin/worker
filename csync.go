@@ -16,6 +16,7 @@ import (
 	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
 	workorder_v1 "github.com/videocoin/cloud-api/workorder/v1"
+	"github.com/videocoin/cloud-pkg/stream"
 
 	"github.com/grafov/m3u8"
 )
@@ -149,12 +150,10 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	addInputTx, err := s.streamManager.AddInputChunkId(s.bcAuth, job.StreamID, job.InputID)
+	err = s.addInputChunk(job.StreamAddress, job.InputID)
 	if err != nil {
 		return err
 	}
-
-	s.log.Infof("AddInputChunkId TX: %x", addInputTx.Hash())
 
 	submitProofTx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
 	if err != nil {
@@ -251,6 +250,24 @@ func (s *Service) updateStatus(streamHash string, status workorder_v1.WorkOrderS
 	if err != nil {
 		s.log.Errorf("failed to update stream status: %s", err.Error())
 	}
+}
+
+func (s *Service) addInputChunk(contractAddress string, chunkId *big.Int) error {
+	streamInsance, err := stream.NewStream(common.HexToAddress(contractAddress), s.bcClient)
+	if err != nil {
+		s.log.Errorf("failed to create new stream: %s", err.Error())
+		return nil
+	}
+
+	tx, err := streamInsance.AddInputChunkId(s.bcAuth, chunkId)
+	if err != nil {
+		s.log.Errorf("failed to add input chunk id: %s", err.Error())
+		return err
+	}
+
+	s.log.Infof("add_input_chunk_tx: %x", tx.Hash())
+
+	return nil
 }
 
 func (s *Service) chunkCreated(j *Job) error {

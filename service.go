@@ -25,7 +25,6 @@ import (
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
 	bc "github.com/videocoin/cloud-pkg/bcops"
 	"github.com/videocoin/cloud-pkg/stream"
-	"github.com/videocoin/cloud-pkg/streamManager"
 	"github.com/videocoin/cloud-pkg/uuid4"
 	"google.golang.org/grpc"
 )
@@ -76,13 +75,6 @@ func newService() (*Service, error) {
 		log.Fatalf("failed to dial blockchain: %s", err.Error())
 	}
 
-	managerAddress := common.HexToAddress(cfg.SMCA)
-
-	sm, err := streamManager.NewManager(managerAddress, client)
-	if err != nil {
-		log.Fatalf("failed to make new stream manager: %s", err.Error())
-	}
-
 	key, err := bc.LoadBcPrivKeys(cfg.Key, cfg.Secret, bc.FromMemory)
 	if err != nil {
 		log.Fatalf("failed to load private keys: %s", err.Error())
@@ -94,14 +86,13 @@ func newService() (*Service, error) {
 	}
 
 	return &Service{
-		streamManager: sm,
-		bcAuth:        bcAuth,
-		bcClient:      client,
-		cfg:           cfg,
-		manager:       manager,
-		verifier:      v,
-		ctx:           ctx,
-		log:           log,
+		bcAuth:   bcAuth,
+		bcClient: client,
+		cfg:      cfg,
+		manager:  manager,
+		verifier: v,
+		ctx:      ctx,
+		log:      log,
 	}, nil
 
 }
