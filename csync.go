@@ -154,6 +154,8 @@ func (s *Service) handleChunk(job *Job) error {
 		StreamId:        job.StreamID.Int64(),
 	})
 
+	s.log.Infof("StreamAddr: %s InputChunkId: %d StreamID: %d", job.StreamAddress, job.InputID, job.StreamID)
+
 	if err != nil {
 		s.log.Errorf("failed to add AddInputChunkId: %s", err.Error())
 	}
