@@ -148,10 +148,11 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	_, err = s.streamManager.AddInputChunkId(s.bcAuth, job.StreamID, job.InputID)
-	if err != nil {
-		return err
-	}
+	_, err = s.manager.AddInputChunkId(context.Background(), &manager_v1.AddInputChunkIdRequest{
+		ContractAddress: task.StreamAddress,
+		InputChunkId:    task.InputID.Int64(),
+		StreamId:        task.StreamID.Int64(),
+	})
 
 	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
