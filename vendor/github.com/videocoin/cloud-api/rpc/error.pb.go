@@ -3,15 +3,13 @@
 
 package rpc
 
-import (
-	fmt "fmt"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	golang_proto "github.com/golang/protobuf/proto"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-)
+import proto "github.com/gogo/protobuf/proto"
+import golang_proto "github.com/golang/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import _ "github.com/gogo/protobuf/gogoproto"
+
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -37,7 +35,7 @@ func (m *ValidationError) Reset()         { *m = ValidationError{} }
 func (m *ValidationError) String() string { return proto.CompactTextString(m) }
 func (*ValidationError) ProtoMessage()    {}
 func (*ValidationError) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c80d403d160b21e3, []int{0}
+	return fileDescriptor_error_233d1b421ebc8955, []int{0}
 }
 func (m *ValidationError) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -54,8 +52,8 @@ func (m *ValidationError) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *ValidationError) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ValidationError.Merge(m, src)
+func (dst *ValidationError) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ValidationError.Merge(dst, src)
 }
 func (m *ValidationError) XXX_Size() int {
 	return m.Size()
@@ -95,7 +93,7 @@ func (m *MultiValidationError) Reset()         { *m = MultiValidationError{} }
 func (m *MultiValidationError) String() string { return proto.CompactTextString(m) }
 func (*MultiValidationError) ProtoMessage()    {}
 func (*MultiValidationError) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c80d403d160b21e3, []int{1}
+	return fileDescriptor_error_233d1b421ebc8955, []int{1}
 }
 func (m *MultiValidationError) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -112,8 +110,8 @@ func (m *MultiValidationError) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *MultiValidationError) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MultiValidationError.Merge(m, src)
+func (dst *MultiValidationError) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MultiValidationError.Merge(dst, src)
 }
 func (m *MultiValidationError) XXX_Size() int {
 	return m.Size()
@@ -140,27 +138,6 @@ func init() {
 	proto.RegisterType((*MultiValidationError)(nil), "cloud.api.rpc.MultiValidationError")
 	golang_proto.RegisterType((*MultiValidationError)(nil), "cloud.api.rpc.MultiValidationError")
 }
-
-func init() { proto.RegisterFile("rpc/error.proto", fileDescriptor_c80d403d160b21e3) }
-func init() { golang_proto.RegisterFile("rpc/error.proto", fileDescriptor_c80d403d160b21e3) }
-
-var fileDescriptor_c80d403d160b21e3 = []byte{
-	// 206 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2f, 0x2a, 0x48, 0xd6,
-	0x4f, 0x2d, 0x2a, 0xca, 0x2f, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4d, 0xce, 0xc9,
-	0x2f, 0x4d, 0xd1, 0x4b, 0x2c, 0xc8, 0xd4, 0x2b, 0x2a, 0x48, 0x96, 0xd2, 0x4d, 0xcf, 0x2c, 0xc9,
-	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0xcf, 0x4f, 0xcf, 0xd7, 0x07, 0xab, 0x4a, 0x2a,
-	0x4d, 0x03, 0xf3, 0xc0, 0x1c, 0x30, 0x0b, 0xa2, 0x5b, 0xc9, 0x91, 0x8b, 0x3f, 0x2c, 0x31, 0x27,
-	0x33, 0x25, 0xb1, 0x24, 0x33, 0x3f, 0xcf, 0x15, 0x64, 0xac, 0x90, 0x08, 0x17, 0x6b, 0x5a, 0x66,
-	0x6a, 0x4e, 0x8a, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x84, 0x23, 0x24, 0xc1, 0xc5, 0x9e,
-	0x9b, 0x5a, 0x5c, 0x9c, 0x98, 0x9e, 0x2a, 0xc1, 0x04, 0x16, 0x87, 0x71, 0x95, 0xfc, 0xb8, 0x44,
-	0x7c, 0x4b, 0x73, 0x4a, 0x32, 0xd1, 0xcd, 0x31, 0xe3, 0x62, 0x03, 0xbb, 0xb3, 0x58, 0x82, 0x51,
-	0x81, 0x59, 0x83, 0xdb, 0x48, 0x4e, 0x0f, 0xc5, 0xa5, 0x7a, 0x68, 0xea, 0x83, 0xa0, 0xaa, 0x9d,
-	0x24, 0x4f, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x03, 0x8f,
-	0xe5, 0x18, 0x4f, 0x3c, 0x96, 0x63, 0x8c, 0x62, 0x2e, 0x2a, 0x48, 0x4e, 0x62, 0x03, 0x3b, 0xda,
-	0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x83, 0x4e, 0x1a, 0xb4, 0x05, 0x01, 0x00, 0x00,
-}
-
 func (m *ValidationError) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -275,7 +252,14 @@ func (m *MultiValidationError) Size() (n int) {
 }
 
 func sovError(x uint64) (n int) {
-	return (math_bits.Len64(x|1) + 6) / 7
+	for {
+		n++
+		x >>= 7
+		if x == 0 {
+			break
+		}
+	}
+	return n
 }
 func sozError(x uint64) (n int) {
 	return sovError(uint64((x << 1) ^ uint64((int64(x) >> 63))))
@@ -295,7 +279,7 @@ func (m *ValidationError) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -323,7 +307,7 @@ func (m *ValidationError) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -333,9 +317,6 @@ func (m *ValidationError) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthError
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthError
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -355,7 +336,7 @@ func (m *ValidationError) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -365,9 +346,6 @@ func (m *ValidationError) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthError
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthError
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -380,9 +358,6 @@ func (m *ValidationError) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
-				return ErrInvalidLengthError
-			}
-			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthError
 			}
 			if (iNdEx + skippy) > l {
@@ -413,7 +388,7 @@ func (m *MultiValidationError) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -441,7 +416,7 @@ func (m *MultiValidationError) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -450,9 +425,6 @@ func (m *MultiValidationError) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthError
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthError
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -468,9 +440,6 @@ func (m *MultiValidationError) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
-				return ErrInvalidLengthError
-			}
-			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthError
 			}
 			if (iNdEx + skippy) > l {
@@ -540,11 +509,8 @@ func skipError(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthError
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthError
 			}
 			return iNdEx, nil
@@ -575,9 +541,6 @@ func skipError(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthError
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -596,3 +559,23 @@ var (
 	ErrInvalidLengthError = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowError   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("rpc/error.proto", fileDescriptor_error_233d1b421ebc8955) }
+func init() { golang_proto.RegisterFile("rpc/error.proto", fileDescriptor_error_233d1b421ebc8955) }
+
+var fileDescriptor_error_233d1b421ebc8955 = []byte{
+	// 206 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2f, 0x2a, 0x48, 0xd6,
+	0x4f, 0x2d, 0x2a, 0xca, 0x2f, 0xd2, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4d, 0xce, 0xc9,
+	0x2f, 0x4d, 0xd1, 0x4b, 0x2c, 0xc8, 0xd4, 0x2b, 0x2a, 0x48, 0x96, 0xd2, 0x4d, 0xcf, 0x2c, 0xc9,
+	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0xcf, 0x4f, 0xcf, 0xd7, 0x07, 0xab, 0x4a, 0x2a,
+	0x4d, 0x03, 0xf3, 0xc0, 0x1c, 0x30, 0x0b, 0xa2, 0x5b, 0xc9, 0x91, 0x8b, 0x3f, 0x2c, 0x31, 0x27,
+	0x33, 0x25, 0xb1, 0x24, 0x33, 0x3f, 0xcf, 0x15, 0x64, 0xac, 0x90, 0x08, 0x17, 0x6b, 0x5a, 0x66,
+	0x6a, 0x4e, 0x8a, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x84, 0x23, 0x24, 0xc1, 0xc5, 0x9e,
+	0x9b, 0x5a, 0x5c, 0x9c, 0x98, 0x9e, 0x2a, 0xc1, 0x04, 0x16, 0x87, 0x71, 0x95, 0xfc, 0xb8, 0x44,
+	0x7c, 0x4b, 0x73, 0x4a, 0x32, 0xd1, 0xcd, 0x31, 0xe3, 0x62, 0x03, 0xbb, 0xb3, 0x58, 0x82, 0x51,
+	0x81, 0x59, 0x83, 0xdb, 0x48, 0x4e, 0x0f, 0xc5, 0xa5, 0x7a, 0x68, 0xea, 0x83, 0xa0, 0xaa, 0x9d,
+	0x24, 0x4f, 0x3c, 0x92, 0x63, 0xbc, 0xf0, 0x48, 0x8e, 0xf1, 0xc1, 0x23, 0x39, 0xc6, 0x03, 0x8f,
+	0xe5, 0x18, 0x4f, 0x3c, 0x96, 0x63, 0x8c, 0x62, 0x2e, 0x2a, 0x48, 0x4e, 0x62, 0x03, 0x3b, 0xda,
+	0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x83, 0x4e, 0x1a, 0xb4, 0x05, 0x01, 0x00, 0x00,
+}

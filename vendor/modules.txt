@@ -14,27 +14,27 @@ github.com/deckarep/golang-set
 # github.com/ethereum/go-ethereum v1.8.27
 github.com/ethereum/go-ethereum/accounts/abi/bind
 github.com/ethereum/go-ethereum/common
-github.com/ethereum/go-ethereum/core/types
 github.com/ethereum/go-ethereum/ethclient
 github.com/ethereum/go-ethereum
 github.com/ethereum/go-ethereum/accounts/abi
 github.com/ethereum/go-ethereum/accounts/keystore
+github.com/ethereum/go-ethereum/core/types
 github.com/ethereum/go-ethereum/crypto
 github.com/ethereum/go-ethereum/event
 github.com/ethereum/go-ethereum/log
 github.com/ethereum/go-ethereum/common/hexutil
-github.com/ethereum/go-ethereum/params
 github.com/ethereum/go-ethereum/rlp
-github.com/ethereum/go-ethereum/trie
 github.com/ethereum/go-ethereum/rpc
 github.com/ethereum/go-ethereum/common/math
 github.com/ethereum/go-ethereum/accounts
+github.com/ethereum/go-ethereum/params
+github.com/ethereum/go-ethereum/trie
 github.com/ethereum/go-ethereum/crypto/secp256k1
 github.com/ethereum/go-ethereum/common/mclock
+github.com/ethereum/go-ethereum/p2p/netutil
 github.com/ethereum/go-ethereum/common/prque
 github.com/ethereum/go-ethereum/ethdb
 github.com/ethereum/go-ethereum/metrics
-github.com/ethereum/go-ethereum/p2p/netutil
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/go-ole/go-ole v1.2.4
@@ -104,7 +104,7 @@ github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
-# github.com/videocoin/cloud-api v0.1.138
+# github.com/videocoin/cloud-api v0.1.162
 github.com/videocoin/cloud-api/manager/v1
 github.com/videocoin/cloud-api/profiles/v1
 github.com/videocoin/cloud-api/transcoder/v1
@@ -113,7 +113,6 @@ github.com/videocoin/cloud-api/workorder/v1
 github.com/videocoin/cloud-api/rpc
 # github.com/videocoin/cloud-pkg v0.0.2
 github.com/videocoin/cloud-pkg/bcops
-github.com/videocoin/cloud-pkg/stream
 github.com/videocoin/cloud-pkg/streamManager
 github.com/videocoin/cloud-pkg/uuid4
 # go.opencensus.io v0.21.0

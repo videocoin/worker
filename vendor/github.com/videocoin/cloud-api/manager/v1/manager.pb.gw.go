@@ -9,6 +9,7 @@ It translates gRPC into RESTful JSON APIs.
 package v1
 
 import (
+	"context"
 	"io"
 	"net/http"
 
@@ -18,8 +19,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/utilities"
 	"github.com/videocoin/cloud-api/profiles/v1"
 	v1_1 "github.com/videocoin/cloud-api/transcoder/v1"
-	v1_0 "github.com/videocoin/cloud-api/workorder/v1"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -80,41 +79,6 @@ func request_ManagerService_Run_0(ctx context.Context, marshaler runtime.Marshal
 	}
 
 	msg, err := client.Run(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-var (
-	filter_ManagerService_Stop_0 = &utilities.DoubleArray{Encoding: map[string]int{"pipeline_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
-)
-
-func request_ManagerService_Stop_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq JobRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["pipeline_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "pipeline_id")
-	}
-
-	protoReq.PipelineId, err = runtime.String(val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "pipeline_id", err)
-	}
-
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ManagerService_Stop_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.Stop(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -274,7 +238,6 @@ func request_ManagerService_UpdateStreamStatus_0(ctx context.Context, marshaler 
 
 	var (
 		val string
-		e   int32
 		ok  bool
 		err error
 		_   = err
@@ -296,13 +259,11 @@ func request_ManagerService_UpdateStreamStatus_0(ctx context.Context, marshaler 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "status")
 	}
 
-	e, err = runtime.Enum(val, v1_0.WorkOrderStatus_value)
+	protoReq.Status, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "status", err)
 	}
-
-	protoReq.Status = v1_0.WorkOrderStatus(e)
 
 	msg, err := client.UpdateStreamStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -430,6 +391,14 @@ func request_ManagerService_UpdateTranscoderStatus_0(ctx context.Context, marsha
 	var protoReq TranscoderStatusRequest
 	var metadata runtime.ServerMetadata
 
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
 	var (
 		val string
 		e   int32
@@ -463,15 +432,6 @@ func request_ManagerService_UpdateTranscoderStatus_0(ctx context.Context, marsha
 	protoReq.Status = v1_1.TranscoderStatus(e)
 
 	msg, err := client.UpdateTranscoderStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func request_ManagerService_GetWork_0(ctx context.Context, marshaler runtime.Marshaler, client ManagerServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq types.Empty
-	var metadata runtime.ServerMetadata
-
-	msg, err := client.GetWork(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -551,26 +511,6 @@ func RegisterManagerServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		}
 
 		forward_ManagerService_Run_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("POST", pattern_ManagerService_Stop_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_ManagerService_Stop_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_ManagerService_Stop_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -834,26 +774,6 @@ func RegisterManagerServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 
 	})
 
-	mux.Handle("GET", pattern_ManagerService_GetWork_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_ManagerService_GetWork_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_ManagerService_GetWork_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	return nil
 }
 
@@ -861,8 +781,6 @@ var (
 	pattern_ManagerService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "job", "new"}, ""))
 
 	pattern_ManagerService_Run_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "job", "pipeline_id", "run"}, ""))
-
-	pattern_ManagerService_Stop_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v1", "job", "pipeline_id", "stop"}, ""))
 
 	pattern_ManagerService_Get_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "job", "pipeline_id"}, ""))
 
@@ -889,16 +807,12 @@ var (
 	pattern_ManagerService_RegisterTranscoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "transcoders"}, ""))
 
 	pattern_ManagerService_UpdateTranscoderStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "transcoder", "transcoder_id", "status"}, ""))
-
-	pattern_ManagerService_GetWork_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "work"}, ""))
 )
 
 var (
 	forward_ManagerService_Create_0 = runtime.ForwardResponseMessage
 
 	forward_ManagerService_Run_0 = runtime.ForwardResponseMessage
-
-	forward_ManagerService_Stop_0 = runtime.ForwardResponseMessage
 
 	forward_ManagerService_Get_0 = runtime.ForwardResponseMessage
 
@@ -925,6 +839,4 @@ var (
 	forward_ManagerService_RegisterTranscoder_0 = runtime.ForwardResponseMessage
 
 	forward_ManagerService_UpdateTranscoderStatus_0 = runtime.ForwardResponseMessage
-
-	forward_ManagerService_GetWork_0 = runtime.ForwardResponseMessage
 )

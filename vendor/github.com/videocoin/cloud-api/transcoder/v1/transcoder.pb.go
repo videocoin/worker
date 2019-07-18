@@ -3,14 +3,12 @@
 
 package v1
 
-import (
-	fmt "fmt"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	v11 "github.com/videocoin/cloud-api/profiles/v1"
-	v1 "github.com/videocoin/cloud-api/workorder/v1"
-	math "math"
-)
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import _ "github.com/gogo/protobuf/gogoproto"
+import v11 "github.com/videocoin/cloud-api/profiles/v1"
+import v1 "github.com/videocoin/cloud-api/workorder/v1"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -38,7 +36,6 @@ var TranscoderStatus_name = map[int32]string{
 	2: "error",
 	3: "busy",
 }
-
 var TranscoderStatus_value = map[string]int32{
 	"available": 0,
 	"offline":   1,
@@ -49,9 +46,8 @@ var TranscoderStatus_value = map[string]int32{
 func (x TranscoderStatus) String() string {
 	return proto.EnumName(TranscoderStatus_name, int32(x))
 }
-
 func (TranscoderStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_09c2ac4ec780d93b, []int{0}
+	return fileDescriptor_transcoder_c0e17541c5c755ae, []int{0}
 }
 
 type Transcoder struct {
@@ -70,7 +66,7 @@ func (m *Transcoder) Reset()         { *m = Transcoder{} }
 func (m *Transcoder) String() string { return proto.CompactTextString(m) }
 func (*Transcoder) ProtoMessage()    {}
 func (*Transcoder) Descriptor() ([]byte, []int) {
-	return fileDescriptor_09c2ac4ec780d93b, []int{0}
+	return fileDescriptor_transcoder_c0e17541c5c755ae, []int{0}
 }
 func (m *Transcoder) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Transcoder.Unmarshal(m, b)
@@ -78,8 +74,8 @@ func (m *Transcoder) XXX_Unmarshal(b []byte) error {
 func (m *Transcoder) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Transcoder.Marshal(b, m, deterministic)
 }
-func (m *Transcoder) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Transcoder.Merge(m, src)
+func (dst *Transcoder) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Transcoder.Merge(dst, src)
 }
 func (m *Transcoder) XXX_Size() int {
 	return xxx_messageInfo_Transcoder.Size(m)
@@ -144,7 +140,7 @@ func (m *Assignment) Reset()         { *m = Assignment{} }
 func (m *Assignment) String() string { return proto.CompactTextString(m) }
 func (*Assignment) ProtoMessage()    {}
 func (*Assignment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_09c2ac4ec780d93b, []int{1}
+	return fileDescriptor_transcoder_c0e17541c5c755ae, []int{1}
 }
 func (m *Assignment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Assignment.Unmarshal(m, b)
@@ -152,8 +148,8 @@ func (m *Assignment) XXX_Unmarshal(b []byte) error {
 func (m *Assignment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Assignment.Marshal(b, m, deterministic)
 }
-func (m *Assignment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Assignment.Merge(m, src)
+func (dst *Assignment) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Assignment.Merge(dst, src)
 }
 func (m *Assignment) XXX_Size() int {
 	return xxx_messageInfo_Assignment.Size(m)
@@ -179,14 +175,16 @@ func (m *Assignment) GetProfile() *v11.Profile {
 }
 
 func init() {
-	proto.RegisterEnum("cloud.api.transcoder.v1.TranscoderStatus", TranscoderStatus_name, TranscoderStatus_value)
 	proto.RegisterType((*Transcoder)(nil), "cloud.api.transcoder.v1.Transcoder")
 	proto.RegisterType((*Assignment)(nil), "cloud.api.transcoder.v1.Assignment")
+	proto.RegisterEnum("cloud.api.transcoder.v1.TranscoderStatus", TranscoderStatus_name, TranscoderStatus_value)
 }
 
-func init() { proto.RegisterFile("transcoder/v1/transcoder.proto", fileDescriptor_09c2ac4ec780d93b) }
+func init() {
+	proto.RegisterFile("transcoder/v1/transcoder.proto", fileDescriptor_transcoder_c0e17541c5c755ae)
+}
 
-var fileDescriptor_09c2ac4ec780d93b = []byte{
+var fileDescriptor_transcoder_c0e17541c5c755ae = []byte{
 	// 481 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0xdd, 0x8a, 0xd3, 0x40,
 	0x1c, 0xc5, 0x33, 0xd9, 0x6e, 0x6a, 0xa7, 0xcb, 0x12, 0x06, 0xb5, 0xd9, 0x2c, 0x86, 0xd9, 0xe2,
