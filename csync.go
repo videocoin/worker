@@ -164,12 +164,13 @@ func (s *Service) handleChunk(job *Job) error {
 // verifyChunk calls verifier with input and output chunk urls
 func (s *Service) verify(job *Job, localFile, outputURL string) error {
 	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
-		StreamId:       job.StreamID.Int64(),
-		Bitrate:        job.Bitrate,
-		InputId:        job.InputID.Uint64(),
-		OutputId:       job.OutputID.Uint64(),
-		SourceChunkUrl: localFile,
-		ResultChunkUrl: outputURL,
+		StreamId:        job.StreamID.Int64(),
+		Bitrate:         job.Bitrate,
+		InputId:         job.InputID.Uint64(),
+		OutputId:        job.OutputID.Uint64(),
+		SourceChunkUrl:  localFile,
+		ResultChunkUrl:  outputURL,
+		ContractAddress: job.StreamAddress,
 	})
 
 	if err != nil {
