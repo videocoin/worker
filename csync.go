@@ -209,12 +209,6 @@ func (s *Service) process(jobChan chan Job, workOrder *workorder_v1.WorkOrder) {
 
 		j := <-jobChan
 
-		go func() {
-			if err := s.chunkCreated(&j); err != nil {
-				s.log.Errorf("failed to register chunk: %s", err.Error())
-			}
-		}()
-
 		if err := s.handleChunk(&j); err != nil {
 			s.log.Errorf("failed to handle chunk: %s", err.Error())
 		}
@@ -231,15 +225,4 @@ func (s *Service) updateStatus(streamHash string, status workorder_v1.WorkOrderS
 	if err != nil {
 		s.log.Errorf("failed to update stream status: %s", err.Error())
 	}
-}
-
-func (s *Service) chunkCreated(j *Job) error {
-	_, err := s.manager.ChunkCreated(s.ctx, &manager_v1.ChunkCreatedRequest{
-		StreamId:      j.StreamID.Int64(),
-		SourceChunkId: j.InputID.Int64(),
-		ResultChunkId: j.OutputID.Int64(),
-		Bitrate:       j.Bitrate,
-	})
-
-	return err
 }

@@ -176,6 +176,11 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 		uid,
 	)
 
+	s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
+		ContractAddress: a.Workorder.StreamAddress,
+		StreamId:        a.Workorder.StreamId,
+	})
+
 	return nil
 }
 
