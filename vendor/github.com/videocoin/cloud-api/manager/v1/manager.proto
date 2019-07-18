@@ -77,21 +77,6 @@ service ManagerService {
     };
   };
 
-  rpc VerifyChunk(VerifyChunkRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/verify"
-      body: "*"
-    };
-  };
-
-
-  rpc ChunkCreated(ChunkCreatedRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/chunk_created"
-      body: "*"
-    };
-  };
-
   rpc CheckBalance(CheckBalanceRequest) returns (CheckBalanceResponse) {
     option (google.api.http) = {
       get: "/api/v1/balance/{contract_address}"
@@ -133,7 +118,7 @@ service ManagerService {
   rpc VerifyProof(VerifyProofRequest) returns (google.protobuf.Empty) {};
   rpc EscrowRefund(EscrowRefundRequest) returns (google.protobuf.Empty) {};
   rpc AddInputChunkId(AddInputChunkIdRequest) returns (google.protobuf.Empty) {};
-  
+
 }
 
 message UpdateProfileRequest {
@@ -160,21 +145,6 @@ message CheckBalanceResponse {
 message ContractAddrRequest {
   string pipeline_id = 1;
   string contract_address = 2;
-}
-
-message VerifyChunkRequest {
-  int64 stream_id = 1;
-  uint64 source_chunk_id = 2;
-  uint64 result_chunk_id = 3;
-  int32 hash_distance = 4;
-  uint32 bitrate = 5;
-}
-
-message ChunkCreatedRequest {
-  int64 stream_id = 1;
-  int64 source_chunk_id = 2;
-  int64 result_chunk_id = 3;
-  uint32 bitrate = 4;
 }
 
 message TranscoderStatusRequest {
