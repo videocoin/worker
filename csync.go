@@ -10,9 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fsnotify/fsnotify"
 	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
 	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
@@ -150,57 +148,22 @@ func (s *Service) handleChunk(job *Job) error {
 		return err
 	}
 
-	addInputTx, err := s.streamManager.AddInputChunkId(s.bcAuth, job.StreamID, job.InputID)
+	_, err = s.streamManager.AddInputChunkId(s.bcAuth, job.StreamID, job.InputID)
 	if err != nil {
 		return err
 	}
-
-	s.log.Infof("AddInputChunkId TX: %x", addInputTx.Hash())
-
-	submitProofTx, err := s.submitProof(job.StreamAddress, job.Bitrate, job.InputID, job.OutputID)
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		s.log.Infof("waiting for AddInputChunkTX: [ %x ] to be mined", addInputTx.Hash())
-		rcp, err := bind.WaitMined(context.Background(), nil, addInputTx)
-		if err != nil {
-			s.log.Errorf("failed to wait for tx: %s", err.Error())
-		} else {
-			s.log.Infof("WaitBind() receipt: %v", rcp)
-		}
-	}()
-
-	s.log.Infof("submitProof TX: %x", submitProofTx.Hash())
 
 	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, job.StreamHash, job.InputChunkName)
 	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, job.StreamHash, job.Bitrate, job.OutputChunkName)
 
-	go s.verify(submitProofTx, job, inputChunk, outputChunk)
+	go s.verify(job, inputChunk, outputChunk)
 
 	return nil
 }
 
-// SubmitProof registers work (output chunk)
-func (s *Service) submitProof(contractAddress string, bitrate uint32, inputChunkID *big.Int, outputChunkID *big.Int) (*types.Transaction, error) {
-	streamInstance, err := s.createStreamInstance(contractAddress)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = streamInstance.AddInputChunkId(s.bcAuth, inputChunkID)
-	if err != nil {
-		s.log.Errorf("faild to add input chunk from streamInstance: %s", err.Error())
-	}
-
-	return streamInstance.SubmitProof(s.bcAuth, big.NewInt(int64(bitrate)), inputChunkID, big.NewInt(0), outputChunkID)
-}
-
 // verifyChunk calls verifier with input and output chunk urls
-func (s *Service) verify(tx *types.Transaction, job *Job, localFile, outputURL string) error {
+func (s *Service) verify(job *Job, localFile, outputURL string) error {
 	_, err := s.verifier.Verify(context.Background(), &verifier_v1.VerifyRequest{
-		TxHash:         tx.Hash().Hex(),
 		StreamId:       job.StreamID.Int64(),
 		Bitrate:        job.Bitrate,
 		InputId:        job.InputID.Uint64(),
