@@ -128,6 +128,12 @@ service ManagerService {
       get: "/api/v1/work"
     };
   };
+
+  rpc SubmitProof(SubmitProofRequest) returns (SubmitProofResponse) {};
+  rpc VerifyProof(VerifyProofRequest) returns (google.protobuf.Empty) {};
+  rpc EscrowRefund(EscrowRefundRequest) returns (google.protobuf.Empty) {};
+  rpc AddInputChunkId(AddInputChunkIdRequest) returns (google.protobuf.Empty) {};
+  
 }
 
 message UpdateProfileRequest {
@@ -206,4 +212,37 @@ message StreamRequest {
 }
 message StopStreamRequest {
   string stream_hash = 1;
+}
+
+
+message SubmitProofRequest {
+  string contract_address = 1;
+  int64 bitrate = 2;
+  int64 input_chunk_id = 3;
+  int64 output_chunk_id = 5;
+  int64 stream_id = 6;
+}
+
+message SubmitProofResponse {
+  bytes tx = 1;
+}
+
+message VerifyProofRequest {
+  string contract_address = 1;
+  int64 bitrate = 2;
+  int64 input_chunk_id = 3;
+  int64 output_chunk_id = 4;
+  int64 distance = 5;
+  int64 stream_id = 6;
+}
+
+message EscrowRefundRequest {
+  string contract_address = 1;
+  int64 stream_id = 2;
+}
+
+message AddInputChunkIdRequest {
+  string contract_address = 1;
+  int64 input_chunk_id = 2;
+  int64 stream_id = 3;
 }
