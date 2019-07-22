@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -136,9 +137,10 @@ func (s *Service) register(uid string) {
 }
 
 func (s *Service) pollForWork() {
-	s.log.Info("polling for work")
 	ticker := time.NewTicker(5 * time.Second)
+	log.Print("polling for work...")
 	for range ticker.C {
+
 		assignment, err := s.manager.GetWork(context.Background(), &types.Empty{})
 		if err != nil {
 			continue
