@@ -55,14 +55,14 @@ github.com/shirou/gopsutil/mem
 github.com/shirou/gopsutil/internal/common
 # github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
-# github.com/videocoin/cloud-api v0.1.160
+# github.com/videocoin/cloud-api v0.1.161-0.20190726203359-4500798149ed
 github.com/videocoin/cloud-api/jobs/v1
 github.com/videocoin/cloud-api/manager/v1
 github.com/videocoin/cloud-api/profiles/v1
 github.com/videocoin/cloud-api/transcoder/v1
 github.com/videocoin/cloud-api/verifier/v1
 github.com/videocoin/cloud-api/rpc
-# github.com/videocoin/cloud-pkg v0.0.3-0.20190702184752-6d6f7da54f91
+# github.com/videocoin/cloud-pkg v0.0.3-0.20190712213107-e13988c093de
 github.com/videocoin/cloud-pkg/uuid4
 # go.opencensus.io v0.22.0
 go.opencensus.io/plugin/ochttp
