@@ -163,6 +163,7 @@ func (s *Service) pollForWork() {
 func (s *Service) handleExit(streamAddr string) {
 	signal.Notify(gracefulStop, syscall.SIGTERM)
 	signal.Notify(gracefulStop, syscall.SIGINT)
+	signal.Notify(gracefulStop, syscall.Signal(0))
 
 	sig := <-gracefulStop
 
