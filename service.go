@@ -149,6 +149,9 @@ func (s *Service) pollForWork() {
 		s.log.Info("work found")
 
 		s.handleTranscode(assignment)
+
+		s.log.Info("exiting..")
+		os.Exit(0)
 	}
 }
 
