@@ -89,11 +89,11 @@ func Start() error {
 		return err
 	}
 
-	go s.wait()
-
 	s.register(uid)
 
 	s.log.Infof("transcoder_id: %s", uid)
+
+	go s.handleExit()
 
 	s.pollForWork()
 
@@ -150,14 +150,11 @@ func (s *Service) pollForWork() {
 
 		s.log.Info("work found")
 
-		go s.handleExit(assignment.Job.StreamAddress)
-
 		s.handleTranscode(assignment)
-
 	}
 }
 
-func (s *Service) handleExit(streamAddr string) {
+func (s *Service) handleExit() {
 	signal.Notify(gracefulStop, syscall.SIGTERM)
 	signal.Notify(gracefulStop, syscall.SIGINT)
 	signal.Notify(gracefulStop, syscall.Signal(0))
@@ -165,10 +162,6 @@ func (s *Service) handleExit(streamAddr string) {
 	sig := <-gracefulStop
 
 	s.log.Infof("exiting: %s", sig.String())
-
-	s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
-		ContractAddress: streamAddr,
-	})
 
 }
 
@@ -197,6 +190,10 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 		a.Job.TranscodeInputUrl,
 	)
 
+	s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
+		ContractAddress: a.Job.StreamAddress,
+	})
+
 	return nil
 }
 
@@ -216,7 +213,7 @@ func (s *Service) transcode(
 		os.Exit(0)
 	}
 
-	stop <- struct{}{}
+	//stop <- struct{}{}
 
 	s.log.Info("transcode complete")
 
@@ -251,11 +248,4 @@ func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.C
 
 	return cmd
 
-}
-
-func (s *Service) wait() {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	<-c
-	s.log.Info("shutting down")
 }
