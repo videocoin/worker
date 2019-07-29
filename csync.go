@@ -193,7 +193,6 @@ func (s *Service) verify(task *Task, localFile, outputURL string) error {
 	}
 
 	if balance.Balance <= 0 || resp.Status == jobs_v1.JobStatusCompleted /* job has been reset */ {
-		_ = task.cmd.Process.Kill()
 		task.stopChan <- struct{}{}
 	}
 
