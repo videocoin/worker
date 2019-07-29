@@ -200,6 +200,7 @@ func (s *Service) transcode(
 		s.log.Errorf("failed to transcode: err : %s output: %s",
 			err.Error(), string(out),
 		)
+		cmd.Process.Kill()
 	}
 
 	stop <- struct{}{}
