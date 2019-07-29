@@ -136,6 +136,8 @@ func (s *Service) register(uid string) {
 	}
 }
 
+var gracefulStop = make(chan os.Signal)
+
 func (s *Service) pollForWork() {
 	ticker := time.NewTicker(5 * time.Second)
 	log.Print("polling for work...")
@@ -148,11 +150,28 @@ func (s *Service) pollForWork() {
 
 		s.log.Info("work found")
 
+		go s.handleExit(assignment.Job.StreamAddress)
+
 		s.handleTranscode(assignment)
 
-		s.log.Info("exiting..")
+		s.log.Info("exiting")
+
 		os.Exit(0)
 	}
+}
+
+func (s *Service) handleExit(streamAddr string) {
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+
+	sig := <-gracefulStop
+
+	s.log.Info(sig.String())
+
+	s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
+		ContractAddress: streamAddr,
+	})
+
 }
 
 func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
@@ -175,18 +194,14 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 		return err
 	}
 
+	if err != nil {
+		return err
+	}
+
 	s.transcode(cmd,
 		stopChan,
 		a.Job.TranscodeInputUrl,
 	)
-
-	_, err = s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
-		ContractAddress: a.Job.StreamAddress,
-	})
-
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
