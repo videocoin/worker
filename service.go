@@ -204,6 +204,7 @@ func (s *Service) transcode(
 			err.Error(), string(out),
 		)
 		cmd.Process.Kill()
+		os.Exit(0)
 	}
 
 	stop <- struct{}{}
