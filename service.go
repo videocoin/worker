@@ -140,8 +140,8 @@ var gracefulStop = make(chan os.Signal)
 
 func (s *Service) pollForWork() {
 	ticker := time.NewTicker(5 * time.Second)
-	log.Print("polling for work...")
 	for range ticker.C {
+		log.Print("polling for work...")
 
 		assignment, err := s.manager.GetWork(context.Background(), &types.Empty{})
 		if err != nil {
@@ -154,9 +154,6 @@ func (s *Service) pollForWork() {
 
 		s.handleTranscode(assignment)
 
-		s.log.Info("exiting")
-
-		os.Exit(0)
 	}
 }
 
@@ -167,7 +164,7 @@ func (s *Service) handleExit(streamAddr string) {
 
 	sig := <-gracefulStop
 
-	s.log.Info(sig.String())
+	s.log.Infof("exiting: %s", sig.String())
 
 	s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
 		ContractAddress: streamAddr,
@@ -192,10 +189,6 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 	go s.syncDir(stopChan, cmd, a.Job, fullDir, a.Profile.Bitrate)
 
 	if err := s.generatePlaylist(a.Job.Id, m3u8, a.Profile.Bitrate); err != nil {
-		return err
-	}
-
-	if err != nil {
 		return err
 	}
 
