@@ -213,7 +213,7 @@ func (s *Service) transcode(
 		os.Exit(0)
 	}
 
-	//stop <- struct{}{}
+	stop <- struct{}{}
 
 	s.log.Info("transcode complete")
 

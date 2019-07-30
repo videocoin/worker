@@ -98,6 +98,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 				watcher.Close()
 				close(ch)
 
+				done <- struct{}{}
 			}
 		}
 	}()
@@ -108,6 +109,8 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 	}
 
 	<-done
+
+	s.log.Info("done")
 }
 
 // handleChunk Appends to playlist, generates chunk id, calls verifier, uploads result
