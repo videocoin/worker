@@ -15,7 +15,7 @@ import (
 )
 
 // Upload uploads an object to gcs with publicread acl
-func (s *Service) upload(output string, r io.Reader) error {
+func (s *Service) upload(output, contentType string, r io.Reader) error {
 	svc, err := storage.NewService(context.Background())
 	if err != nil {
 		return err
@@ -24,6 +24,7 @@ func (s *Service) upload(output string, r io.Reader) error {
 	object := &storage.Object{
 		Name:         output,
 		CacheControl: "public, max-age=0",
+		ContentType:  contentType,
 	}
 
 	if _, err := svc.Objects.Insert(s.cfg.Bucket, object).Media(r).PredefinedAcl("publicread").Do(); err != nil {
@@ -70,7 +71,7 @@ func (s *Service) generatePlaylist(streamHash string, filename string, bitrate u
 
 	reader := bytes.NewReader(m3u8)
 
-	err = s.upload(fmt.Sprintf("%s/%s", streamHash, "index.m3u8"), reader)
+	err = s.upload(fmt.Sprintf("%s/%s", streamHash, "index.m3u8"), "application/x-mpegURL", reader)
 	if err != nil {
 		s.log.Errorf("failed to upload: %s", err.Error())
 		return err

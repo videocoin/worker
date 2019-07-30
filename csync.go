@@ -142,12 +142,12 @@ func (s *Service) handleChunk(task *Task) error {
 	}
 
 	// Upload chunk
-	if err = s.upload(path.Join(uploadPath, task.OutputChunkName), chunk); err != nil {
+	if err = s.upload(path.Join(uploadPath, task.OutputChunkName), "video/MP2T", chunk); err != nil {
 		return err
 	}
 
 	// Upload playlist
-	if err = s.upload(path.Join(uploadPath, "index.m3u8"), task.Playlist.Encode()); err != nil {
+	if err = s.upload(path.Join(uploadPath, "index.m3u8"), "application/vnd.apple.mpegURL", task.Playlist.Encode()); err != nil {
 		return err
 	}
 
