@@ -24,7 +24,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 	var ch = make(chan Task, 10)
 	go s.process(ch, job)
 
-	playlist, err := m3u8.NewMediaPlaylist(100, 200)
+	playlist, err := m3u8.NewMediaPlaylist(1000, 2000)
 	if err != nil {
 		s.log.Errorf("failed to generate new media playlist: %s", err.Error())
 		return
@@ -195,8 +195,9 @@ func (s *Service) verify(task *Task, localFile, outputURL string) error {
 		s.log.Warnf("failed to get current job status: %s", err.Error())
 	}
 
-	if balance.Balance <= 0 || resp.Status == jobs_v1.JobStatusCompleted /* job has been reset */ {
-		//task.stopChan <- struct{}{}
+	if balance.Balance <= 0 || resp.Status == jobs_v1.JobStatusCancelled /* job has been reset */ {
+		task.stopChan <- struct{}{}
+		task.cmd.Process.Kill()
 	}
 
 	return err
