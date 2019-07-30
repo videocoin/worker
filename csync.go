@@ -196,7 +196,7 @@ func (s *Service) verify(task *Task, localFile, outputURL string) error {
 	}
 
 	if balance.Balance <= 0 || resp.Status == jobs_v1.JobStatusCompleted /* job has been reset */ {
-		task.stopChan <- struct{}{}
+		//task.stopChan <- struct{}{}
 	}
 
 	return err
