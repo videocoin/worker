@@ -229,7 +229,7 @@ func (s *Service) waitForStreamReady(streamurl string) {
 			return
 		}
 		s.log.Infof("waiting for stream %s to become ready...", streamurl)
-		time.Sleep(5 * time.Second)
+		time.Sleep(2 * time.Second)
 	}
 
 }
