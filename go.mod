@@ -26,7 +26,7 @@ require (
 	github.com/steakknife/hamming v0.0.0-20180906055917-c99c65617cd3 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.0 // indirect
 	github.com/videocoin/cloud-api v0.2.6
-	github.com/videocoin/cloud-pkg v0.0.2
+	github.com/videocoin/cloud-pkg v0.0.3-0.20190712213107-e13988c093de
 	github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208 // indirect
 	google.golang.org/api v0.7.0
 	google.golang.org/grpc v1.21.1
