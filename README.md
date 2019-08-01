@@ -32,6 +32,6 @@ kubectl port-forward config-consul-0 8500:8500
 
 ### deploy
 
-To release a new image simply run `make` which will build and push a new docker image then release the assosiated helm chart.
+To release a new image simply run `make` && `make deploy` which will build and push a new docker image then release the assosiated helm chart.
 
 If you have new dependencies run `make deps` before releasing.

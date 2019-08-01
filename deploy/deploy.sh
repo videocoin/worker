@@ -6,7 +6,7 @@ readonly CHART_DIR=./helm/transcoder
 CONSUL_ADDR=${CONSUL_ADDR:=127.0.0.1:8500}
 ENV=${ENV:=thor}
 DOCKER_REGISTRY=us.gcr.io
-VERSION=${VERSION:=`git describe --abbrev=0`-`git rev-parse --short HEAD`}
+VERSION=$(git describe --abbrev=0)-$(git rev-parse --short HEAD)
 PROJECT=${PROJECT:=`gcloud config list --format 'value(core.project)' 2>/dev/null`}
 
 function log {
