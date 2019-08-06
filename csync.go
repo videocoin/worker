@@ -65,7 +65,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 
 					// Add job to the job channel to be worked on later
 					ch <- Task{
-						Id:              job.Id,
+						ID:              job.Id,
 						ChunksDir:       dir,
 						InputChunkName:  chunk,
 						Bitrate:         bitrate,
@@ -116,7 +116,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 // handleChunk Appends to playlist, generates chunk id, calls verifier, uploads result
 func (s *Service) handleChunk(task *Task) error {
 	chunkLoc := path.Join(task.ChunksDir, task.InputChunkName)
-	uploadPath := fmt.Sprintf("%s/%d", task.Id, task.Bitrate)
+	uploadPath := fmt.Sprintf("%s/%d", task.ID, task.Bitrate)
 
 	if task.InputChunkName == "0.ts" {
 		duration, err := s.duration(chunkLoc)
@@ -151,7 +151,7 @@ func (s *Service) handleChunk(task *Task) error {
 		return err
 	}
 
-	_, err = s.manager.AddInputChunkId(context.Background(), &manager_v1.AddInputChunkIdRequest{
+	_, err = s.manager.AddInputChunkID(context.Background(), &manager_v1.AddInputChunkIdRequest{
 		ContractAddress: task.StreamAddress,
 		InputChunkId:    task.InputID.Int64(),
 		StreamId:        task.StreamID.Int64(),
@@ -161,8 +161,8 @@ func (s *Service) handleChunk(task *Task) error {
 		return err
 	}
 
-	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, task.Id, task.InputChunkName)
-	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, task.Id, task.Bitrate, task.OutputChunkName)
+	inputChunk := fmt.Sprintf("%s/%s/%s", s.cfg.BaseStreamURL, task.ID, task.InputChunkName)
+	outputChunk := fmt.Sprintf("https://%s/%s/%d/%s", s.cfg.Bucket, task.ID, task.Bitrate, task.OutputChunkName)
 
 	go s.verify(task, inputChunk, outputChunk)
 
@@ -190,7 +190,7 @@ func (s *Service) verify(task *Task, localFile, outputURL string) error {
 		s.log.Warnf("failed to check balance, allowing work")
 	}
 
-	resp, err := s.manager.Get(context.Background(), &manager_v1.JobRequest{Id: task.Id})
+	resp, err := s.manager.Get(context.Background(), &manager_v1.JobRequest{Id: task.ID})
 	if err != nil {
 		s.log.Warnf("failed to get current job status: %s", err.Error())
 	}
