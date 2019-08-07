@@ -23,7 +23,7 @@ const (
 type (
 	// Task used to queue up chunk work
 	Task struct {
-		Id              string
+		ID              string
 		Bitrate         uint32
 		InputChunkName  string
 		OutputChunkName string

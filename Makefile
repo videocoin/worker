@@ -4,6 +4,7 @@
 DOCKER_REGISTRY = us.gcr.io
 PROJECT_ID= videocoin-network
 SERVICE_NAME = transcoder
+BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
@@ -18,8 +19,6 @@ image-tag:
 
 deps:
 	env GO111MODULE=on go mod vendor
-	cp -r $(GOPATH)/src/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1 \
-	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
 build:
 	export GOOS=linux

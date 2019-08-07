@@ -215,6 +215,16 @@ github.com/videocoin/cloud-api v0.1.160 h1:On2dyh64wnrXeVXTAyVhoQYG0ChUdvw9xi6rc
 github.com/videocoin/cloud-api v0.1.160/go.mod h1:ZJ5Dnw2fBytz7bWxjm1L/wvztaFe0EuBIWpvzEfdbBw=
 github.com/videocoin/cloud-api v0.1.161-0.20190726203359-4500798149ed h1:sLaHt5sO37QC5hLrSndSbc46HPPS9hn7UydhH1OpSto=
 github.com/videocoin/cloud-api v0.1.161-0.20190726203359-4500798149ed/go.mod h1:ZJ5Dnw2fBytz7bWxjm1L/wvztaFe0EuBIWpvzEfdbBw=
+github.com/videocoin/cloud-api v0.1.164-0.20190805221926-259d5c968d87 h1:OWU+YXh73xu9k4epu2jovxIq6A1OtHOEo9w7Bzbh21k=
+github.com/videocoin/cloud-api v0.1.164-0.20190805221926-259d5c968d87/go.mod h1:ZJ5Dnw2fBytz7bWxjm1L/wvztaFe0EuBIWpvzEfdbBw=
+github.com/videocoin/cloud-api v0.1.165 h1:f7gX65egRmu+CupP+Q/7NKxYyU4nPkXaXWNnNQrocc8=
+github.com/videocoin/cloud-api v0.1.165/go.mod h1:ZJ5Dnw2fBytz7bWxjm1L/wvztaFe0EuBIWpvzEfdbBw=
+github.com/videocoin/cloud-api v0.1.166 h1:bjc7oQL0SKX7iWIaKPrRPEF9d8ZMsdYMqgS3T4DJLC0=
+github.com/videocoin/cloud-api v0.1.166/go.mod h1:ZJ5Dnw2fBytz7bWxjm1L/wvztaFe0EuBIWpvzEfdbBw=
+github.com/videocoin/cloud-api v0.1.168 h1:GxTyKRVklEqhCTTpJFGzqNLAJfK1/CVSah68ECXCfAQ=
+github.com/videocoin/cloud-api v0.1.168/go.mod h1:ZJ5Dnw2fBytz7bWxjm1L/wvztaFe0EuBIWpvzEfdbBw=
+github.com/videocoin/cloud-api v0.2.5 h1:Hj3dwOZxtu4sJdNMZJaHANDQadv15o7jF2To7JvhRvU=
+github.com/videocoin/cloud-api v0.2.5/go.mod h1:6HhpNaw1C8VsYtRpaF2gNZCKJmZjWjeQwXHn4lvm1QQ=
 github.com/videocoin/cloud-api v0.2.6 h1:kQ3WHs1dpA6Tr0oVT9bNAWE1XNb0fhnjMMcbOgM3E2g=
 github.com/videocoin/cloud-pkg v0.0.2 h1:U1QD0rlYrMpEgba4LlxbfwsocIM8LcqARrvMVqRlMAM=
 github.com/videocoin/cloud-pkg v0.0.2/go.mod h1:zB1t/OI+YAP5dVshydrqkaPQs8ug1/mA77xjiELgaSs=
