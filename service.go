@@ -241,7 +241,7 @@ func prepareDir(dir string) error {
 func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
-	args := fmt.Sprintf("-live_start_index -1 -b:v %d -vf scale=%d:-2 -strict -2 -c:v libx264 -c:a aac -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 2 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, dir, profile.Bitrate, dir, profile.Bitrate)
+	args := fmt.Sprintf("-max_muxing_queue_size 9999 -live_start_index -1 -b:v %d -vf scale=%d:-2 -strict -2 -c:v libx264 -c:a aac -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 2 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, dir, profile.Bitrate, dir, profile.Bitrate)
 	process = append(process, strings.Split(args, " ")...)
 
 	cmd := exec.Command("ffmpeg", process...)
