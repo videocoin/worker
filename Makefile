@@ -8,8 +8,6 @@ BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
-LATEST=$(DOCKER_REGISTRY)/${PROJECT_ID}/$(SERVICE_NAME):latest
-
 
 version:
 	@echo $(VERSION)
@@ -37,11 +35,10 @@ test-coverage:
 
 docker:
 	@echo "==> Docker building..."
-	docker build -t ${IMAGE_TAG} -t $(LATEST) .
+	docker build -t ${IMAGE_TAG} .
 
 docker-push:
 	docker push $(IMAGE_TAG)
-	docker push $(LATEST)
 
 clean:
 	rm -rf bin/*
