@@ -148,7 +148,7 @@ func (s *Service) pollForWork() {
 			continue
 		}
 
-		s.log.Info("work found")
+		s.log.Printf("work found: id=%s", assignment.Job.Id)
 
 		s.handleTranscode(assignment)
 	}
