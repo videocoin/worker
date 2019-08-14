@@ -61,6 +61,7 @@ message Job {
     string transcode_output_url =12;
     JobStatus status = 13;
     int64 created_at = 14;
+    int64 updated_at = 15;
     bool refunded = 16;
     InputStatus input_status = 17;
     string user_id = 18;
@@ -83,6 +84,8 @@ message JobProfile {
 
     JobStatus status = 9;
     InputStatus input_status = 10;
+
+    int64 created_at = 11;
 }
 
 message JobProfiles {
