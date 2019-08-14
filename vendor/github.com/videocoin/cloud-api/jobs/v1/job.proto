@@ -62,9 +62,11 @@ message Job {
     JobStatus status = 13;
     int64 created_at = 14;
     int64 updated_at = 15;
-    bool refunded = 16;
-    InputStatus input_status = 17;
-    string user_id = 18;
+    int64 ready_at = 16;
+    int64 completed_at = 17;
+    bool refunded = 18;
+    InputStatus input_status = 19;
+    string user_id = 20;
 }
 
 message Jobs {
