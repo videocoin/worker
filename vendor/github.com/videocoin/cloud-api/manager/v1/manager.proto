@@ -188,4 +188,5 @@ message AddInputChunkIdRequest {
   string contract_address = 1;
   int64 input_chunk_id = 2;
   int64 stream_id = 3;
+  double chunk_duration = 4;
 }

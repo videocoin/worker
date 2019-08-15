@@ -155,6 +155,7 @@ func (s *Service) handleChunk(task *Task) error {
 		ContractAddress: task.StreamAddress,
 		InputChunkId:    task.InputID.Int64(),
 		StreamId:        task.StreamID.Int64(),
+		ChunkDuration:	   duration,
 	})
 
 	if err != nil {
