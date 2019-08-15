@@ -193,10 +193,6 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 		a.Job.TranscodeInputUrl,
 	)
 
-	s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
-		ContractAddress: a.Job.StreamAddress,
-	})
-
 	return nil
 }
 
