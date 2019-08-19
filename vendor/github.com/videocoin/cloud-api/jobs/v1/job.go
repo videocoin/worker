@@ -54,12 +54,7 @@ func (j *Job) BeforeSave(scope *gorm.Scope) error {
 	if err := scope.SetColumn("updated_at", time.Now().Unix()); err != nil {
 		return err
 	}
-	if err := scope.SetColumn("ready_at", time.Now().Unix()); err != nil {
-		return err
-	}
-	if err := scope.SetColumn("completed_at", time.Now().Unix()); err != nil {
-		return err
-	}
+
 	return nil
 }
 
@@ -67,11 +62,6 @@ func (j *Job) BeforeUpdate(scope *gorm.Scope) error {
 	if err := scope.SetColumn("updated_at", time.Now().Unix()); err != nil {
 		return err
 	}
-	if err := scope.SetColumn("ready_at", time.Now().Unix()); err != nil {
-		return err
-	}
-	if err := scope.SetColumn("completed_at", time.Now().Unix()); err != nil {
-		return err
-	}
+	
 	return nil
 }

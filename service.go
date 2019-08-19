@@ -148,12 +148,16 @@ func (s *Service) pollForWork() {
 			continue
 		}
 
-		s.log.Printf("work found: id=%s", assignment.Job.Id)
+		s.eth = NewEth(s.cfg)
+		s.eth.connect(cfg.BlockchainURL, cfg.SMCA, assignment.Job.StreamAddress)
+
+		log.Printf("work found: id=%s", assignment.Job.Id)
+		log.Printf("using key: %s", s.eth.kv.Key)
+		log.Printf("value: %s", string(s.eth.kv.Value))
 
 		if s.handleTranscode(assignment) != nil {
 			os.Exit(0)
 		}
-
 	}
 }
 

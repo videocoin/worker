@@ -77,7 +77,6 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 						StreamID:        big.NewInt(job.StreamId),
 						StreamAddress:   job.StreamAddress,
 						cmd:             cmd,
-						stopChan:        stop,
 					}
 
 				}
@@ -197,7 +196,6 @@ func (s *Service) verify(task *Task, localFile, outputURL string) error {
 	}
 
 	if balance.Balance <= 0 || resp.Status == jobs_v1.JobStatusCancelled /* job has been reset */ {
-		task.stopChan <- struct{}{}
 		task.cmd.Process.Kill()
 	}
 
