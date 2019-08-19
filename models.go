@@ -55,11 +55,12 @@ type (
 
 	// Eth Used for all eth interactions
 	Eth struct {
-		sm     *streamManager.Manager
-		si     *stream.Stream
-		kv     *api.KVPair
-		rawKey *keystore.Key
-		auth   *bind.TransactOpts
-		client *ethclient.Client
+		sm       *streamManager.Manager
+		si       *stream.Stream
+		kv       *api.KVPair
+		rawKey   *keystore.Key
+		auth     *bind.TransactOpts
+		client   *ethclient.Client
+		profiles []*big.Int
 	}
 )

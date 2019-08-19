@@ -81,6 +81,13 @@ func (e *Eth) connect(url, smca, streamAddress string) {
 	if err != nil {
 		panic(err)
 	}
+
+	profiles, err := e.si.Getprofiles(nil)
+	if err != nil {
+		panic(err)
+	}
+
+	e.profiles = profiles
 }
 
 func createHash(key string) string {

@@ -117,6 +117,11 @@ func (s *Service) handleChunk(task *Task) error {
 	chunkLoc := path.Join(task.ChunksDir, task.InputChunkName)
 	uploadPath := fmt.Sprintf("%s/%d", task.ID, task.Bitrate)
 
+	_, err := s.eth.si.SubmitProof(s.eth.auth, s.eth.profiles[0], task.InputID, big.NewInt(0), task.OutputID)
+	if err != nil {
+		s.log.Errorf("failed to submit proof: %s", err.Error())
+	}
+
 	if task.InputChunkName == "0.ts" {
 		duration, err := s.duration(chunkLoc)
 		if err != nil {
