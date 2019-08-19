@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"math/rand"
 	"strings"
 
@@ -46,10 +47,12 @@ func NewEth(c *Config) *Eth {
 	key.Value = decrypt(key.Value, c.DecryptionKey)
 	secret.Value = decrypt(secret.Value, c.DecryptionKey)
 
-	rawKey, err := bc.LoadBcPrivKeys(string(key.Value), string(secret.Value), bc.FromMemory)
+	rawKey, err := bc.LoadBcPrivKeys(`{"address":"263287e4debff1cd61d75127794d837ba4932928","crypto":{"cipher":"aes-128-ctr","ciphertext":"a805d15481f97b6fa2500b7a6876dddbd4a527f0b240c2890a67cb31f0edc3b6","cipherparams":{"iv":"6dfc7c3b3a280a175f131323ec6d2670"},"kdf":"scrypt","kdfparams":{"dklen":32,"n":262144,"p":1,"r":8,"salt":"7f3f92d81110ea68b896b6ba5db2164d514822dc0263b8bdb2747a3572221ca1"},"mac":"7ef9d43e4068608617d3db2b590ae3e89a0a5766616d81f7fa8c94205a98c77d"},"id":"0ca0e295-b4fd-451f-8ba9-0d5f8bd38108","version":3}`, "efbzjzcqmg", bc.FromMemory)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println(rawKey)
 
 	return &Eth{
 		rawKey: rawKey,
