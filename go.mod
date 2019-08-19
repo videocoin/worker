@@ -20,7 +20,7 @@ require (
 	github.com/shirou/gopsutil v2.18.12+incompatible
 	github.com/sirupsen/logrus v1.4.2
 	github.com/videocoin/cloud-api v0.1.178
-	github.com/videocoin/cloud-pkg v0.0.3-0.20190712213107-e13988c093de
+	github.com/videocoin/cloud-pkg v0.0.5
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/exp v0.0.0-20190627132806-fd42eb6b336f // indirect
 	golang.org/x/image v0.0.0-20190622003408-7e034cad6442 // indirect

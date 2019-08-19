@@ -133,7 +133,7 @@ github.com/videocoin/cloud-api/profiles/v1
 github.com/videocoin/cloud-api/transcoder/v1
 github.com/videocoin/cloud-api/verifier/v1
 github.com/videocoin/cloud-api/rpc
-# github.com/videocoin/cloud-pkg v0.0.3-0.20190712213107-e13988c093de
+# github.com/videocoin/cloud-pkg v0.0.5
 github.com/videocoin/cloud-pkg/bcops
 github.com/videocoin/cloud-pkg/stream
 github.com/videocoin/cloud-pkg/streamManager
