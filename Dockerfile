@@ -9,7 +9,7 @@ ADD ./ ./
 
 RUN make build
 
-FROM jrottenberg/ffmpeg:4.0-ubuntu AS release
+FROM jrottenberg/ffmpeg:4.1-ubuntu AS release
 
 COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder ./
 

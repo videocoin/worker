@@ -80,6 +80,21 @@ spec:
               secretKeyRef:
                 name: {{ .Chart.Name }}
                 key: key
+          - name: CONSUL_URL
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: consulUrl
+          - name: CONSUL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: consulUsername
+          - name: CONSUL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: consulPassword
           - name: VERIFIER_RPC_ADDR
             value: verifier:50055
           - name: OUTPUT_DIR

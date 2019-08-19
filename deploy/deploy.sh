@@ -59,6 +59,9 @@ function get_vars() {
     readonly LOG_LEVEL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/logLevel` 
 
     readonly SECRET=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/secret`
+    readonly CONSUL_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/consulUrl`
+    readonly CONSUL_USERNAME=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/consulUsername`
+    readonly CONSUL_PASSWORD=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/consulPassword`
     readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/blockchainUrl`
     readonly KEY=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/key`
 
@@ -80,6 +83,9 @@ function deploy() {
         --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set secrets.secret="${SECRET}" \
         --set secrets.key="${KEY}" \
+        --set secrets.consulPassword="${CONSUL_PASSWORD}" \
+        --set secrets.consulUsername="${CONSUL_USERNAME}" \
+        --set secrets.consulUrl="${CONSUL_URL}" \
         --wait ${CHART_NAME} ${CHART_DIR}
 }
 
