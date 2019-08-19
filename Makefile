@@ -6,7 +6,7 @@ PROJECT_ID= videocoin-network
 SERVICE_NAME = transcoder
 BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
-VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --short HEAD)
+VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
 
 version:
