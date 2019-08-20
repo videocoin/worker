@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	mRand "math/rand"
+
 	"github.com/gogo/protobuf/types"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
@@ -28,6 +30,7 @@ import (
 
 func init() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
+	mRand.Seed(time.Now().Unix())
 }
 
 // New initialize and return a new Service object
