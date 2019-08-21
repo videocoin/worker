@@ -1,10 +1,6 @@
 package transcode
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/md5"
-	"encoding/hex"
 	"math/rand"
 	"strings"
 
@@ -42,9 +38,6 @@ func NewEth(c *Config) *Eth {
 	if err != nil {
 		panic(err)
 	}
-
-	key.Value = decrypt(key.Value, c.DecryptionKey)
-	secret.Value = decrypt(secret.Value, c.DecryptionKey)
 
 	rawKey, err := bc.LoadBcPrivKeys(string(key.Value), string(secret.Value), bc.FromMemory)
 	if err != nil {
@@ -88,34 +81,4 @@ func (e *Eth) connect(url, smca, streamAddress string) {
 	}
 
 	e.profiles = profiles
-}
-
-func createHash(key string) string {
-	hasher := md5.New()
-	hasher.Write([]byte(key))
-	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-func decrypt(data []byte, passphrase string) []byte {
-	key := []byte(createHash(passphrase))
-
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	nonceSize := gcm.NonceSize()
-	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
-
-	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return plaintext
 }
