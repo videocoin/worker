@@ -1,7 +1,9 @@
 package transcode
 
 import (
+	"fmt"
 	"math/rand"
+	"os"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -16,11 +18,7 @@ import (
 // NewEth returns new eth object with new key
 func NewEth(c *Config) *Eth {
 	consul, err := api.NewClient(&api.Config{
-		Address: c.ConsulAddress,
-		HttpAuth: &api.HttpBasicAuth{
-			Username: c.ConsulUsername,
-			Password: c.ConsulPassword,
-		},
+		Address: fmt.Sprintf("%s:%s", os.Getenv("CONFIG_CONSUL_UI_SERVICE_HOST"), os.Getenv("CONFIG_CONSUL_UI_SERVICE_PORT_HTTP")),
 	})
 
 	if err != nil {

@@ -20,10 +20,6 @@ type Config struct {
 	Key             string `required:"true" envconfig:"KEY"`
 	Secret          string `required:"true" envconfig:"SECRET" default:"transcoder"`
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
-	DecryptionKey   string `required:"true" envconfig:"DECRYPTION_KEY" default:"gameofthronessucks"`
-	ConsulAddress   string `required:"true" envconfig:"CONSUL_URL" default:"localhost"`
-	ConsulUsername  string `required:"true" envconfig:"CONSUL_USERNAME" default:"admin"`
-	ConsulPassword  string `required:"true" envconfig:"CONSUL_PASSWORD" default:"password"`
 }
 
 var cfg Config
