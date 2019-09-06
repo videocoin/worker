@@ -20,7 +20,7 @@ import (
 )
 
 // SyncDir watches file system and processes chunks as they are written
-func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, dir string, bitrate uint32) {
+func (s *Service) syncDir(stop chan bool, cmd *exec.Cmd, job *jobs_v1.Job, dir string, bitrate uint32) {
 	var ch = make(chan Task, 10)
 	go s.process(ch, job)
 
@@ -38,7 +38,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 
 	defer watcher.Close()
 
-	done := make(chan struct{})
+	done := make(chan bool)
 
 	walletHex := common.HexToAddress(job.StreamAddress)
 
@@ -97,7 +97,7 @@ func (s *Service) syncDir(stop chan struct{}, cmd *exec.Cmd, job *jobs_v1.Job, d
 				watcher.Close()
 				close(ch)
 
-				done <- struct{}{}
+				done <- true
 			}
 		}
 	}()
