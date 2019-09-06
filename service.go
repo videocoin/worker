@@ -180,7 +180,7 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 	m3u8 := path.Join(dir, "index.m3u8")
 
 	cmd := buildCmd(a.Job.TranscodeInputUrl, dir, a.Profile)
-	var stopChan = make(chan struct{})
+	var stopChan = make(chan bool)
 
 	fullDir := fmt.Sprintf("%s/%d", dir, a.Profile.Bitrate)
 	err := prepareDir(fullDir)
@@ -205,7 +205,7 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment) error {
 
 func (s *Service) transcode(
 	cmd *exec.Cmd,
-	stop chan struct{},
+	stop chan bool,
 	streamurl string,
 ) {
 	s.waitForStreamReady(streamurl)
@@ -219,7 +219,7 @@ func (s *Service) transcode(
 		os.Exit(0)
 	}
 
-	stop <- struct{}{}
+	stop <- true
 
 	s.log.Info("transcode complete")
 
