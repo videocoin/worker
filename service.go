@@ -211,6 +211,10 @@ func (s *Service) transcode(
 	s.waitForStreamReady(streamurl)
 
 	out, err := cmd.CombinedOutput()
+
+	// Allow any chunks being uploaded to finish
+	time.Sleep(20 * time.Second)
+
 	if err != nil {
 		s.log.Errorf("failed to transcode: err : %s output: %s",
 			err.Error(), string(out),
