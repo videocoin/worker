@@ -1,8 +1,10 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	"github.com/videocoin/cloud-pkg/grpcutil"
+	"github.com/videocoin/transcode/telegraf"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
 )
@@ -11,6 +13,8 @@ type Service struct {
 	cfg        *Config
 	dispatcher dispatcherv1.DispatcherServiceClient
 	transcoder *transcoder.Transcoder
+
+	MachineID string
 }
 
 func NewService(cfg *Config) (*Service, error) {
@@ -27,10 +31,13 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
+	machineID := uuid.New()
+
 	svc := &Service{
 		cfg:        cfg,
 		dispatcher: dispatcher,
 		transcoder: trans,
+		MachineID:  machineID.String(),
 	}
 
 	return svc, nil
@@ -38,6 +45,10 @@ func NewService(cfg *Config) (*Service, error) {
 
 func (s *Service) Start() error {
 	go s.transcoder.Start()
+	go telegraf.Run(
+		s.cfg.Logger.WithField("system", "telegraf"),
+		s.MachineID)
+
 	return nil
 }
 
