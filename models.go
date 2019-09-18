@@ -1,7 +1,6 @@
 package transcode
 
 import (
-	"context"
 	"math/big"
 	"os/exec"
 
@@ -11,9 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/grafov/m3u8"
 	"github.com/hashicorp/consul/api"
-	"github.com/sirupsen/logrus"
-	manager_v1 "github.com/videocoin/cloud-api/manager/v1"
-	verifier_v1 "github.com/videocoin/cloud-api/verifier/v1"
 	"github.com/videocoin/cloud-pkg/stream"
 	streamManager "github.com/videocoin/cloud-pkg/streamManager"
 )
@@ -41,16 +37,6 @@ type (
 		cmd             *exec.Cmd
 		Wallet          common.Address
 		Playlist        *m3u8.MediaPlaylist
-	}
-
-	// Service primary reciever for service
-	Service struct {
-		cfg      *Config
-		log      *logrus.Entry
-		ctx      context.Context
-		manager  manager_v1.ManagerServiceClient
-		verifier verifier_v1.VerifierServiceClient
-		eth      *Eth
 	}
 
 	// Eth Used for all eth interactions
