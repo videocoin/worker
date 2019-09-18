@@ -4,21 +4,9 @@ package m3u8
  Part of M3U8 parser & generator library.
  This file defines functions related to playlist generation.
 
- Copyleft 2013-2015 Alexander I.Grafov aka Axel <grafov@gmail.com>
- Copyleft 2013-2015 library authors (see AUTHORS file).
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ Copyright 2013-2017 The Project Developers.
+ See the AUTHORS and LICENSE files at the top-level directory of this distribution
+ and at https://github.com/grafov/m3u8/
 
  ॐ तारे तुत्तारे तुरे स्व
 */
@@ -31,6 +19,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+)
+
+var (
+	ErrPlaylistFull = errors.New("playlist is full")
 )
 
 // Set version of the playlist accordingly with section 7
@@ -86,6 +78,20 @@ func (p *MasterPlaylist) Encode() *bytes.Buffer {
 	p.buf.WriteString("#EXTM3U\n#EXT-X-VERSION:")
 	p.buf.WriteString(strver(p.ver))
 	p.buf.WriteRune('\n')
+
+	if p.IndependentSegments() {
+		p.buf.WriteString("#EXT-X-INDEPENDENT-SEGMENTS\n")
+	}
+
+	// Write any custom master tags
+	if p.Custom != nil {
+		for _, v := range p.Custom {
+			if customBuf := v.Encode(); customBuf != nil {
+				p.buf.WriteString(customBuf.String())
+				p.buf.WriteRune('\n')
+			}
+		}
+	}
 
 	var altsWritten map[string]bool = make(map[string]bool)
 
@@ -157,6 +163,10 @@ func (p *MasterPlaylist) Encode() *bytes.Buffer {
 			p.buf.WriteString(strconv.FormatUint(uint64(pl.ProgramId), 10))
 			p.buf.WriteString(",BANDWIDTH=")
 			p.buf.WriteString(strconv.FormatUint(uint64(pl.Bandwidth), 10))
+			if pl.AverageBandwidth != 0 {
+				p.buf.WriteString(",AVERAGE-BANDWIDTH=")
+				p.buf.WriteString(strconv.FormatUint(uint64(pl.AverageBandwidth), 10))
+			}
 			if pl.Codecs != "" {
 				p.buf.WriteString(",CODECS=\"")
 				p.buf.WriteString(pl.Codecs)
@@ -171,6 +181,14 @@ func (p *MasterPlaylist) Encode() *bytes.Buffer {
 				p.buf.WriteString(pl.Video)
 				p.buf.WriteRune('"')
 			}
+			if pl.VideoRange != "" {
+				p.buf.WriteString(",VIDEO-RANGE=")
+				p.buf.WriteString(pl.VideoRange)
+			}
+			if pl.HDCPLevel != "" {
+				p.buf.WriteString(",HDCP-LEVEL=")
+				p.buf.WriteString(pl.HDCPLevel)
+			}
 			if pl.URI != "" {
 				p.buf.WriteString(",URI=\"")
 				p.buf.WriteString(pl.URI)
@@ -182,6 +200,10 @@ func (p *MasterPlaylist) Encode() *bytes.Buffer {
 			p.buf.WriteString(strconv.FormatUint(uint64(pl.ProgramId), 10))
 			p.buf.WriteString(",BANDWIDTH=")
 			p.buf.WriteString(strconv.FormatUint(uint64(pl.Bandwidth), 10))
+			if pl.AverageBandwidth != 0 {
+				p.buf.WriteString(",AVERAGE-BANDWIDTH=")
+				p.buf.WriteString(strconv.FormatUint(uint64(pl.AverageBandwidth), 10))
+			}
 			if pl.Codecs != "" {
 				p.buf.WriteString(",CODECS=\"")
 				p.buf.WriteString(pl.Codecs)
@@ -201,6 +223,16 @@ func (p *MasterPlaylist) Encode() *bytes.Buffer {
 				p.buf.WriteString(pl.Video)
 				p.buf.WriteRune('"')
 			}
+			if pl.Captions != "" {
+				p.buf.WriteString(",CLOSED-CAPTIONS=")
+				if pl.Captions == "NONE" {
+					p.buf.WriteString(pl.Captions) // CC should not be quoted when eq NONE
+				} else {
+					p.buf.WriteRune('"')
+					p.buf.WriteString(pl.Captions)
+					p.buf.WriteRune('"')
+				}
+			}
 			if pl.Subtitles != "" {
 				p.buf.WriteString(",SUBTITLES=\"")
 				p.buf.WriteString(pl.Subtitles)
@@ -211,6 +243,19 @@ func (p *MasterPlaylist) Encode() *bytes.Buffer {
 				p.buf.WriteString(pl.Name)
 				p.buf.WriteRune('"')
 			}
+			if pl.FrameRate != 0 {
+				p.buf.WriteString(",FRAME-RATE=")
+				p.buf.WriteString(strconv.FormatFloat(pl.FrameRate, 'f', 3, 64))
+			}
+			if pl.VideoRange != "" {
+				p.buf.WriteString(",VIDEO-RANGE=")
+				p.buf.WriteString(pl.VideoRange)
+			}
+			if pl.HDCPLevel != "" {
+				p.buf.WriteString(",HDCP-LEVEL=")
+				p.buf.WriteString(pl.HDCPLevel)
+			}
+
 			p.buf.WriteRune('\n')
 			p.buf.WriteString(pl.URI)
 			if p.Args != "" {
@@ -228,6 +273,38 @@ func (p *MasterPlaylist) Encode() *bytes.Buffer {
 	return &p.buf
 }
 
+// SetCustomTag sets the provided tag on the master playlist for its TagName
+func (p *MasterPlaylist) SetCustomTag(tag CustomTag) {
+	if p.Custom == nil {
+		p.Custom = make(map[string]CustomTag)
+	}
+
+	p.Custom[tag.TagName()] = tag
+}
+
+// Version returns the current playlist version number
+func (p *MasterPlaylist) Version() uint8 {
+	return p.ver
+}
+
+// SetVersion sets the playlist version number, note the version maybe changed
+// automatically by other Set methods.
+func (p *MasterPlaylist) SetVersion(ver uint8) {
+	p.ver = ver
+}
+
+// IndependentSegments returns true if all media samples in a segment can be
+// decoded without information from other segments.
+func (p *MasterPlaylist) IndependentSegments() bool {
+	return p.independentSegments
+}
+
+// SetIndependentSegments sets whether all media samples in a segment can be
+// decoded without information from other segments.
+func (p *MasterPlaylist) SetIndependentSegments(b bool) {
+	p.independentSegments = b
+}
+
 // For compatibility with Stringer interface
 // For example fmt.Printf("%s", sampleMediaList) will encode
 // playist and print its string representation.
@@ -239,15 +316,22 @@ func (p *MasterPlaylist) String() string {
 // Winsize defines how much items will displayed on playlist generation.
 // Capacity is total size of a playlist.
 func NewMediaPlaylist(winsize uint, capacity uint) (*MediaPlaylist, error) {
-	if capacity < winsize {
-		return nil, errors.New("capacity must be greater then winsize or equal")
-	}
 	p := new(MediaPlaylist)
 	p.ver = minver
-	p.winsize = winsize
 	p.capacity = capacity
+	if err := p.SetWinSize(winsize); err != nil {
+		return nil, err
+	}
 	p.Segments = make([]*MediaSegment, capacity)
 	return p, nil
+}
+
+// last returns the previously written segment's index
+func (p *MediaPlaylist) last() uint {
+	if p.tail == 0 {
+		return p.capacity - 1
+	}
+	return p.tail - 1
 }
 
 // Remove current segment from the head of chunk slice form a media playlist. Useful for sliding playlists.
@@ -268,18 +352,28 @@ func (p *MediaPlaylist) Remove() (err error) {
 // Append general chunk to the tail of chunk slice for a media playlist.
 // This operation does reset playlist cache.
 func (p *MediaPlaylist) Append(uri string, duration float64, title string) error {
-	if p.head == p.tail && p.count > 0 {
-		return errors.New("playlist is full")
-	}
 	seg := new(MediaSegment)
 	seg.URI = uri
 	seg.Duration = duration
 	seg.Title = title
+	return p.AppendSegment(seg)
+}
+
+// AppendSegment appends a MediaSegment to the tail of chunk slice for a media playlist.
+// This operation does reset playlist cache.
+func (p *MediaPlaylist) AppendSegment(seg *MediaSegment) error {
+	if p.head == p.tail && p.count > 0 {
+		return ErrPlaylistFull
+	}
+	seg.SeqId = p.SeqNo
+	if p.count > 0 {
+		seg.SeqId = p.Segments[(p.capacity+p.tail-1)%p.capacity].SeqId + 1
+	}
 	p.Segments[p.tail] = seg
 	p.tail = (p.tail + 1) % p.capacity
 	p.count++
-	if p.TargetDuration < duration {
-		p.TargetDuration = math.Ceil(duration)
+	if p.TargetDuration < seg.Duration {
+		p.TargetDuration = math.Ceil(seg.Duration)
 	}
 	p.buf.Reset()
 	return nil
@@ -291,8 +385,6 @@ func (p *MediaPlaylist) Append(uri string, duration float64, title string) error
 func (p *MediaPlaylist) Slide(uri string, duration float64, title string) {
 	if !p.Closed && p.count >= p.winsize {
 		p.Remove()
-	} else if !p.Closed {
-		p.SeqNo++
 	}
 	p.Append(uri, duration, title)
 }
@@ -304,39 +396,47 @@ func (p *MediaPlaylist) ResetCache() {
 
 // Generate output in M3U8 format. Marshal `winsize` elements from bottom of the `segments` queue.
 func (p *MediaPlaylist) Encode() *bytes.Buffer {
-	var seg *MediaSegment
-
 	if p.buf.Len() > 0 {
 		return &p.buf
 	}
 
-	if p.SeqNo == 0 {
-		p.SeqNo = 1
-	}
 	p.buf.WriteString("#EXTM3U\n#EXT-X-VERSION:")
 	p.buf.WriteString(strver(p.ver))
 	p.buf.WriteRune('\n')
+
+	// Write any custom master tags
+	if p.Custom != nil {
+		for _, v := range p.Custom {
+			if customBuf := v.Encode(); customBuf != nil {
+				p.buf.WriteString(customBuf.String())
+				p.buf.WriteRune('\n')
+			}
+		}
+	}
+
 	// default key (workaround for Widevine)
 	if p.Key != nil {
 		p.buf.WriteString("#EXT-X-KEY:")
 		p.buf.WriteString("METHOD=")
 		p.buf.WriteString(p.Key.Method)
-		p.buf.WriteString(",URI=\"")
-		p.buf.WriteString(p.Key.URI)
-		p.buf.WriteRune('"')
-		if p.Key.IV != "" {
-			p.buf.WriteString(",IV=")
-			p.buf.WriteString(p.Key.IV)
-		}
-		if p.Key.Keyformat != "" {
-			p.buf.WriteString(",KEYFORMAT=\"")
-			p.buf.WriteString(p.Key.Keyformat)
+		if p.Key.Method != "NONE" {
+			p.buf.WriteString(",URI=\"")
+			p.buf.WriteString(p.Key.URI)
 			p.buf.WriteRune('"')
-		}
-		if p.Key.Keyformatversions != "" {
-			p.buf.WriteString(",KEYFORMATVERSIONS=\"")
-			p.buf.WriteString(p.Key.Keyformatversions)
-			p.buf.WriteRune('"')
+			if p.Key.IV != "" {
+				p.buf.WriteString(",IV=")
+				p.buf.WriteString(p.Key.IV)
+			}
+			if p.Key.Keyformat != "" {
+				p.buf.WriteString(",KEYFORMAT=\"")
+				p.buf.WriteString(p.Key.Keyformat)
+				p.buf.WriteRune('"')
+			}
+			if p.Key.Keyformatversions != "" {
+				p.buf.WriteString(",KEYFORMATVERSIONS=\"")
+				p.buf.WriteString(p.Key.Keyformatversions)
+				p.buf.WriteRune('"')
+			}
 		}
 		p.buf.WriteRune('\n')
 	}
@@ -369,6 +469,19 @@ func (p *MediaPlaylist) Encode() *bytes.Buffer {
 	p.buf.WriteString("#EXT-X-TARGETDURATION:")
 	p.buf.WriteString(strconv.FormatInt(int64(math.Ceil(p.TargetDuration)), 10)) // due section 3.4.2 of M3U8 specs EXT-X-TARGETDURATION must be integer
 	p.buf.WriteRune('\n')
+	if p.StartTime > 0.0 {
+		p.buf.WriteString("#EXT-X-START:TIME-OFFSET=")
+		p.buf.WriteString(strconv.FormatFloat(p.StartTime, 'f', -1, 64))
+		if p.StartTimePrecise {
+			p.buf.WriteString(",PRECISE=YES")
+		}
+		p.buf.WriteRune('\n')
+	}
+	if p.DiscontinuitySeq != 0 {
+		p.buf.WriteString("#EXT-X-DISCONTINUITY-SEQUENCE:")
+		p.buf.WriteString(strconv.FormatUint(uint64(p.DiscontinuitySeq), 10))
+		p.buf.WriteRune('\n')
+	}
 	if p.Iframe {
 		p.buf.WriteString("#EXT-X-I-FRAMES-ONLY\n")
 	}
@@ -441,9 +554,14 @@ func (p *MediaPlaylist) Encode() *bytes.Buffer {
 		}
 	}
 
+	var (
+		seg           *MediaSegment
+		durationCache = make(map[float64]string)
+	)
+
 	head := p.head
 	count := p.count
-	for i := uint(0); i < p.winsize && count > 0; count-- {
+	for i := uint(0); (i < p.winsize || p.winsize == 0) && count > 0; count-- {
 		seg = p.Segments[head]
 		head = (head + 1) % p.capacity
 		if seg == nil { // protection from badly filled chunklists
@@ -452,32 +570,89 @@ func (p *MediaPlaylist) Encode() *bytes.Buffer {
 		if p.winsize > 0 { // skip for VOD playlists, where winsize = 0
 			i++
 		}
+		if seg.SCTE != nil {
+			switch seg.SCTE.Syntax {
+			case SCTE35_67_2014:
+				p.buf.WriteString("#EXT-SCTE35:")
+				p.buf.WriteString("CUE=\"")
+				p.buf.WriteString(seg.SCTE.Cue)
+				p.buf.WriteRune('"')
+				if seg.SCTE.ID != "" {
+					p.buf.WriteString(",ID=\"")
+					p.buf.WriteString(seg.SCTE.ID)
+					p.buf.WriteRune('"')
+				}
+				if seg.SCTE.Time != 0 {
+					p.buf.WriteString(",TIME=")
+					p.buf.WriteString(strconv.FormatFloat(seg.SCTE.Time, 'f', -1, 64))
+				}
+				p.buf.WriteRune('\n')
+			case SCTE35_OATCLS:
+				switch seg.SCTE.CueType {
+				case SCTE35Cue_Start:
+					p.buf.WriteString("#EXT-OATCLS-SCTE35:")
+					p.buf.WriteString(seg.SCTE.Cue)
+					p.buf.WriteRune('\n')
+					p.buf.WriteString("#EXT-X-CUE-OUT:")
+					p.buf.WriteString(strconv.FormatFloat(seg.SCTE.Time, 'f', -1, 64))
+					p.buf.WriteRune('\n')
+				case SCTE35Cue_Mid:
+					p.buf.WriteString("#EXT-X-CUE-OUT-CONT:")
+					p.buf.WriteString("ElapsedTime=")
+					p.buf.WriteString(strconv.FormatFloat(seg.SCTE.Elapsed, 'f', -1, 64))
+					p.buf.WriteString(",Duration=")
+					p.buf.WriteString(strconv.FormatFloat(seg.SCTE.Time, 'f', -1, 64))
+					p.buf.WriteString(",SCTE35=")
+					p.buf.WriteString(seg.SCTE.Cue)
+					p.buf.WriteRune('\n')
+				case SCTE35Cue_End:
+					p.buf.WriteString("#EXT-X-CUE-IN")
+					p.buf.WriteRune('\n')
+				}
+			}
+		}
 		// check for key change
 		if seg.Key != nil && p.Key != seg.Key {
 			p.buf.WriteString("#EXT-X-KEY:")
 			p.buf.WriteString("METHOD=")
 			p.buf.WriteString(seg.Key.Method)
-			p.buf.WriteString(",URI=\"")
-			p.buf.WriteString(seg.Key.URI)
-			p.buf.WriteRune('"')
-			if seg.Key.IV != "" {
-				p.buf.WriteString(",IV=")
-				p.buf.WriteString(seg.Key.IV)
-			}
-			if seg.Key.Keyformat != "" {
-				p.buf.WriteString(",KEYFORMAT=\"")
-				p.buf.WriteString(seg.Key.Keyformat)
+			if seg.Key.Method != "NONE" {
+				p.buf.WriteString(",URI=\"")
+				p.buf.WriteString(seg.Key.URI)
 				p.buf.WriteRune('"')
-			}
-			if seg.Key.Keyformatversions != "" {
-				p.buf.WriteString(",KEYFORMATVERSIONS=\"")
-				p.buf.WriteString(seg.Key.Keyformatversions)
-				p.buf.WriteRune('"')
+				if seg.Key.IV != "" {
+					p.buf.WriteString(",IV=")
+					p.buf.WriteString(seg.Key.IV)
+				}
+				if seg.Key.Keyformat != "" {
+					p.buf.WriteString(",KEYFORMAT=\"")
+					p.buf.WriteString(seg.Key.Keyformat)
+					p.buf.WriteRune('"')
+				}
+				if seg.Key.Keyformatversions != "" {
+					p.buf.WriteString(",KEYFORMATVERSIONS=\"")
+					p.buf.WriteString(seg.Key.Keyformatversions)
+					p.buf.WriteRune('"')
+				}
 			}
 			p.buf.WriteRune('\n')
 		}
 		if seg.Discontinuity {
 			p.buf.WriteString("#EXT-X-DISCONTINUITY\n")
+		}
+		// ignore segment Map if default playlist Map is present
+		if p.Map == nil && seg.Map != nil {
+			p.buf.WriteString("#EXT-X-MAP:")
+			p.buf.WriteString("URI=\"")
+			p.buf.WriteString(seg.Map.URI)
+			p.buf.WriteRune('"')
+			if seg.Map.Limit > 0 {
+				p.buf.WriteString(",BYTERANGE=")
+				p.buf.WriteString(strconv.FormatInt(seg.Map.Limit, 10))
+				p.buf.WriteRune('@')
+				p.buf.WriteString(strconv.FormatInt(seg.Map.Offset, 10))
+			}
+			p.buf.WriteRune('\n')
 		}
 		if !seg.ProgramDateTime.IsZero() {
 			p.buf.WriteString("#EXT-X-PROGRAM-DATE-TIME:")
@@ -491,23 +666,39 @@ func (p *MediaPlaylist) Encode() *bytes.Buffer {
 			p.buf.WriteString(strconv.FormatInt(seg.Offset, 10))
 			p.buf.WriteRune('\n')
 		}
+
+		// Add Custom Segment Tags here
+		if seg.Custom != nil {
+			for _, v := range seg.Custom {
+				if customBuf := v.Encode(); customBuf != nil {
+					p.buf.WriteString(customBuf.String())
+					p.buf.WriteRune('\n')
+				}
+			}
+		}
+
 		p.buf.WriteString("#EXTINF:")
-		if p.durationAsInt {
-			// Old Android players has problems with non integer Duration.
-			p.buf.WriteString(strconv.FormatInt(int64(math.Ceil(seg.Duration)), 10))
+		if str, ok := durationCache[seg.Duration]; ok {
+			p.buf.WriteString(str)
 		} else {
-			// Wowza Mediaserver and some others prefer floats.
-			p.buf.WriteString(strconv.FormatFloat(seg.Duration, 'f', 3, 32))
+			if p.durationAsInt {
+				// Old Android players has problems with non integer Duration.
+				durationCache[seg.Duration] = strconv.FormatInt(int64(math.Ceil(seg.Duration)), 10)
+			} else {
+				// Wowza Mediaserver and some others prefer floats.
+				durationCache[seg.Duration] = strconv.FormatFloat(seg.Duration, 'f', 3, 32)
+			}
+			p.buf.WriteString(durationCache[seg.Duration])
 		}
 		p.buf.WriteRune(',')
 		p.buf.WriteString(seg.Title)
-		p.buf.WriteString("\n")
+		p.buf.WriteRune('\n')
 		p.buf.WriteString(seg.URI)
 		if p.Args != "" {
 			p.buf.WriteRune('?')
 			p.buf.WriteString(p.Args)
 		}
-		p.buf.WriteString("\n")
+		p.buf.WriteRune('\n')
 	}
 	if p.Closed {
 		p.buf.WriteString("#EXT-X-ENDLIST\n")
@@ -551,7 +742,7 @@ func (p *MediaPlaylist) SetDefaultKey(method, uri, iv, keyformat, keyformatversi
 	// A Media Playlist MUST indicate a EXT-X-VERSION of 5 or higher if it
 	// contains:
 	//   - The KEYFORMAT and KEYFORMATVERSIONS attributes of the EXT-X-KEY tag.
-	if keyformat != "" && keyformatversions != "" {
+	if keyformat != "" || keyformatversions != "" {
 		version(&p.ver, 5)
 	}
 	p.Key = &Key{method, uri, iv, keyformat, keyformatversions}
@@ -559,9 +750,8 @@ func (p *MediaPlaylist) SetDefaultKey(method, uri, iv, keyformat, keyformatversi
 	return nil
 }
 
-// Set map appeared once in header of the playlist (pointer to MediaPlaylist.Key).
-// It useful when map not changed during playback.
-// Set tag for the whole list.
+// Set default Media Initialization Section values for playlist (pointer to MediaPlaylist.Map).
+// Set EXT-X-MAP tag for the whole playlist.
 func (p *MediaPlaylist) SetDefaultMap(uri string, limit, offset int64) {
 	version(&p.ver, 5) // due section 4
 	p.Map = &Map{uri, limit, offset}
@@ -583,21 +773,21 @@ func (p *MediaPlaylist) SetKey(method, uri, iv, keyformat, keyformatversions str
 	// A Media Playlist MUST indicate a EXT-X-VERSION of 5 or higher if it
 	// contains:
 	//   - The KEYFORMAT and KEYFORMATVERSIONS attributes of the EXT-X-KEY tag.
-	if keyformat != "" && keyformatversions != "" {
+	if keyformat != "" || keyformatversions != "" {
 		version(&p.ver, 5)
 	}
 
-	p.Segments[(p.tail-1)%p.capacity].Key = &Key{method, uri, iv, keyformat, keyformatversions}
+	p.Segments[p.last()].Key = &Key{method, uri, iv, keyformat, keyformatversions}
 	return nil
 }
 
-// Set encryption key for the current segment of media playlist (pointer to Segment.Key)
+// Set map for the current segment of media playlist (pointer to Segment.Map)
 func (p *MediaPlaylist) SetMap(uri string, limit, offset int64) error {
 	if p.count == 0 {
 		return errors.New("playlist is empty")
 	}
 	version(&p.ver, 5) // due section 4
-	p.Segments[(p.tail-1)%p.capacity].Map = &Map{uri, limit, offset}
+	p.Segments[p.last()].Map = &Map{uri, limit, offset}
 	return nil
 }
 
@@ -607,8 +797,24 @@ func (p *MediaPlaylist) SetRange(limit, offset int64) error {
 		return errors.New("playlist is empty")
 	}
 	version(&p.ver, 4) // due section 3.4.1
-	p.Segments[(p.tail-1)%p.capacity].Limit = limit
-	p.Segments[(p.tail-1)%p.capacity].Offset = offset
+	p.Segments[p.last()].Limit = limit
+	p.Segments[p.last()].Offset = offset
+	return nil
+}
+
+// SetSCTE sets the SCTE cue format for the current media segment.
+//
+// Deprecated: Use SetSCTE35 instead.
+func (p *MediaPlaylist) SetSCTE(cue string, id string, time float64) error {
+	return p.SetSCTE35(&SCTE{Syntax: SCTE35_67_2014, Cue: cue, ID: id, Time: time})
+}
+
+// SetSCTE35 sets the SCTE cue format for the current media segment
+func (p *MediaPlaylist) SetSCTE35(scte35 *SCTE) error {
+	if p.count == 0 {
+		return errors.New("playlist is empty")
+	}
+	p.Segments[p.last()].SCTE = scte35
 	return nil
 }
 
@@ -620,7 +826,7 @@ func (p *MediaPlaylist) SetDiscontinuity() error {
 	if p.count == 0 {
 		return errors.New("playlist is empty")
 	}
-	p.Segments[(p.tail-1)%p.capacity].Discontinuity = true
+	p.Segments[p.last()].Discontinuity = true
 	return nil
 }
 
@@ -633,6 +839,57 @@ func (p *MediaPlaylist) SetProgramDateTime(value time.Time) error {
 	if p.count == 0 {
 		return errors.New("playlist is empty")
 	}
-	p.Segments[(p.tail-1)%p.capacity].ProgramDateTime = value
+	p.Segments[p.last()].ProgramDateTime = value
+	return nil
+}
+
+// SetCustomTag sets the provided tag on the media playlist for its TagName
+func (p *MediaPlaylist) SetCustomTag(tag CustomTag) {
+	if p.Custom == nil {
+		p.Custom = make(map[string]CustomTag)
+	}
+
+	p.Custom[tag.TagName()] = tag
+}
+
+// SetCustomTag sets the provided tag on the current media segment for its TagName
+func (p *MediaPlaylist) SetCustomSegmentTag(tag CustomTag) error {
+	if p.count == 0 {
+		return errors.New("playlist is empty")
+	}
+
+	last := p.Segments[p.last()]
+
+	if last.Custom == nil {
+		last.Custom = make(map[string]CustomTag)
+	}
+
+	last.Custom[tag.TagName()] = tag
+
+	return nil
+}
+
+// Version returns the current playlist version number
+func (p *MediaPlaylist) Version() uint8 {
+	return p.ver
+}
+
+// SetVersion sets the playlist version number, note the version maybe changed
+// automatically by other Set methods.
+func (p *MediaPlaylist) SetVersion(ver uint8) {
+	p.ver = ver
+}
+
+// WinSize returns the playlist's window size.
+func (p *MediaPlaylist) WinSize() uint {
+	return p.winsize
+}
+
+// SetWinSize overwrites the playlist's window size.
+func (p *MediaPlaylist) SetWinSize(winsize uint) error {
+	if winsize > p.capacity {
+		return errors.New("capacity must be greater than winsize or equal")
+	}
+	p.winsize = winsize
 	return nil
 }

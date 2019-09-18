@@ -4,21 +4,9 @@ package m3u8
  Part of M3U8 parser & generator library.
  This file defines data structures related to package.
 
- Copyleft 2013-2015 Alexander I.Grafov aka Axel <grafov@gmail.com>
- Copyleft 2013-2015 library authors (see AUTHORS file).
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ Copyright 2013-2017 The Project Developers.
+ See the AUTHORS and LICENSE files at the top-level directory of this distribution
+ and at https://github.com/grafov/m3u8/
 
  ॐ तारे तुत्तारे तुरे स्व
 */
@@ -64,6 +52,27 @@ const (
 	VOD
 )
 
+// SCTE35Syntax defines the format of the SCTE-35 cue points which do not use
+// the draft-pantos-http-live-streaming-19 EXT-X-DATERANGE tag and instead
+// have their own custom tags
+type SCTE35Syntax uint
+
+const (
+	// SCTE35_67_2014 will be the default due to backwards compatibility reasons.
+	SCTE35_67_2014 SCTE35Syntax = iota // SCTE35_67_2014 defined in http://www.scte.org/documents/pdf/standards/SCTE%2067%202014.pdf
+	SCTE35_OATCLS                      // SCTE35_OATCLS is a non-standard but common format
+)
+
+// SCTE35CueType defines the type of cue point, used by readers and writers to
+// write a different syntax
+type SCTE35CueType uint
+
+const (
+	SCTE35Cue_Start SCTE35CueType = iota // SCTE35Cue_Start indicates an out cue point
+	SCTE35Cue_Mid                        // SCTE35Cue_Mid indicates a segment between start and end cue points
+	SCTE35Cue_End                        // SCTE35Cue_End indicates an in cue point
+)
+
 /*
  This structure represents a single bitrate playlist aka media playlist.
  It related to both a simple media playlists and a sliding window media playlists.
@@ -93,25 +102,30 @@ const (
    https://priv.example.com/fileSequence2682.ts
 */
 type MediaPlaylist struct {
-	TargetDuration float64
-	SeqNo          uint64 // EXT-X-MEDIA-SEQUENCE
-	Segments       []*MediaSegment
-	Args           string // optional arguments placed after URIs (URI?Args)
-	Iframe         bool   // EXT-X-I-FRAMES-ONLY
-	Closed         bool   // is this VOD (closed) or Live (sliding) playlist?
-	MediaType      MediaType
-	durationAsInt  bool // output durations as integers of floats?
-	keyformat      int
-	winsize        uint // max number of segments displayed in an encoded playlist; need set to zero for VOD playlists
-	capacity       uint // total capacity of slice used for the playlist
-	head           uint // head of FIFO, we add segments to head
-	tail           uint // tail of FIFO, we remove segments from tail
-	count          uint // number of segments added to the playlist
-	buf            bytes.Buffer
-	ver            uint8
-	Key            *Key // EXT-X-KEY is optional encryption key displayed before any segments (default key for the playlist)
-	Map            *Map // EXT-X-MAP is optional tag specifies how to obtain the Media Initialization Section (default map for the playlist)
-	WV             *WV  // Widevine related tags outside of M3U8 specs
+	TargetDuration   float64
+	SeqNo            uint64 // EXT-X-MEDIA-SEQUENCE
+	Segments         []*MediaSegment
+	Args             string // optional arguments placed after URIs (URI?Args)
+	Iframe           bool   // EXT-X-I-FRAMES-ONLY
+	Closed           bool   // is this VOD (closed) or Live (sliding) playlist?
+	MediaType        MediaType
+	DiscontinuitySeq uint64 // EXT-X-DISCONTINUITY-SEQUENCE
+	StartTime        float64
+	StartTimePrecise bool
+	durationAsInt    bool // output durations as integers of floats?
+	keyformat        int
+	winsize          uint // max number of segments displayed in an encoded playlist; need set to zero for VOD playlists
+	capacity         uint // total capacity of slice used for the playlist
+	head             uint // head of FIFO, we add segments to head
+	tail             uint // tail of FIFO, we remove segments from tail
+	count            uint // number of segments added to the playlist
+	buf              bytes.Buffer
+	ver              uint8
+	Key              *Key // EXT-X-KEY is optional encryption key displayed before any segments (default key for the playlist)
+	Map              *Map // EXT-X-MAP is optional tag specifies how to obtain the Media Initialization Section (default map for the playlist)
+	WV               *WV  // Widevine related tags outside of M3U8 specs
+	Custom           map[string]CustomTag
+	customDecoders   []CustomDecoder
 }
 
 /*
@@ -130,11 +144,14 @@ type MediaPlaylist struct {
    http://example.com/audio-only.m3u8
 */
 type MasterPlaylist struct {
-	Variants      []*Variant
-	Args          string // optional arguments placed after URI (URI?Args)
-	CypherVersion string // non-standard tag for Widevine (see also WV struct)
-	buf           bytes.Buffer
-	ver           uint8
+	Variants            []*Variant
+	Args                string // optional arguments placed after URI (URI?Args)
+	CypherVersion       string // non-standard tag for Widevine (see also WV struct)
+	buf                 bytes.Buffer
+	ver                 uint8
+	independentSegments bool
+	Custom              map[string]CustomTag
+	customDecoders      []CustomDecoder
 }
 
 // This structure represents variants for master playlist.
@@ -145,20 +162,24 @@ type Variant struct {
 	VariantParams
 }
 
-// This stucture represents additional parameters for a variant
+// This structure represents additional parameters for a variant
 // used in EXT-X-STREAM-INF and EXT-X-I-FRAME-STREAM-INF
 type VariantParams struct {
-	ProgramId    uint32
-	Bandwidth    uint32
-	Codecs       string
-	Resolution   string
-	Audio        string // EXT-X-STREAM-INF only
-	Video        string
-	Subtitles    string // EXT-X-STREAM-INF only
-	Captions     string // EXT-X-STREAM-INF only
-	Name         string // EXT-X-STREAM-INF only (non standard Wowza/JWPlayer extension to name the variant/quality in UA)
-	Iframe       bool   // EXT-X-I-FRAME-STREAM-INF
-	Alternatives []*Alternative
+	ProgramId        uint32
+	Bandwidth        uint32
+	AverageBandwidth uint32 // EXT-X-STREAM-INF only
+	Codecs           string
+	Resolution       string
+	Audio            string // EXT-X-STREAM-INF only
+	Video            string
+	Subtitles        string // EXT-X-STREAM-INF only
+	Captions         string // EXT-X-STREAM-INF only
+	Name             string // EXT-X-STREAM-INF only (non standard Wowza/JWPlayer extension to name the variant/quality in UA)
+	Iframe           bool   // EXT-X-I-FRAME-STREAM-INF
+	VideoRange       string
+	HDCPLevel        string
+	FrameRate        float64        // EXT-X-STREAM-INF
+	Alternatives     []*Alternative // EXT-X-MEDIA
 }
 
 // This structure represents EXT-X-MEDIA tag in variants.
@@ -188,7 +209,19 @@ type MediaSegment struct {
 	Key             *Key      // EXT-X-KEY displayed before the segment and means changing of encryption key (in theory each segment may have own key)
 	Map             *Map      // EXT-X-MAP displayed before the segment
 	Discontinuity   bool      // EXT-X-DISCONTINUITY indicates an encoding discontinuity between the media segment that follows it and the one that preceded it (i.e. file format, number and type of tracks, encoding parameters, encoding sequence, timestamp sequence)
+	SCTE            *SCTE     // SCTE-35 used for Ad signaling in HLS
 	ProgramDateTime time.Time // EXT-X-PROGRAM-DATE-TIME tag associates the first sample of a media segment with an absolute date and/or time
+	Custom          map[string]CustomTag
+}
+
+// SCTE holds custom, non EXT-X-DATERANGE, SCTE-35 tags
+type SCTE struct {
+	Syntax  SCTE35Syntax  // Syntax defines the format of the SCTE-35 cue tag
+	CueType SCTE35CueType // CueType defines whether the cue is a start, mid, end (if applicable)
+	Cue     string
+	ID      string
+	Time    float64
+	Elapsed float64
 }
 
 // This structure represents information about stream encryption.
@@ -241,6 +274,33 @@ type Playlist interface {
 	Encode() *bytes.Buffer
 	Decode(bytes.Buffer, bool) error
 	DecodeFrom(reader io.Reader, strict bool) error
+	WithCustomDecoders([]CustomDecoder) Playlist
+	String() string
+}
+
+// Interface for decoding custom and unsupported tags
+type CustomDecoder interface {
+	// TagName should return the full indentifier including the leading '#' as well as the
+	// trailing ':' if the tag also contains a value or attribute list
+	TagName() string
+	// Decode parses a line from the playlist and returns the CustomTag representation
+	Decode(line string) (CustomTag, error)
+	// SegmentTag should return true if this CustomDecoder should apply per segment.
+	// Should returns false if it a MediaPlaylist header tag.
+	// This value is ignored for MasterPlaylists.
+	SegmentTag() bool
+}
+
+// Interface for encoding custom and unsupported tags
+type CustomTag interface {
+	// TagName should return the full indentifier including the leading '#' as well as the
+	// trailing ':' if the tag also contains a value or attribute list
+	TagName() string
+	// Encode should return the complete tag string as a *bytes.Buffer. This will
+	// be used by Playlist.Decode to write the tag to the m3u8.
+	// Return nil to not write anything to the m3u8.
+	Encode() *bytes.Buffer
+	// String should return the encoded tag as a string.
 	String() string
 }
 
@@ -250,18 +310,23 @@ type decodingState struct {
 	m3u                bool
 	tagWV              bool
 	tagStreamInf       bool
-	tagIframeStreamInf bool
 	tagInf             bool
+	tagSCTE35          bool
 	tagRange           bool
 	tagDiscontinuity   bool
 	tagProgramDateTime bool
 	tagKey             bool
 	tagMap             bool
+	tagCustom          bool
 	programDateTime    time.Time
 	limit              int64
 	offset             int64
 	duration           float64
+	title              string
 	variant            *Variant
+	alternatives       []*Alternative
 	xkey               *Key
 	xmap               *Map
+	scte               *SCTE
+	custom             map[string]CustomTag
 }

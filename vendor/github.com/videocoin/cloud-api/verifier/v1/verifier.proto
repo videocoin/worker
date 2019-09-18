@@ -13,17 +13,13 @@ option (gogoproto.marshaler_all) = false;
 option (gogoproto.sizer_all) = false;
 
 service VerifierService {
-  rpc Verify(VerifyRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post : "/api/v1/verify"
-      body: "*"
-    };
-  };
   rpc Health(google.protobuf.Empty) returns (cloud.api.rpc.HealthStatus) {
     option (google.api.http) = {
       get : "/healthz"
     };
   };
+
+  rpc Verify(VerifyRequest) returns (google.protobuf.Empty) {}
 }
 
 message VerifyRequest {
