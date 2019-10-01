@@ -152,7 +152,8 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 	dir := path.Join(s.cfg.OutputDir, a.Workorder.StreamHash)
 	m3u8 := path.Join(dir, "index.m3u8")
 
-	cmd := buildCmd(a.Workorder.TranscodeInputUrl, dir, a.Profile)
+	transcodeCmd := buildTranscodeCmd(a.Workorder.TranscodeInputUrl, dir, a.Profile)
+	genProofCmd := buildGenProofCmd(a.Workorder.TranscodeInputUrl, s.cfg.ProverKeyLoc, s.cfg.SSIMLevel, dir, a.Profile)
 	var stopChan = make(chan struct{})
 
 	fullDir := fmt.Sprintf("%s/%d", dir, a.Profile.Bitrate)
@@ -162,19 +163,21 @@ func (s *Service) handleTranscode(a *transcoder_v1.Assignment, uid string) error
 		return err
 	}
 
-	go s.syncDir(stopChan, cmd, a.Workorder, fullDir, a.Profile.Bitrate)
+	go s.syncDir(stopChan, transcodeCmd, a.Workorder, fullDir, a.Profile.Bitrate)
 
 	if err := s.generatePlaylist(a.Workorder.StreamHash, m3u8, a.Profile.Bitrate); err != nil {
 		return err
 	}
 
-	s.transcode(cmd,
+	s.transcode(transcodeCmd,
 		stopChan,
 		a.Workorder.TranscodeInputUrl,
 		a.Workorder.StreamAddress,
 		a.Workorder.StreamHash,
 		uid,
 	)
+
+	s.generateProof(genProofCmd)
 
 	s.manager.EscrowRefund(context.Background(), &manager_v1.EscrowRefundRequest{
 		ContractAddress: a.Workorder.StreamAddress,
@@ -206,7 +209,19 @@ func (s *Service) transcode(
 	s.manager.UpdateTranscoderStatus(s.ctx, &manager_v1.TranscoderStatusRequest{TranscoderId: uid, Status: transcoder_v1.TranscoderStatusAvailable})
 
 	s.log.Info("transcode complete")
+}
 
+func (s *Service) generateProof(cmd *exec.Cmd) {
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		s.log.Errorf("failed to generate proof: err : %s output: %s",
+			err.Error(), string(out),
+		)
+	}
+
+	// TODO: should we have new status for proof generation?
+
+	s.log.Info("proof generated")
 }
 
 func (s *Service) waitForStreamReady(streamurl string) {
@@ -228,7 +243,7 @@ func prepareDir(dir string) error {
 	return os.MkdirAll(dir, 0777)
 }
 
-func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.Cmd {
+func buildTranscodeCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.Cmd {
 	process := []string{"-re", "-i", inputURL}
 
 	args := fmt.Sprintf("-live_start_index 0 -b:v %d -vf scale=%d:-2 -strict -2 -c:v libx264 -c:a aac -bsf:v h264_mp4toannexb -map 0 -f segment -segment_time 2 -segment_format mpegts -segment_list %s/%d/index.m3u8 -segment_list_type m3u8 %s/%d/%%d.ts", profile.Bitrate, profile.Width, dir, profile.Bitrate, dir, profile.Bitrate)
@@ -237,7 +252,20 @@ func buildCmd(inputURL string, dir string, profile *profiles_v1.Profile) *exec.C
 	cmd := exec.Command("ffmpeg", process...)
 
 	return cmd
+}
 
+func buildGenProofCmd(inputURL, keyUrl, SSIMLevel, dir string, profile *profiles_v1.Profile) *exec.Cmd {
+	process := []string{"-p", keyUrl, "-s", SSIMLevel}
+
+	args := fmt.Sprintf("-P %s/%d/%%d.proof", dir, profile.Bitrate)
+	process = append(process, strings.Split(args, " ")...)
+
+	args = fmt.Sprintf("-f %s %s/%d/%%d.ts", inputURL, dir, profile.Bitrate)
+	process = append(process, strings.Split(args, " ")...)
+
+	cmd := exec.Command("genproof", process...)
+
+	return cmd
 }
 
 func (s *Service) wait() {

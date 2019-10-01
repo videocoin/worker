@@ -20,6 +20,8 @@ type Config struct {
 	Key             string `required:"true" envconfig:"KEY"`
 	Secret          string `required:"true" envconfig:"SECRET" default:"transcoder"`
 	LogLevel        string `required:"true" envconfig:"LOG_LEVEL" default:"DEBUG"`
+	ProverKeyLoc    string `required:"true" envconfig:"PROVER_KEY_LOC"`
+	SSIMLevel       string `required:"true" envconfig:"SSIM_LEVEL" default:"80"`
 }
 
 var cfg Config
