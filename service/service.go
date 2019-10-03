@@ -26,12 +26,17 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(dispatcherConn)
 
-	trans, err := transcoder.NewTranscoder(cfg.Logger.WithField("system", "transcoder"))
+	machineID := uuid.New()
+
+	trans, err := transcoder.NewTranscoder(
+		cfg.Logger.WithField("system", "transcoder"),
+		dispatcher,
+		machineID.String(),
+		cfg.OutputDir,
+	)
 	if err != nil {
 		return nil, err
 	}
-
-	machineID := uuid.New()
 
 	svc := &Service{
 		cfg:        cfg,
