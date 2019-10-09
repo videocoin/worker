@@ -2,11 +2,14 @@ package transcoder
 
 import (
 	"context"
+	"math/big"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/videocoin/transcode/blockchain"
 
 	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
@@ -23,6 +26,9 @@ type Transcoder struct {
 	dispatcher v1.DispatcherServiceClient
 	outputDir  string
 	cmd        *exec.Cmd
+	bccli      *blockchain.Client
+	sc         *blockchain.StreamContract
+	task       *v1.Task
 	HLSWatcher *hlswatcher.Watcher
 }
 
@@ -31,12 +37,15 @@ func NewTranscoder(
 	dispatcher v1.DispatcherServiceClient,
 	machineID string,
 	outputDir string,
+	bccli *blockchain.Client,
 ) (*Transcoder, error) {
 	return &Transcoder{
 		logger:     logger,
 		machineID:  machineID,
 		dispatcher: dispatcher,
 		outputDir:  outputDir,
+		bccli:      bccli,
+		sc:         &blockchain.StreamContract{},
 		HLSWatcher: hlswatcher.New(time.Second * 2),
 	}, nil
 }
@@ -96,6 +105,11 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 
 	logger.Info("running task")
 
+	t.task = task
+	defer func() {
+		t.task = nil
+	}()
+
 	task.Cmdline = strings.Replace(task.Cmdline, "$OUTPUT", t.outputDir, -1)
 	task.Output.Path = strings.Replace(task.Output.Path, "$OUTPUT", t.outputDir, -1)
 
@@ -132,22 +146,91 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	taskStatCtx, taskStatCancel := context.WithCancel(context.Background())
 	hlssrCtx, hlssrCancel := context.WithCancel(context.Background())
 
+	streamContract, err := blockchain.NewStreamContract(
+		task.StreamContractAddress,
+		t.bccli.EthClient(),
+		t.bccli.EthAuth())
+	if err != nil {
+		return err
+	}
+
+	t.sc = streamContract
+
 	wg.Add(1)
 	go t.runFFmpeg(task, wg, ffmpegErrCh)
 
 	wg.Add(1)
 	go t.runTaskStatMonitor(taskStatCtx, task, wg, taskStatCancel)
 
-	t.hlsFlow(taskStatCtx, taskStatCancel, hlssrCtx, hlssrCancel, wg, task)
+	t.hlsFlow(
+		taskStatCtx,
+		taskStatCancel,
+		hlssrCtx,
+		hlssrCancel,
+		wg,
+		task,
+		t.OnSegmentTranscoded,
+	)
 
 	err = <-ffmpegErrCh
 	if err != nil {
+		taskStatCancel()
+		hlssrCancel()
 		return err
 	}
+
+	taskStatCancel()
 
 	wg.Wait()
 
 	logger.Info("task has been completed")
 
 	return nil
+}
+
+func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
+	logger := t.logger.WithFields(logrus.Fields{
+		"segment": segment.Num,
+		"source":  segment.Source,
+	})
+
+	logger.Debug("segment has been transcoded")
+
+	// Upload segment
+	go func() {
+		err := retry.RetryWithAttempts(5, time.Millisecond*200, func() error {
+			// return t.uploadSegment(task, segment)
+			return nil
+		})
+		if err != nil {
+			logger.Errorf("failed to upload segment: %s", err)
+			return
+		}
+	}()
+
+	//
+
+	chunks, err := t.sc.GetInChunks()
+	if err != nil {
+		logger.Errorf("failed to get in chunks: %s", err)
+		return
+	}
+
+	logger.Debugf("GetInChunks: %+v\n", chunks)
+
+	idx := SearchBigInts(chunks, big.NewInt(int64(segment.Num)))
+	if idx >= 0 {
+		logger.Debug("submitting proof")
+
+		inChunkID := big.NewInt(int64(segment.Num))
+		outChunkID := inChunkID
+
+		tx, err := t.sc.SubmitProof(inChunkID, outChunkID, t.task.ProfileID)
+		if err != nil {
+			logger.Errorf("failed to submit proof: %s", err)
+			return
+		}
+
+		logger.Debugf("tx %+v\n", tx.Hash().String())
+	}
 }

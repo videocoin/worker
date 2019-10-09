@@ -5,10 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
-	"github.com/videocoin/cloud-pkg/retry"
+	"github.com/videocoin/transcode/transcoder/hlswatcher"
 )
+
+type SegmentRecvFunc func(*hlswatcher.SegmentInfo)
 
 func (t *Transcoder) hlsFlow(
 	jobStatCtx context.Context,
@@ -17,6 +18,7 @@ func (t *Transcoder) hlsFlow(
 	hlssrCancel context.CancelFunc,
 	wg *sync.WaitGroup,
 	task *v1.Task,
+	callback SegmentRecvFunc,
 ) {
 	t.logger.Debug("starting hls watcher")
 
@@ -31,7 +33,7 @@ func (t *Transcoder) hlsFlow(
 	time.Sleep(time.Second * 2)
 
 	wg.Add(1)
-	go t.runHLSSegmentReciever(hlssrCtx, task, wg, hlssrCancel)
+	go t.runHLSSegmentReciever(hlssrCtx, task, wg, hlssrCancel, callback)
 
 	wg.Add(1)
 	go func() {
@@ -74,6 +76,7 @@ func (t *Transcoder) runHLSSegmentReciever(
 	task *v1.Task,
 	wg *sync.WaitGroup,
 	cancel context.CancelFunc,
+	callback SegmentRecvFunc,
 ) {
 	defer func() {
 		t.logger.Debug("hls segment reciever has been stopped")
@@ -95,32 +98,11 @@ func (t *Transcoder) runHLSSegmentReciever(
 				continue
 			}
 
-			t.logger.WithFields(logrus.Fields{
-				"segment": segment.Num,
-				"source":  segment.Source,
-			}).Debug("segment has been transcoded")
-
-			err := retry.RetryWithAttempts(5, time.Millisecond*200, func() error {
-				// return t.uploadSegment(task, segment)
-				return nil
-			})
-			if err != nil {
-				t.logger.
-					WithFields(logrus.Fields{
-						"segment": segment.Num,
-						"source":  segment.Source,
-					}).
-					Errorf("failed to upload segment: %s", err)
-				return
-			}
+			callback(segment)
 
 			if segment.IsLast {
 				lastSegmentCount++
-
-				t.logger.Debugf("variants: %d/%d", lastSegmentCount, variantsCount)
-
 				if lastSegmentCount == variantsCount {
-					t.logger.Debug("all playlist variants have been processed")
 					return
 				}
 			}

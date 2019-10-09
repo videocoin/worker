@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	"github.com/videocoin/cloud-pkg/grpcutil"
+	"github.com/videocoin/transcode/blockchain"
 	"github.com/videocoin/transcode/telegraf"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
@@ -28,11 +29,24 @@ func NewService(cfg *Config) (*Service, error) {
 
 	machineID := uuid.New()
 
+	bcConfig := &blockchain.Config{
+		URL:    cfg.BlockchainURL,
+		Key:    cfg.Key,
+		Secret: cfg.Secret,
+		SMCA:   cfg.SMCA,
+	}
+
+	bccli, err := blockchain.Dial(bcConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	trans, err := transcoder.NewTranscoder(
 		cfg.Logger.WithField("system", "transcoder"),
 		dispatcher,
 		machineID.String(),
 		cfg.OutputDir,
+		bccli,
 	)
 	if err != nil {
 		return nil, err

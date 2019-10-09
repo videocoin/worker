@@ -3,8 +3,10 @@ package transcoder
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -33,4 +35,10 @@ func checkSource(url string) error {
 	}
 
 	return nil
+}
+
+func SearchBigInts(a []*big.Int, x *big.Int) int {
+	return sort.Search(len(a), func(i int) bool {
+		return a[i].Cmp(x) >= 0
+	})
 }
