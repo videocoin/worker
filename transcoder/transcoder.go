@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/videocoin/transcode/blockchain"
-
 	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-pkg/retry"
+	"github.com/videocoin/transcode/blockchain"
 	"github.com/videocoin/transcode/transcoder/hlswatcher"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -225,12 +225,32 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 		inChunkID := big.NewInt(int64(segment.Num))
 		outChunkID := inChunkID
 
-		tx, err := t.sc.SubmitProof(inChunkID, outChunkID, t.task.ProfileID)
+		profileID := new(big.Int)
+		profiles, _ := t.sc.GetProfiles()
+		if len(profiles) > 0 {
+			profileID = profiles[0]
+		}
+
+		tx, err := t.sc.SubmitProof(inChunkID, outChunkID, profileID)
 		if err != nil {
 			logger.Errorf("failed to submit proof: %s", err)
 			return
 		}
 
 		logger.Debugf("tx %+v\n", tx.Hash().String())
+
+		ctx := context.Background()
+		vpReq := &validatorv1.ValidateProofRequest{
+			// StreamContractId:      t.task.StreamContractID,
+			StreamContractAddress: t.task.StreamContractAddress,
+			ProfileId:             profileID.Bytes(),
+			InputChunkId:          inChunkID.Bytes(),
+			OutputChunkId:         outChunkID.Bytes(),
+		}
+		_, err = t.dispatcher.ValidateProof(ctx, vpReq)
+		if err != nil {
+			logger.Errorf("failed to validate proof: %s", err)
+			return
+		}
 	}
 }

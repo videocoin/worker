@@ -1,7 +1,10 @@
 package blockchain
 
 import (
+	"context"
+	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethcommon "github.com/ethereum/go-ethereum/common"
@@ -62,6 +65,7 @@ func (c *Client) EthAuth() *bind.TransactOpts {
 }
 
 type StreamContract struct {
+	cli    *ethclient.Client
 	stream *stream.Stream
 	auth   *bind.TransactOpts
 }
@@ -75,9 +79,19 @@ func NewStreamContract(addr string, cli *ethclient.Client, auth *bind.TransactOp
 	}
 
 	return &StreamContract{
+		cli:    cli,
 		stream: stream,
 		auth:   auth,
 	}, nil
+}
+
+func (sc *StreamContract) GetProfiles() ([]*big.Int, error) {
+	profiles, err := sc.stream.Getprofiles(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return profiles, nil
 }
 
 func (sc *StreamContract) GetInChunks() ([]*big.Int, error) {
@@ -89,19 +103,32 @@ func (sc *StreamContract) GetInChunks() ([]*big.Int, error) {
 	return chunks, nil
 }
 
-func (sc *StreamContract) SubmitProof(chunkID, outChunkID *big.Int, profileID string) (*ethtypes.Transaction, error) {
-	profile := new(big.Int)
-	profile.SetString(profileID, 16)
-
-	profiles, _ := sc.stream.Getprofiles(nil)
-	if len(profiles) > 0 {
-		profile = profiles[0]
-	}
-
-	tx, err := sc.stream.SubmitProof(sc.auth, profile, chunkID, big.NewInt(0), outChunkID)
+func (sc *StreamContract) SubmitProof(chunkID, outChunkID *big.Int, profileID *big.Int) (*ethtypes.Transaction, error) {
+	tx, err := sc.stream.SubmitProof(sc.auth, profileID, chunkID, big.NewInt(0), outChunkID)
 	if err != nil {
 		return nil, err
 	}
 
+	err = sc.waitMinedAndCheck(tx)
+	if err != nil {
+		return tx, fmt.Errorf("failed to wait mined after submit proof: %s", err.Error())
+	}
+
 	return tx, nil
+}
+
+func (sc *StreamContract) waitMinedAndCheck(tx *ethtypes.Transaction) error {
+	cancelCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	receipt, err := bind.WaitMined(cancelCtx, sc.cli, tx)
+	if err != nil {
+		return err
+	}
+
+	if receipt.Status != ethtypes.ReceiptStatusSuccessful {
+		return fmt.Errorf("transaction %s failed", tx.Hash().String())
+	}
+
+	return nil
 }
