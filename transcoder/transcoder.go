@@ -22,7 +22,7 @@ import (
 type Transcoder struct {
 	logger     *logrus.Entry
 	t          *time.Ticker
-	machineID  string
+	clientID   string
 	dispatcher v1.DispatcherServiceClient
 	outputDir  string
 	cmd        *exec.Cmd
@@ -35,13 +35,13 @@ type Transcoder struct {
 func NewTranscoder(
 	logger *logrus.Entry,
 	dispatcher v1.DispatcherServiceClient,
-	machineID string,
+	clientID string,
 	outputDir string,
 	bccli *blockchain.Client,
 ) (*Transcoder, error) {
 	return &Transcoder{
 		logger:     logger,
-		machineID:  machineID,
+		clientID:   clientID,
 		dispatcher: dispatcher,
 		outputDir:  outputDir,
 		bccli:      bccli,
@@ -64,7 +64,7 @@ func (t *Transcoder) Stop() error {
 }
 
 func (t *Transcoder) dispatch() error {
-	req := &v1.TaskPendingRequest{MachineID: t.machineID}
+	req := &v1.TaskPendingRequest{ClientID: t.clientID}
 
 	for range t.t.C {
 		t.logger.Infof("waiting task...")
