@@ -3,9 +3,9 @@ package service
 import (
 	"github.com/google/uuid"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	"github.com/videocoin/cloud-pkg/grpcutil"
 	"github.com/videocoin/transcode/blockchain"
-	"github.com/videocoin/transcode/telegraf"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
 )
@@ -14,8 +14,9 @@ type Service struct {
 	cfg        *Config
 	dispatcher dispatcherv1.DispatcherServiceClient
 	transcoder *transcoder.Transcoder
+	syncer     syncerv1.SyncerServiceClient
 
-	MachineID string
+	ClientID string
 }
 
 func NewService(cfg *Config) (*Service, error) {
@@ -27,7 +28,7 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(dispatcherConn)
 
-	machineID := uuid.New()
+	clientID := uuid.New()
 
 	bcConfig := &blockchain.Config{
 		URL:    cfg.BlockchainURL,
@@ -44,7 +45,7 @@ func NewService(cfg *Config) (*Service, error) {
 	trans, err := transcoder.NewTranscoder(
 		cfg.Logger.WithField("system", "transcoder"),
 		dispatcher,
-		machineID.String(),
+		clientID.String(),
 		cfg.OutputDir,
 		bccli,
 	)
@@ -56,7 +57,7 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg:        cfg,
 		dispatcher: dispatcher,
 		transcoder: trans,
-		MachineID:  machineID.String(),
+		ClientID:   clientID.String(),
 	}
 
 	return svc, nil
@@ -64,9 +65,9 @@ func NewService(cfg *Config) (*Service, error) {
 
 func (s *Service) Start() error {
 	go s.transcoder.Start()
-	go telegraf.Run(
-		s.cfg.Logger.WithField("system", "telegraf"),
-		s.MachineID)
+	// go telegraf.Run(
+	// 	s.cfg.Logger.WithField("system", "telegraf"),
+	// 	s.ClientID)
 
 	return nil
 }

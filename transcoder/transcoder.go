@@ -2,6 +2,8 @@ package transcoder
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
 	"math/big"
 	"os"
 	"os/exec"
@@ -11,6 +13,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-pkg/retry"
 	"github.com/videocoin/transcode/blockchain"
@@ -176,12 +179,27 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	if err != nil {
 		taskStatCancel()
 		hlssrCancel()
+
+		t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
+			ClientID: t.clientID,
+			ID:       t.task.ID,
+		})
+
+		t.task = nil
+
 		return err
 	}
 
 	taskStatCancel()
 
 	wg.Wait()
+
+	t.dispatcher.MarkTaskAsCompleted(context.Background(), &v1.TaskRequest{
+		ClientID: t.clientID,
+		ID:       t.task.ID,
+	})
+
+	t.task = nil
 
 	logger.Info("task has been completed")
 
@@ -199,8 +217,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 	// Upload segment
 	go func() {
 		err := retry.RetryWithAttempts(5, time.Millisecond*200, func() error {
-			// return t.uploadSegment(task, segment)
-			return nil
+			return t.uploadSegment(t.task, segment)
 		})
 		if err != nil {
 			logger.Errorf("failed to upload segment: %s", err)
@@ -253,4 +270,35 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 			return
 		}
 	}
+}
+
+func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInfo) error {
+	t.logger.
+		WithField("segment", segment.Num).
+		WithField("path", segment.Source).
+		Debug("uploading segment")
+
+	f, err := os.Open(segment.Source)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+
+	req := &syncerv1.SyncRequest{
+		Path:        fmt.Sprintf("%s/%d.ts", task.ID, segment.Num),
+		ContentType: "video/MP2T",
+		Data:        data,
+	}
+	_, err = t.dispatcher.Sync(context.Background(), req)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
