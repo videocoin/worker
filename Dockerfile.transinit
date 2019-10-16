@@ -1,4 +1,4 @@
-FROM golang:latest AS builder
+FROM golang:1.12.4 AS builder
 
 LABEL maintainer="Videocoin" description="transcoding client streams"
 
@@ -6,11 +6,9 @@ WORKDIR /go/src/github.com/videocoin/transcode
 
 ADD ./ ./
 
-ENV GO111MODULE=off
-
 RUN make build-transinit
 
-FROM phusion/baseimage AS release
+FROM bitnami/minideb:jessie
 
 COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transinit ./
 

@@ -1,12 +1,10 @@
-FROM golang:latest AS builder
+FROM golang:1.12.4 AS builder
 
 LABEL maintainer="Videocoin" description="transcoding client streams"
 
 WORKDIR /go/src/github.com/videocoin/transcode
 
 ADD ./ ./
-
-ENV GO111MODULE=off
 
 RUN make build
 
