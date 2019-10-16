@@ -12,7 +12,10 @@ RUN make build
 
 FROM jrottenberg/ffmpeg:4.1-ubuntu AS release
 
-COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder ./
+COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder /transcoder
+COPY --from=builder /go/src/github.com/videocoin/transcode/entrypoint.sh /entrypoint.sh
+
+RUN chmod a+x /entrypoint.sh
 
 RUN apt-get update && apt upgrade -y
 
@@ -20,4 +23,4 @@ RUN apt-get install -y --no-install-recommends \
     apt-transport-https \
     ca-certificates
 
-ENTRYPOINT [ "./transcoder" ]
+ENTRYPOINT ["/entrypoint.sh"]

@@ -8,6 +8,7 @@ BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
+TRANSINIT_IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/transinit:$(VERSION)
 
 version:
 	@echo $(VERSION)
@@ -21,11 +22,12 @@ deps:
 	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
 
 build:
-	export GOOS=linux
-	export GOARCH=amd64
-	export CGO_ENABLED=0
 	@echo "==> Building..."
 	go build -a -installsuffix cgo -ldflags="-w -s" -o bin/$(SERVICE_NAME) cmd/main.go
+
+build-transinit:
+	@echo "==> Building transinit..."
+	go build -ldflags="-w -s" -o bin/transinit cmd/transinit.go
 
 test:
 	@echo "==> Running tests..."
@@ -38,6 +40,10 @@ test-coverage:
 docker:
 	@echo "==> Docker building..."
 	docker build -t ${IMAGE_TAG} .
+
+docker-transinit:
+	@echo "==> Docker building..."
+	docker build -t ${TRANSINIT_IMAGE_TAG} -f Dockerfile.transinit .
 
 docker-push:
 	docker push $(IMAGE_TAG)
