@@ -15,16 +15,23 @@ import (
 
 func main() {
 	env := os.Getenv("CLUSTER_ENV")
+	if env == "" {
+		env = "snb"
+	}
 	outPath := os.Getenv("OUTPUT_PATH")
 	if outPath == "" {
 		outPath = "/env/init.env"
 	}
+	consulHost := os.Getenv("CONFIG_CONSUL_UI_SERVICE_HOST")
+	if consulHost == "" {
+		consulHost = "127.0.0.1"
+	}
+	consulPort := os.Getenv("CONFIG_CONSUL_UI_SERVICE_PORT_HTTP")
+	if consulPort == "" {
+		consulPort = "8500"
+	}
 	consul, err := consulapi.NewClient(&consulapi.Config{
-		Address: fmt.Sprintf(
-			"%s:%s",
-			os.Getenv("CONFIG_CONSUL_UI_SERVICE_HOST"),
-			os.Getenv("CONFIG_CONSUL_UI_SERVICE_PORT_HTTP"),
-		),
+		Address: fmt.Sprintf("%s:%s", consulHost, consulPort),
 	})
 	if err != nil {
 		log.Fatal(err)
