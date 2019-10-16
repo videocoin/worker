@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -23,9 +24,9 @@ type Config struct {
 }
 
 type Client struct {
-	cli *ethclient.Client
-	// sm   *streamManager.Manager
-	auth *bind.TransactOpts
+	cli    *ethclient.Client
+	auth   *bind.TransactOpts
+	RawKey *keystore.Key
 }
 
 func Dial(cfg *Config) (*Client, error) {
@@ -42,12 +43,7 @@ func Dial(cfg *Config) (*Client, error) {
 		return nil, err
 	}
 
-	// managerAddress := ethcommon.HexToAddress(cfg.SMCA)
-	// eth.sm, err = streamManager.NewManager(managerAddress, eth.cli)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
+	eth.RawKey = rawKey
 	eth.auth, err = bc.GetBCAuth(eth.cli, rawKey)
 	if err != nil {
 		return nil, err

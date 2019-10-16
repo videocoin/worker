@@ -25,6 +25,7 @@ require (
 	github.com/videocoin/telegraf v0.0.0-20190710212555-97388fb1c745
 	go.uber.org/atomic v1.4.0 // indirect
 	google.golang.org/grpc v1.23.1
+	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20190709231704-1e4459ed25ff // indirect
 )
 
 replace github.com/videocoin/cloud-api => ../cloud-api

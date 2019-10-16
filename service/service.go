@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/google/uuid"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
@@ -42,8 +44,12 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
+	translogger := cfg.Logger.
+		WithField("system", "transcoder").
+		WithField("address", strings.ToLower(bccli.RawKey.Address.String()))
+
 	trans, err := transcoder.NewTranscoder(
-		cfg.Logger.WithField("system", "transcoder"),
+		translogger,
 		dispatcher,
 		clientID.String(),
 		cfg.OutputDir,
