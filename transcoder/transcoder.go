@@ -130,7 +130,7 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 		}
 	}
 
-	err := retry.RetryWithAttempts(30, time.Second*1, func() error {
+	err := retry.RetryWithAttempts(60, time.Second*1, func() error {
 		logger.Infof("checking source %s", task.Input.URI)
 		return checkSource(task.Input.URI)
 	})
@@ -199,8 +199,6 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 		ID:       t.task.ID,
 	})
 
-	t.task = nil
-
 	logger.Info("task has been completed")
 
 	return nil
@@ -214,30 +212,45 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 
 	logger.Debug("segment has been transcoded")
 
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
 	// Upload segment
-	go func() {
-		err := retry.RetryWithAttempts(5, time.Millisecond*200, func() error {
+	go func(wg *sync.WaitGroup) {
+		defer wg.Done()
+		err := retry.RetryWithAttempts(5, time.Second*1, func() error {
 			return t.uploadSegment(t.task, segment)
 		})
 		if err != nil {
 			logger.Errorf("failed to upload segment: %s", err)
 			return
 		}
-	}()
+	}(wg)
 
 	//
 
-	chunks, err := t.sc.GetInChunks()
-	if err != nil {
-		logger.Errorf("failed to get in chunks: %s", err)
-		return
+	idx := -1
+	for {
+		chunks, err := t.sc.GetInChunks()
+		if err != nil {
+			logger.Errorf("failed to get in chunks: %s", err)
+			return
+		}
+
+		logger.Debugf("GetInChunks: %+v\n", chunks)
+
+		if len(chunks) > 0 {
+			idx = SearchBigInts(chunks, big.NewInt(int64(segment.Num)))
+			if idx >= 0 {
+				break
+			}
+		}
+
+		time.Sleep(time.Second * 2)
 	}
 
-	logger.Debugf("GetInChunks: %+v\n", chunks)
-
-	idx := SearchBigInts(chunks, big.NewInt(int64(segment.Num)))
 	if idx >= 0 {
-		logger.Debug("submitting proof")
+		logger.Info("submitting proof")
 
 		inChunkID := big.NewInt(int64(segment.Num))
 		outChunkID := inChunkID
@@ -254,7 +267,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 			return
 		}
 
-		logger.Debugf("tx %+v\n", tx.Hash().String())
+		logger.Debugf("submitting proof tx %+v\n", tx.Hash().String())
 
 		ctx := context.Background()
 		vpReq := &validatorv1.ValidateProofRequest{
@@ -270,6 +283,8 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 			return
 		}
 	}
+
+	wg.Wait()
 }
 
 func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInfo) error {

@@ -6,7 +6,6 @@ import (
 	"math/big"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	"time"
 )
@@ -38,7 +37,10 @@ func checkSource(url string) error {
 }
 
 func SearchBigInts(a []*big.Int, x *big.Int) int {
-	return sort.Search(len(a), func(i int) bool {
-		return a[i].Cmp(x) >= 0
-	})
+	for idx, item := range a {
+		if x.Cmp(item) == 0 {
+			return idx
+		}
+	}
+	return -1
 }
