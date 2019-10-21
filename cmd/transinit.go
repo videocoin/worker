@@ -38,6 +38,8 @@ func main() {
 	}
 
 	keyPath := fmt.Sprintf("config/%s/services/transcoder/keys", env)
+	log.Println(keyPath)
+
 	keyPairs, _, err := consul.KV().List(keyPath, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -68,5 +70,7 @@ func main() {
 			}
 			fmt.Print(content)
 		}
+	} else {
+		log.Fatal("no keys")
 	}
 }

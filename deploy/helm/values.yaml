@@ -1,0 +1,26 @@
+replicasCount: 2
+maxUnavailableCount: 0
+
+image:
+  repository: gcr.io/videocoin-network/transcoder
+  tag: latest
+  pullPolicy: Always
+
+imageInit:
+  repository: gcr.io/videocoin-network/transinit
+  tag: latest
+  pullPolicy: Always
+
+config: {}
+
+autoscaler:
+  minCount: 1
+  maxCount: 10
+  targets:
+    targetCPUUtilizationPercentage: 70
+
+secrets:
+  dbUri: ""
+  mqUri: ""
+  secret: ""
+  sentryDsn: ""

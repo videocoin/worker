@@ -1,0 +1,66 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicasCount }}
+  strategy:
+    rollingUpdate:
+      maxUnavailable: {{ .Values.maxUnavailableCount }}
+  template:
+    metadata:
+      name: {{ .Release.Name }}
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      initContainers:
+        - name: {{ .Release.Name }}-init
+          image: "{{ .Values.imageInit.repository }}:{{ .Values.imageInit.tag }}"
+          imagePullPolicy: {{ .Values.imageInit.pullPolicy }}
+          volumeMounts:
+          - name: shared-data
+            mountPath: /env
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DISPATCHER_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Chart.Name }}
+                  key: dispatcherRpcAddr
+            - name: BLOCKCHAIN_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}
+                  key: blockchainUrl
+            - name: SMCA
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}
+                  key: streamManagerContractAddr
+          volumeMounts:
+          - name: shared-data
+            mountPath: /env
+          {{- if .Values.resources }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Release.Name }}
+        - name: secrets
+          secret:
+            secretName: {{ .Release.Name }}
+        - name: shared-data
+          hostPath:
+            path: /tmp
+            type: Directory
+      nodeSelector:
+        cloud.google.com/gke-nodepool: xcode

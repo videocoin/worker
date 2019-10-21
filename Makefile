@@ -1,7 +1,7 @@
 .NOTPARALLEL:
 .EXPORT_ALL_VARIABLES:
 .DEFAULT_GOAL := push
-DOCKER_REGISTRY = us.gcr.io
+DOCKER_REGISTRY = gcr.io
 PROJECT_ID= videocoin-network
 SERVICE_NAME = transcoder
 BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
@@ -9,6 +9,8 @@ BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
 TRANSINIT_IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/transinit:$(VERSION)
+
+ENV?=snb
 
 version:
 	@echo $(VERSION)
@@ -48,12 +50,19 @@ docker-transinit:
 docker-push:
 	docker push $(IMAGE_TAG)
 
+docker-transinit-push:
+	docker push $(TRANSINIT_IMAGE_TAG)
+
 clean:
 	rm -rf bin/*
 
 deploy:
-	@cd deploy && ./deploy.sh
+	ENV=${ENV} cd deploy && ./deploy.sh
 
 push: docker docker-push
+
+push-transinit: docker-transinit docker-transinit-push
+
+release: push-transinit push
 
 .PHONY : build deps test push clean docker deploy release
