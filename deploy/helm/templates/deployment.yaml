@@ -29,6 +29,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: LOGLEVEL
+              value: DEBUG
             - name: DISPATCHER_ADDR
               valueFrom:
                 configMapKeyRef:
