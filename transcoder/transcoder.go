@@ -309,6 +309,7 @@ func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInf
 		Path:        fmt.Sprintf("%s/%d.ts", task.ID, segment.Num),
 		ContentType: "video/MP2T",
 		Data:        data,
+		Duration:    segment.Duration,
 	}
 	_, err = t.dispatcher.Sync(context.Background(), req)
 	if err != nil {

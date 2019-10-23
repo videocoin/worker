@@ -26,3 +26,5 @@ require (
 	go.uber.org/atomic v1.4.0 // indirect
 	google.golang.org/grpc v1.23.1
 )
+
+replace github.com/videocoin/cloud-api => ../cloud-api
