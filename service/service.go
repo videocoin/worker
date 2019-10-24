@@ -3,11 +3,11 @@ package service
 import (
 	"strings"
 
-	"github.com/google/uuid"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	"github.com/videocoin/cloud-pkg/grpcutil"
 	"github.com/videocoin/transcode/blockchain"
+	"github.com/videocoin/transcode/telegraf"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
 )
@@ -30,8 +30,6 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(dispatcherConn)
 
-	clientID := uuid.New()
-
 	bcConfig := &blockchain.Config{
 		URL:    cfg.BlockchainURL,
 		Key:    cfg.Key,
@@ -51,7 +49,7 @@ func NewService(cfg *Config) (*Service, error) {
 	trans, err := transcoder.NewTranscoder(
 		translogger,
 		dispatcher,
-		clientID.String(),
+		cfg.ClientID,
 		cfg.OutputDir,
 		bccli,
 	)
@@ -63,7 +61,7 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg:        cfg,
 		dispatcher: dispatcher,
 		transcoder: trans,
-		ClientID:   clientID.String(),
+		ClientID:   cfg.ClientID,
 	}
 
 	return svc, nil
@@ -71,9 +69,9 @@ func NewService(cfg *Config) (*Service, error) {
 
 func (s *Service) Start() error {
 	go s.transcoder.Start()
-	// go telegraf.Run(
-	// 	s.cfg.Logger.WithField("system", "telegraf"),
-	// 	s.ClientID)
+	go telegraf.Run(
+		s.cfg.Logger.WithField("system", "telegraf"),
+		s.ClientID)
 
 	return nil
 }

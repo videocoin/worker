@@ -16,4 +16,5 @@ type Config struct {
 	SMCA              string `required:"true" envconfig:"SMCA" default:"0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721" description:"stream manager contract address"`
 	Key               string `required:"true" envconfig:"KEY"`
 	Secret            string `required:"true" envconfig:"SECRET" default:"transcoder"`
+	ClientID          string `required:"true" envconfig:"CLIENT_ID"`
 }
