@@ -2,12 +2,13 @@ package service
 
 import (
 	"strings"
+	"time"
 
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	"github.com/videocoin/cloud-pkg/grpcutil"
 	"github.com/videocoin/transcode/blockchain"
-	"github.com/videocoin/transcode/telegraf"
+	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
 )
@@ -17,6 +18,7 @@ type Service struct {
 	dispatcher dispatcherv1.DispatcherServiceClient
 	transcoder *transcoder.Transcoder
 	syncer     syncerv1.SyncerServiceClient
+	pinger     *pinger.Pinger
 
 	ClientID string
 }
@@ -57,10 +59,17 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
+	plogger := cfg.Logger.WithField("system", "pinger")
+	pinger, err := pinger.NewPinger(dispatcher, cfg.ClientID, time.Second*5, plogger)
+	if err != nil {
+		return nil, err
+	}
+
 	svc := &Service{
 		cfg:        cfg,
 		dispatcher: dispatcher,
 		transcoder: trans,
+		pinger:     pinger,
 		ClientID:   cfg.ClientID,
 	}
 
@@ -69,14 +78,12 @@ func NewService(cfg *Config) (*Service, error) {
 
 func (s *Service) Start() error {
 	go s.transcoder.Start()
-	go telegraf.Run(
-		s.cfg.Logger.WithField("system", "telegraf"),
-		s.ClientID)
-
+	go s.pinger.Start()
 	return nil
 }
 
 func (s *Service) Stop() error {
 	s.transcoder.Stop()
+	s.pinger.Stop()
 	return nil
 }
