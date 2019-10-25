@@ -64,9 +64,9 @@ github.com/gobwas/glob/syntax/ast
 github.com/gobwas/glob/util/runes
 github.com/gobwas/glob/syntax/lexer
 github.com/gobwas/glob/util/strings
-# github.com/gogo/googleapis v1.2.0
+# github.com/gogo/googleapis v1.3.0
 github.com/gogo/googleapis/google/api
-# github.com/gogo/protobuf v1.2.1
+# github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/types
@@ -74,17 +74,15 @@ github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
 # github.com/golang/protobuf v1.3.2
 github.com/golang/protobuf/proto
+github.com/golang/protobuf/descriptor
 github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/jsonpb
-github.com/golang/protobuf/protoc-gen-go/generator
+github.com/golang/protobuf/protoc-gen-go/descriptor
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
 github.com/golang/protobuf/ptypes/struct
-github.com/golang/protobuf/protoc-gen-go/descriptor
-github.com/golang/protobuf/protoc-gen-go/generator/internal/remap
-github.com/golang/protobuf/protoc-gen-go/plugin
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
 # github.com/google/uuid v1.1.1
@@ -105,7 +103,7 @@ github.com/grpc-ecosystem/go-grpc-middleware/util/backoffutils
 github.com/grpc-ecosystem/go-grpc-middleware/util/metautils
 # github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 github.com/grpc-ecosystem/go-grpc-prometheus
-# github.com/grpc-ecosystem/grpc-gateway v1.9.3
+# github.com/grpc-ecosystem/grpc-gateway v1.11.3
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/grpc-ecosystem/grpc-gateway/internal
@@ -212,6 +210,7 @@ github.com/uber/jaeger-client-go/thrift-gen/baggage
 github.com/uber/jaeger-lib/metrics
 # github.com/videocoin/cloud-api v0.2.14 => ../cloud-api
 github.com/videocoin/cloud-api/dispatcher/v1
+github.com/videocoin/cloud-api/miners/v1
 github.com/videocoin/cloud-api/syncer/v1
 github.com/videocoin/cloud-api/validator/v1
 github.com/videocoin/cloud-api/rpc
