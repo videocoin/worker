@@ -25,7 +25,7 @@ type Service struct {
 
 func NewService(cfg *Config) (*Service, error) {
 	dlogger := cfg.Logger.WithField("system", "dispatchercli")
-	dGrpcDialOpts := grpcutil.ClientDialOptsWithRetry(dlogger)
+	dGrpcDialOpts := grpcutil.DefaultClientDialOpts(dlogger)
 	dispatcherConn, err := grpc.Dial(cfg.DispatcherRPCAddr, dGrpcDialOpts...)
 	if err != nil {
 		return nil, err

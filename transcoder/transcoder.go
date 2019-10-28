@@ -1,10 +1,14 @@
 package transcoder
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/big"
+	"mime/multipart"
+	"net/http"
 	"os"
 	"os/exec"
 	"strings"
@@ -311,8 +315,81 @@ func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInf
 		Data:        data,
 		Duration:    segment.Duration,
 	}
-	_, err = t.dispatcher.Sync(context.Background(), req)
+
+	dctx, dcancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer dcancel()
+
+	_, err = t.dispatcher.Sync(dctx, req)
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *Transcoder) uploadSegmentViaHttp(task *v1.Task, segment *hlswatcher.SegmentInfo) error {
+	t.logger.
+		WithField("segment", segment.Num).
+		WithField("path", segment.Source).
+		Debug("uploading segment via http")
+
+	f, err := os.Open(segment.Source)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	var b bytes.Buffer
+	w := multipart.NewWriter(&b)
+
+	fw, err := w.CreateFormField("path")
+	if err != nil {
+		return err
+	}
+	if _, err = io.Copy(fw, strings.NewReader(fmt.Sprintf("%s/%d.ts", task.ID, segment.Num))); err != nil {
+		return err
+	}
+
+	fw, err = w.CreateFormField("ct")
+	if err != nil {
+		return err
+	}
+	if _, err = io.Copy(fw, strings.NewReader("video/MP2T")); err != nil {
+		return err
+	}
+
+	fw, err = w.CreateFormFile("file", segment.Name)
+	if err != nil {
+		return err
+	}
+
+	if _, err = io.Copy(fw, f); err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", "http://127.0.0.1:5121/sync", &b)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", w.FormDataContentType())
+
+	w.Close()
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	// body, _ := req.GetBody()
+	// bd, err := ioutil.ReadAll(body)
+	// fmt.Println(err)
+	// fmt.Println(string(bd))
+	// defer body.Close()
+
+	if res.StatusCode != http.StatusAccepted {
+		err = fmt.Errorf("bad status: %s", res.Status)
 		return err
 	}
 
