@@ -54,6 +54,7 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg.ClientID,
 		cfg.OutputDir,
 		bccli,
+		cfg.SyncerURL,
 	)
 	if err != nil {
 		return nil, err

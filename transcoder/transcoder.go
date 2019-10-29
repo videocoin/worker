@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -36,6 +38,7 @@ type Transcoder struct {
 	bccli      *blockchain.Client
 	sc         *blockchain.StreamContract
 	task       *v1.Task
+	syncerAddr string
 	HLSWatcher *hlswatcher.Watcher
 }
 
@@ -45,6 +48,7 @@ func NewTranscoder(
 	clientID string,
 	outputDir string,
 	bccli *blockchain.Client,
+	syncerAddr string,
 ) (*Transcoder, error) {
 	return &Transcoder{
 		logger:     logger,
@@ -53,6 +57,7 @@ func NewTranscoder(
 		outputDir:  outputDir,
 		bccli:      bccli,
 		sc:         &blockchain.StreamContract{},
+		syncerAddr: syncerAddr,
 		HLSWatcher: hlswatcher.New(time.Second * 2),
 	}, nil
 }
@@ -223,7 +228,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 	go func(wg *sync.WaitGroup) {
 		defer wg.Done()
 		err := retry.RetryWithAttempts(5, time.Second*1, func() error {
-			return t.uploadSegment(t.task, segment)
+			return t.uploadSegmentViaHttp(t.task, segment)
 		})
 		if err != nil {
 			logger.Errorf("failed to upload segment: %s", err)
@@ -333,65 +338,54 @@ func (t *Transcoder) uploadSegmentViaHttp(task *v1.Task, segment *hlswatcher.Seg
 		WithField("path", segment.Source).
 		Debug("uploading segment via http")
 
-	f, err := os.Open(segment.Source)
+	params := map[string]string{
+		"path":        fmt.Sprintf("%s/%d.ts", task.ID, segment.Num),
+		"ct":          "video/MP2T",
+		"segment_num": strconv.FormatInt(int64(segment.Num), 10),
+	}
+
+	request, err := newfileUploadRequest(t.syncerAddr, params, "file", segment.Source)
 	if err != nil {
 		return err
 	}
-
-	defer f.Close()
-
-	var b bytes.Buffer
-	w := multipart.NewWriter(&b)
-
-	fw, err := w.CreateFormField("path")
-	if err != nil {
-		return err
-	}
-	if _, err = io.Copy(fw, strings.NewReader(fmt.Sprintf("%s/%d.ts", task.ID, segment.Num))); err != nil {
-		return err
-	}
-
-	fw, err = w.CreateFormField("ct")
-	if err != nil {
-		return err
-	}
-	if _, err = io.Copy(fw, strings.NewReader("video/MP2T")); err != nil {
-		return err
-	}
-
-	fw, err = w.CreateFormFile("file", segment.Name)
-	if err != nil {
-		return err
-	}
-
-	if _, err = io.Copy(fw, f); err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest("POST", "http://127.0.0.1:5121/sync", &b)
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", w.FormDataContentType())
-
-	w.Close()
 
 	client := &http.Client{}
-	res, err := client.Do(req)
+	resp, err := client.Do(request)
 	if err != nil {
 		return err
 	}
 
-	// body, _ := req.GetBody()
-	// bd, err := ioutil.ReadAll(body)
-	// fmt.Println(err)
-	// fmt.Println(string(bd))
-	// defer body.Close()
-
-	if res.StatusCode != http.StatusAccepted {
-		err = fmt.Errorf("bad status: %s", res.Status)
-		return err
+	if resp.StatusCode != http.StatusAccepted {
+		return fmt.Errorf("bad status: %s", resp.Status)
 	}
 
 	return nil
+}
+
+func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
+	if err != nil {
+		return nil, err
+	}
+	_, err = io.Copy(part, file)
+
+	for key, val := range params {
+		_ = writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", uri, body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	return req, err
 }
