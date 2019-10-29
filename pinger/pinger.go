@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
+	"github.com/videocoin/transcode/sysinfo"
 )
 
 type Pinger struct {
@@ -41,7 +41,11 @@ func (p *Pinger) Start() error {
 		select {
 		case <-p.ticker.C:
 			ctx := context.Background()
-			req := &minersv1.PingRequest{ClientID: p.clientID}
+			_, systemInfo, _ := sysinfo.GetInfo()
+			req := &minersv1.PingRequest{
+				ClientID:   p.clientID,
+				SystemInfo: systemInfo,
+			}
 			_, err := p.dispatcher.Ping(ctx, req)
 			if err != nil {
 				p.logger.Errorf("failed to ping: %s", err)
