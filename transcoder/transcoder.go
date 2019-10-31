@@ -225,16 +225,14 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 	wg.Add(1)
 
 	// Upload segment
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		err := retry.RetryWithAttempts(5, time.Second*1, func() error {
-			return t.uploadSegmentViaHttp(t.task, segment)
-		})
-		if err != nil {
-			logger.Errorf("failed to upload segment: %s", err)
-			return
-		}
-	}(wg)
+
+	err := retry.RetryWithAttempts(5, time.Second*1, func() error {
+		return t.uploadSegmentViaHttp(t.task, segment)
+	})
+	if err != nil {
+		logger.Errorf("failed to upload segment: %s", err)
+		return
+	}
 
 	//
 
@@ -278,22 +276,24 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 
 		logger.Debugf("submitting proof tx %+v\n", tx.Hash().String())
 
-		ctx := context.Background()
-		vpReq := &validatorv1.ValidateProofRequest{
-			// StreamContractId:      t.task.StreamContractID,
-			StreamContractAddress: t.task.StreamContractAddress,
-			ProfileId:             profileID.Bytes(),
-			InputChunkId:          inChunkID.Bytes(),
-			OutputChunkId:         outChunkID.Bytes(),
-		}
-		_, err = t.dispatcher.ValidateProof(ctx, vpReq)
-		if err != nil {
-			logger.Errorf("failed to validate proof: %s", err)
-			return
+		if t.task != nil {
+			logger.Info("validating proof")
+
+			ctx := context.Background()
+			vpReq := &validatorv1.ValidateProofRequest{
+				// StreamContractId:      t.task.StreamContractID,
+				StreamContractAddress: t.task.StreamContractAddress,
+				ProfileId:             profileID.Bytes(),
+				OutputChunkId:         outChunkID.Bytes(),
+				StreamId:              t.task.ID,
+			}
+			_, err = t.dispatcher.ValidateProof(ctx, vpReq)
+			if err != nil {
+				logger.Errorf("failed to validate proof: %s", err)
+				return
+			}
 		}
 	}
-
-	wg.Wait()
 }
 
 func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInfo) error {
