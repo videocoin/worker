@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -31,6 +32,14 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(dispatcherConn)
+
+	_, err = dispatcher.Register(
+		context.Background(),
+		&dispatcherv1.RegistrationRequest{ClientID: cfg.ClientID},
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	bcConfig := &blockchain.Config{
 		URL:    cfg.BlockchainURL,
