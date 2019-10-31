@@ -29,17 +29,7 @@ func GetInfo() (map[string]interface{}, []byte, error) {
 		}
 	}
 
-	cpuUsage, err := cpu.Percent(time.Second, true)
-	if err == nil {
-		info["cpu_percent"] = map[string]float64{
-			"user":   cpuUsage[cpu.CPUser],
-			"nice":   cpuUsage[cpu.CPNice],
-			"sys":    cpuUsage[cpu.CPSys],
-			"intr":   cpuUsage[cpu.CPIntr],
-			"idle":   cpuUsage[cpu.CPIdle],
-			"states": cpuUsage[cpu.CPUStates],
-		}
-	}
+	info["cpu_usage"] = GetCPUUsage()
 
 	loadInfo, err := load.Avg()
 	if err == nil {
@@ -56,4 +46,13 @@ func GetInfo() (map[string]interface{}, []byte, error) {
 	}
 
 	return info, b, nil
+}
+
+func GetCPUUsage() float64 {
+	cpuUsage, err := cpu.Percent(time.Second, false)
+	if err == nil {
+		return cpuUsage[0]
+	}
+
+	return -1
 }
