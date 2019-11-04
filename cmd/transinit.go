@@ -45,32 +45,53 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if len(keyPairs) > 0 {
-		rand.Seed(time.Now().UnixNano())
-		key := keyPairs[rand.Intn(len(keyPairs)-1)]
+	content := ""
 
-		k, _, err := consul.KV().Get(key.Key, nil)
+	if len(keyPairs) <= 0 {
+		log.Fatal("no keys")
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	key := keyPairs[rand.Intn(len(keyPairs)-1)]
+
+	k, _, err := consul.KV().Get(key.Key, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	parts := strings.Split(key.Key, "/")
+	if len(parts) > 0 {
+		secretBase64 := parts[len(parts)-1]
+		secret, err := base64.StdEncoding.DecodeString(secretBase64)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		parts := strings.Split(key.Key, "/")
-		if len(parts) > 0 {
-			secretBase64 := parts[len(parts)-1]
-			secret, err := base64.StdEncoding.DecodeString(secretBase64)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			keyValue := strings.Replace(string(k.Value), "'", "\"", -1)
-			content := fmt.Sprintf("export KEY='%s'\nexport SECRET=%s\n", keyValue, secret)
-			err = ioutil.WriteFile(outPath, []byte(content), 0777)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Print(content)
-		}
-	} else {
-		log.Fatal("no keys")
+		keyValue := strings.Replace(string(k.Value), "'", "\"", -1)
+		content = fmt.Sprintf("export KEY='%s'\nexport SECRET=%s\n", keyValue, secret)
 	}
+
+	clientIdsPath := fmt.Sprintf("config/%s/services/transcoder/clientids", env)
+	log.Println(clientIdsPath)
+
+	clientidsPairs, _, err := consul.KV().List(clientIdsPath, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(clientidsPairs) <= 0 {
+		log.Fatal("no client ids")
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	clientidsKey := clientidsPairs[rand.Intn(len(clientidsPairs)-1)]
+
+	content += fmt.Sprintf("export CLIENT_ID=%s\n", clientidsKey.Value)
+
+	err = ioutil.WriteFile(outPath, []byte(content), 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Print(content)
+
 }
