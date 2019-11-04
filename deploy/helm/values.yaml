@@ -15,12 +15,14 @@ config: {}
 
 autoscaler:
   minCount: 1
-  maxCount: 20
+  maxCount: 10
   targets:
-    targetCPUUtilizationPercentage: 40
+    targetCPUUtilizationPercentage: 70
 
 secrets:
   dbUri: ""
   mqUri: ""
   secret: ""
   sentryDsn: ""
+
+resources: {}
