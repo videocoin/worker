@@ -1,4 +1,4 @@
-replicasCount: 2
+replicasCount: 5
 maxUnavailableCount: 0
 
 image:
@@ -15,9 +15,9 @@ config: {}
 
 autoscaler:
   minCount: 1
-  maxCount: 10
+  maxCount: 20
   targets:
-    targetCPUUtilizationPercentage: 70
+    targetCPUUtilizationPercentage: 50
 
 secrets:
   dbUri: ""
