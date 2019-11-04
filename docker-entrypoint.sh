@@ -1,12 +1,13 @@
 #!/bin/bash
 set -e
 
-if [ "$1" = 'transcoder' ]; then
+if [ "$1" = 'transcoderd' ]
+then
     mkdir -p /env
     transinit
     source /env/init.env
 
+    exec transcoder
+else
     exec "$@"
 fi
-
-exec "$@"

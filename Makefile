@@ -43,26 +43,15 @@ docker:
 	@echo "==> Docker building..."
 	docker build -t ${IMAGE_TAG} .
 
-docker-transinit:
-	@echo "==> Docker building..."
-	docker build -t ${TRANSINIT_IMAGE_TAG} -f Dockerfile.transinit .
-
 docker-push:
 	docker push $(IMAGE_TAG)
-
-docker-transinit-push:
-	docker push $(TRANSINIT_IMAGE_TAG)
 
 clean:
 	rm -rf bin/*
 
 deploy:
-	ENV=${ENV} cd deploy && ./deploy.sh
+	ENV=${ENV} deploy/deploy.sh
 
-push: docker docker-push
-
-push-transinit: docker-transinit docker-transinit-push
-
-release: push-transinit push
+release: docker docker-push
 
 .PHONY : build deps test push clean docker deploy release
