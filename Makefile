@@ -13,7 +13,7 @@ TRANSINIT_IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/transinit:$(VERSION)
 ENV?=snb
 
 version:
-	@echo $(VERSION)
+	@echo ${VERSION}
 
 image-tag:
 	@echo $(IMAGE_TAG)
@@ -25,7 +25,7 @@ deps:
 
 build:
 	@echo "==> Building..."
-	go build -a -installsuffix cgo -ldflags="-w -s" -o bin/$(SERVICE_NAME) cmd/main.go
+	go build -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(SERVICE_NAME) cmd/main.go
 
 build-transinit:
 	@echo "==> Building transinit..."
