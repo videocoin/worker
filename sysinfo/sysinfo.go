@@ -9,7 +9,11 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
-func GetInfo() (map[string]interface{}, []byte, error) {
+type SystemInfo struct {
+	AppVersion string
+}
+
+func (si *SystemInfo) GetInfo() (map[string]interface{}, []byte, error) {
 	info := map[string]interface{}{}
 
 	vm, err := mem.VirtualMemory()
@@ -39,6 +43,8 @@ func GetInfo() (map[string]interface{}, []byte, error) {
 			"load15": loadInfo.Load15,
 		}
 	}
+
+	info["app_version"] = si.AppVersion
 
 	b, err := json.Marshal(info)
 	if err != nil {

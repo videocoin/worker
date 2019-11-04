@@ -70,7 +70,7 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 
 	plogger := cfg.Logger.WithField("system", "pinger")
-	pinger, err := pinger.NewPinger(dispatcher, cfg.ClientID, time.Second*5, plogger)
+	pinger, err := pinger.NewPinger(dispatcher, cfg.ClientID, time.Second*5, cfg.Version, plogger)
 	if err != nil {
 		return nil, err
 	}

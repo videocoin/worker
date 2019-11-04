@@ -16,12 +16,14 @@ type Pinger struct {
 	clientID   string
 	timeout    time.Duration
 	ticker     *time.Ticker
+	appVersion string
 }
 
 func NewPinger(
 	dispatcher v1.DispatcherServiceClient,
 	clientID string,
 	timeout time.Duration,
+	appVersion string,
 	logger *logrus.Entry,
 ) (*Pinger, error) {
 	ticker := time.NewTicker(timeout)
@@ -31,6 +33,7 @@ func NewPinger(
 		clientID:   clientID,
 		timeout:    timeout,
 		ticker:     ticker,
+		appVersion: appVersion,
 	}, nil
 }
 
@@ -41,7 +44,8 @@ func (p *Pinger) Start() error {
 		select {
 		case <-p.ticker.C:
 			ctx := context.Background()
-			_, systemInfo, _ := sysinfo.GetInfo()
+			si := &sysinfo.SystemInfo{AppVersion: p.appVersion}
+			_, systemInfo, _ := si.GetInfo()
 			req := &minersv1.PingRequest{
 				ClientID:   p.clientID,
 				SystemInfo: systemInfo,
