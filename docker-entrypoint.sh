@@ -1,4 +1,12 @@
 #!/bin/bash
 set -e
-source /env/init.env
+
+if [ "$1" = 'transcoder' ]; then
+    mkdir -p /env
+    transinit
+    source /env/init.env
+
+    exec "$@"
+fi
+
 exec "$@"
