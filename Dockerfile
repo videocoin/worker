@@ -10,7 +10,7 @@ RUN make build
 
 FROM jrottenberg/ffmpeg:4.1-ubuntu AS release
 
-COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder /transcoder
+COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder /bin/transcoder
 COPY --from=builder /go/src/github.com/videocoin/transcode/docker-entrypoint.sh /docker-entrypoint.sh
 
 RUN chmod a+x /docker-entrypoint.sh
@@ -28,3 +28,4 @@ RUN touch /env/init.env
 RUN echo "LOGLEVEL=debug" > /env/init.env
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["transcoder"]
