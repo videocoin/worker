@@ -34,7 +34,7 @@ func (t *Transcoder) runTaskStatMonitor(
 			ctx := context.Background()
 			taskResp, err := t.dispatcher.GetTask(
 				ctx,
-				&v1.TaskRequest{ID: task.ID},
+				&v1.TaskRequest{ID: task.ID, ClientID: t.clientID},
 			)
 			if err != nil {
 				t.logger.Debugf("[WARN] failed to get task: %s", err)
