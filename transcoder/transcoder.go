@@ -101,9 +101,17 @@ func (t *Transcoder) dispatch() error {
 
 		err = t.runTask(task)
 		if err != nil {
+			t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
+				ClientID: t.clientID,
+				ID:       t.task.ID,
+			})
+
 			t.logger.
 				WithField("task_id", task.ID).
 				Errorf("failed to transcode: %s", err)
+
+			t.task = nil
+
 			continue
 		}
 	}
@@ -118,9 +126,6 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	logger.Info("running task")
 
 	t.task = task
-	defer func() {
-		t.task = nil
-	}()
 
 	task.Cmdline = strings.Replace(task.Cmdline, "$OUTPUT", t.outputDir, -1)
 	task.Output.Path = strings.Replace(task.Output.Path, "$OUTPUT", t.outputDir, -1)
