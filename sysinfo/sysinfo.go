@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 )
@@ -45,6 +46,20 @@ func (si *SystemInfo) GetInfo() (map[string]interface{}, []byte, error) {
 	}
 
 	info["app_version"] = si.AppVersion
+
+	hostInfo, err := host.Info()
+	if err == nil {
+		info["host"] = map[string]string{
+			"hostname":         hostInfo.Hostname,
+			"os":               hostInfo.OS,
+			"platform":         hostInfo.Platform,
+			"platform_version": hostInfo.PlatformVersion,
+			"platform_family":  hostInfo.PlatformFamily,
+			"kernel_version":   hostInfo.KernelVersion,
+			"virt_role":        hostInfo.VirtualizationRole,
+			"virt_system":      hostInfo.VirtualizationSystem,
+		}
+	}
 
 	b, err := json.Marshal(info)
 	if err != nil {
