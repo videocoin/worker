@@ -28,7 +28,7 @@ func (si *SystemInfo) GetInfo() (map[string]interface{}, []byte, error) {
 	cpuInfo, err := cpu.Info()
 	if err == nil {
 		info["cpu"] = map[string]interface{}{
-			"cores": cpuInfo[0].Cores,
+			"cores": len(cpuInfo),
 			"freq":  cpuInfo[0].Mhz,
 		}
 	}
