@@ -91,7 +91,7 @@ func (t *Transcoder) runFFmpeg(task *v1.Task, wg *sync.WaitGroup, errCh chan err
 		}
 	}(stopCh)
 
-	t.logger.Info("waiting ffmpeg")
+	t.logger.Info("transcoding")
 
 	err = t.cmd.Wait()
 	if err != nil {

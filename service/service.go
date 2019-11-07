@@ -2,16 +2,15 @@ package service
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
-	"github.com/videocoin/cloud-pkg/grpcutil"
 	"github.com/videocoin/transcode/blockchain"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 )
 
 type Service struct {
@@ -25,8 +24,15 @@ type Service struct {
 }
 
 func NewService(cfg *Config) (*Service, error) {
-	dlogger := cfg.Logger.WithField("system", "dispatchercli")
-	dGrpcDialOpts := grpcutil.DefaultClientDialOpts(dlogger)
+	dGrpcDialOpts := []grpc.DialOption{
+		grpc.WithInsecure(),
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:                time.Second * 10,
+			Timeout:             time.Second * 10,
+			PermitWithoutStream: true,
+		}),
+	}
+
 	dispatcherConn, err := grpc.Dial(cfg.DispatcherRPCAddr, dGrpcDialOpts...)
 	if err != nil {
 		return nil, err
@@ -53,10 +59,7 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	translogger := cfg.Logger.
-		WithField("system", "transcoder").
-		WithField("address", strings.ToLower(bccli.RawKey.Address.String()))
-
+	translogger := cfg.Logger
 	trans, err := transcoder.NewTranscoder(
 		translogger,
 		dispatcher,

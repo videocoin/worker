@@ -120,7 +120,7 @@ func (t *Transcoder) dispatch() error {
 }
 
 func (t *Transcoder) runTask(task *v1.Task) error {
-	logger := t.logger.WithField("id", task.ID)
+	logger := t.logger.WithField("task_id", task.ID)
 	logger.Debugf("task: %+v", task)
 
 	logger.Info("running task")
@@ -144,7 +144,7 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 		}
 	}
 
-	err := retry.RetryWithAttempts(60, time.Second*1, func() error {
+	err := retry.RetryWithAttempts(3, time.Second*10, func() error {
 		logger.Infof("checking source %s", task.Input.URI)
 		return checkSource(task.Input.URI)
 	})
@@ -220,16 +220,17 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 
 func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 	logger := t.logger.WithFields(logrus.Fields{
+		"task_id": t.task.ID,
 		"segment": segment.Num,
-		"source":  segment.Source,
 	})
 
-	logger.Debug("segment has been transcoded")
+	logger.Info("segment has been transcoded")
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
 	// Upload segment
+	logger.Info("uploading segment")
 
 	err := retry.RetryWithAttempts(5, time.Second*1, func() error {
 		return t.uploadSegmentViaHttp(t.task, segment)
@@ -238,6 +239,8 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 		logger.Errorf("failed to upload segment: %s", err)
 		return
 	}
+
+	logger.Info("segment has been uploaded")
 
 	//
 
