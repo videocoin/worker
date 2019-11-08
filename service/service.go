@@ -5,6 +5,7 @@ import (
 	"time"
 
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	"github.com/videocoin/transcode/blockchain"
 	"github.com/videocoin/transcode/pinger"
@@ -24,6 +25,18 @@ type Service struct {
 }
 
 func NewService(cfg *Config) (*Service, error) {
+	bcConfig := &blockchain.Config{
+		URL:    cfg.BlockchainURL,
+		Key:    cfg.Key,
+		Secret: cfg.Secret,
+		SMCA:   cfg.SMCA,
+	}
+
+	bccli, err := blockchain.Dial(bcConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	dGrpcDialOpts := []grpc.DialOption{
 		grpc.WithInsecure(),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
@@ -41,20 +54,11 @@ func NewService(cfg *Config) (*Service, error) {
 
 	_, err = dispatcher.Register(
 		context.Background(),
-		&dispatcherv1.RegistrationRequest{ClientID: cfg.ClientID},
+		&minersv1.RegistrationRequest{
+			ClientID: cfg.ClientID,
+			Address:  bccli.RawKey.Address.String(),
+		},
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	bcConfig := &blockchain.Config{
-		URL:    cfg.BlockchainURL,
-		Key:    cfg.Key,
-		Secret: cfg.Secret,
-		SMCA:   cfg.SMCA,
-	}
-
-	bccli, err := blockchain.Dial(bcConfig)
 	if err != nil {
 		return nil, err
 	}
