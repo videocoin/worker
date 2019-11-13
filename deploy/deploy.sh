@@ -50,6 +50,7 @@ function get_vars() {
     log_info "Getting variables..."
     readonly KUBE_CONTEXT=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/common/kube_context`
     readonly DISPATCHER_RPC_ADDR=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/dispatcherRpcAddr`
+    readonly SYNCER_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/vars/syncerHttpUrl`
 
     readonly BLOCKCHAIN_URL=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/blockchainUrl`
     readonly SMCA=`consul kv get -http-addr=${CONSUL_ADDR} config/${ENV}/services/${CHART_NAME}/secrets/streamManagerContractAddr`
@@ -63,6 +64,7 @@ function deploy() {
         --set image.tag="${VERSION}" \
         --set imageInit.tag="${VERSION}" \
         --set config.dispatcherRpcAddr="${DISPATCHER_RPC_ADDR}" \
+        --set config.syncerUrl="${SYNCER_URL}" \
         --set secrets.blockchainUrl="${BLOCKCHAIN_URL}" \
         --set secrets.streamManagerContractAddr="${SMCA}" \
         --wait ${CHART_NAME} ${CHART_DIR}
