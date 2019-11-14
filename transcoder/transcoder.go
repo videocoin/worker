@@ -99,6 +99,8 @@ func (t *Transcoder) dispatch() error {
 			continue
 		}
 
+		t.task = task
+
 		err = t.runTask(task)
 		if err != nil {
 			t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
@@ -114,6 +116,8 @@ func (t *Transcoder) dispatch() error {
 
 			continue
 		}
+
+		t.task = nil
 	}
 
 	return nil
@@ -124,8 +128,6 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	logger.Debugf("task: %+v", task)
 
 	logger.Info("running task")
-
-	t.task = task
 
 	task.Cmdline = strings.Replace(task.Cmdline, "$OUTPUT", t.outputDir, -1)
 	task.Output.Path = strings.Replace(task.Output.Path, "$OUTPUT", t.outputDir, -1)
@@ -198,8 +200,6 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 			ClientID: t.clientID,
 			ID:       t.task.ID,
 		})
-
-		t.task = nil
 
 		return err
 	}
