@@ -36,6 +36,11 @@ spec:
                 configMapKeyRef:
                   name: {{ .Chart.Name }}
                   key: syncerUrl
+            - name: CLUSTER_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Chart.Name }}
+                  key: clusterEnv
             - name: BLOCKCHAIN_URL
               valueFrom:
                 secretKeyRef:
