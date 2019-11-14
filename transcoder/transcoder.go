@@ -103,14 +103,14 @@ func (t *Transcoder) dispatch() error {
 
 		err = t.runTask(task)
 		if err != nil {
+			t.logger.
+				WithField("task_id", task.ID).
+				Errorf("failed to transcode: %s", err)
+
 			t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
 				ClientID: t.clientID,
 				ID:       t.task.ID,
 			})
-
-			t.logger.
-				WithField("task_id", task.ID).
-				Errorf("failed to transcode: %s", err)
 
 			t.task = nil
 
