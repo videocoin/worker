@@ -1,5 +1,4 @@
 .NOTPARALLEL:
-.EXPORT_ALL_VARIABLES:
 .DEFAULT_GOAL := push
 DOCKER_REGISTRY = gcr.io
 PROJECT_ID= videocoin-network
