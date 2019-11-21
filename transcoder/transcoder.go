@@ -146,7 +146,7 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 		}
 	}
 
-	err := retry.RetryWithAttempts(3, time.Second*10, func() error {
+	err := retry.RetryWithAttempts(5, time.Second*10, func() error {
 		logger.Infof("checking source %s", task.Input.URI)
 		return checkSource(task.Input.URI)
 	})
