@@ -30,8 +30,13 @@ func main() {
 		level, _ = logrus.ParseLevel(loglevel)
 	}
 
-	logrus.SetLevel(level)
-	logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+	l := logrus.New()
+	l.SetLevel(level)
+	l.SetFormatter(&logrus.TextFormatter{TimestampFormat: time.RFC3339Nano})
+	log := logrus.NewEntry(l)
+
+	// logrus.SetLevel(level)
+	// logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
 
 	sentryDSN := os.Getenv("SENTRY_DSN")
 	if sentryDSN != "" {
@@ -54,13 +59,11 @@ func main() {
 		sentryHook.SetRelease(Version)
 
 		if err != nil {
-			logrus.Warning(err)
+			l.Warning(err)
 		} else {
-			logrus.AddHook(sentryHook)
+			l.AddHook(sentryHook)
 		}
 	}
-
-	log := logrus.NewEntry(logrus.New())
 
 	closer, err := tracer.NewTracer(ServiceName)
 	if err != nil {
