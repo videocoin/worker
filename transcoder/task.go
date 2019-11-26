@@ -86,8 +86,8 @@ func (t *Transcoder) runTaskStatMonitor(
 					t.logger.Info("ffmpeg has been killed")
 					return
 				}
-			case v1.TaskStatusCompleted:
-				return
+				// case v1.TaskStatusCompleted:
+				// 	return
 			}
 		}
 	}
