@@ -9,7 +9,7 @@ VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git r
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
 TRANSINIT_IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/transinit:$(VERSION)
 
-ENV?=snb
+ENV?=dev
 
 version:
 	@echo ${VERSION}
