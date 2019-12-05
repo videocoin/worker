@@ -218,7 +218,7 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	return nil
 }
 
-func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
+func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error {
 	logger := t.logger.WithFields(logrus.Fields{
 		"task_id": t.task.ID,
 		"segment": segment.Num,
@@ -237,7 +237,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 	})
 	if err != nil {
 		logger.Errorf("failed to upload segment: %s", err)
-		return
+		return err
 	}
 
 	logger.Info("segment has been uploaded")
@@ -245,11 +245,12 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 	//
 
 	idx := -1
+	counter := 0
 	for {
 		chunks, err := t.sc.GetInChunks()
 		if err != nil {
 			logger.Errorf("failed to get in chunks: %s", err)
-			return
+			return err
 		}
 
 		logger.Debugf("GetInChunks: %+v\n", chunks)
@@ -259,6 +260,12 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 			if idx >= 0 {
 				break
 			}
+			if counter >= 30 {
+				err = fmt.Errorf("failed to search in chunks: %s", err)
+				logger.Error(err)
+				return err
+			}
+			counter++
 		}
 
 		time.Sleep(time.Second * 2)
@@ -279,7 +286,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 		tx, err := t.sc.SubmitProof(inChunkID, outChunkID, profileID)
 		if err != nil {
 			logger.Errorf("failed to submit proof: %s", err)
-			return
+			return err
 		}
 
 		logger.Debugf("submitting proof tx %+v\n", tx.Hash().String())
@@ -298,10 +305,12 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) {
 			_, err = t.dispatcher.ValidateProof(ctx, vpReq)
 			if err != nil {
 				logger.Errorf("failed to validate proof: %s", err)
-				return
+				return err
 			}
 		}
 	}
+
+	return nil
 }
 
 func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInfo) error {

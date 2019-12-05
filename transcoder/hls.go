@@ -9,7 +9,7 @@ import (
 	"github.com/videocoin/transcode/transcoder/hlswatcher"
 )
 
-type SegmentRecvFunc func(*hlswatcher.SegmentInfo)
+type SegmentRecvFunc func(*hlswatcher.SegmentInfo) error
 
 func (t *Transcoder) hlsFlow(
 	jobStatCtx context.Context,
@@ -98,7 +98,14 @@ func (t *Transcoder) runHLSSegmentReciever(
 				continue
 			}
 
-			callback(segment)
+			err := callback(segment)
+			if err != nil {
+				t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
+					ClientID: t.clientID,
+					ID:       task.ID,
+				})
+				return
+			}
 
 			if segment.IsLast {
 				lastSegmentCount++
