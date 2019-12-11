@@ -4,10 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/ethereum/go-ethereum/ethclient"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
-	"github.com/videocoin/transcode/blockchain"
+	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
@@ -25,14 +26,12 @@ type Service struct {
 }
 
 func NewService(cfg *Config) (*Service, error) {
-	bcConfig := &blockchain.Config{
-		URL:    cfg.BlockchainURL,
-		Key:    cfg.Key,
-		Secret: cfg.Secret,
-		SMCA:   cfg.SMCA,
+	cli, err := ethclient.Dial(cfg.RPCNodeURL)
+	if err != nil {
+		return nil, err
 	}
 
-	bccli, err := blockchain.Dial(bcConfig)
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, cli)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +55,7 @@ func NewService(cfg *Config) (*Service, error) {
 		context.Background(),
 		&minersv1.RegistrationRequest{
 			ClientID: cfg.ClientID,
-			Address:  bccli.RawKey.Address.String(),
+			Address:  caller.Addr().String(),
 		},
 	)
 	if err != nil {
@@ -69,7 +68,7 @@ func NewService(cfg *Config) (*Service, error) {
 		dispatcher,
 		cfg.ClientID,
 		cfg.OutputDir,
-		bccli,
+		caller,
 		cfg.SyncerURL,
 	)
 	if err != nil {

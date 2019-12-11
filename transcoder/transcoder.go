@@ -22,7 +22,8 @@ import (
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-pkg/retry"
-	"github.com/videocoin/transcode/blockchain"
+	"github.com/videocoin/transcode/caller"
+	"github.com/videocoin/transcode/stream"
 	"github.com/videocoin/transcode/transcoder/hlswatcher"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -35,8 +36,8 @@ type Transcoder struct {
 	dispatcher v1.DispatcherServiceClient
 	outputDir  string
 	cmd        *exec.Cmd
-	bccli      *blockchain.Client
-	sc         *blockchain.StreamContract
+	caller     *caller.Caller
+	sc         *stream.StreamClient
 	task       *v1.Task
 	syncerAddr string
 	HLSWatcher *hlswatcher.Watcher
@@ -47,7 +48,7 @@ func NewTranscoder(
 	dispatcher v1.DispatcherServiceClient,
 	clientID string,
 	outputDir string,
-	bccli *blockchain.Client,
+	caller *caller.Caller,
 	syncerAddr string,
 ) (*Transcoder, error) {
 	return &Transcoder{
@@ -55,8 +56,8 @@ func NewTranscoder(
 		clientID:   clientID,
 		dispatcher: dispatcher,
 		outputDir:  outputDir,
-		bccli:      bccli,
-		sc:         &blockchain.StreamContract{},
+		caller:     caller,
+		sc:         &stream.StreamClient{},
 		syncerAddr: syncerAddr,
 		HLSWatcher: hlswatcher.New(time.Second * 2),
 	}, nil
@@ -165,15 +166,14 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	taskStatCtx, taskStatCancel := context.WithCancel(context.Background())
 	hlssrCtx, hlssrCancel := context.WithCancel(context.Background())
 
-	streamContract, err := blockchain.NewStreamContract(
+	streamClient, err := stream.NewStreamClient(
 		task.StreamContractAddress,
-		t.bccli.EthClient(),
-		t.bccli.EthAuth())
+		t.caller)
 	if err != nil {
 		return err
 	}
 
-	t.sc = streamContract
+	t.sc = streamClient
 
 	wg.Add(1)
 	go t.runFFmpeg(task, wg, ffmpegErrCh)
@@ -296,7 +296,6 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 
 			ctx := context.Background()
 			vpReq := &validatorv1.ValidateProofRequest{
-				// StreamContractId:      t.task.StreamContractID,
 				StreamContractAddress: t.task.StreamContractAddress,
 				ProfileId:             profileID.Bytes(),
 				OutputChunkId:         outChunkID.Bytes(),
