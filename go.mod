@@ -17,15 +17,16 @@ require (
 	github.com/huin/goupnp v1.0.0 // indirect
 	github.com/jackpal/go-nat-pmp v1.0.1 // indirect
 	github.com/karalabe/hid v1.0.0 // indirect
-	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/prometheus/common v0.7.0
 	github.com/shirou/gopsutil v2.18.12+incompatible
 	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/cobra v0.0.5
+	github.com/spf13/viper v1.6.1
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/videocoin/cloud-api v0.2.14
 	github.com/videocoin/cloud-pkg v0.0.6
 	github.com/videocoin/telegraf v0.0.0-20190710212555-97388fb1c745
-	go.uber.org/atomic v1.4.0 // indirect
 	google.golang.org/grpc v1.23.1
 )
 
