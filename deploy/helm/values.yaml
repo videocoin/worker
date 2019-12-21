@@ -1,4 +1,4 @@
-replicasCount: 5
+replicasCount: 3
 maxUnavailableCount: 0
 
 image:
@@ -14,10 +14,10 @@ imageInit:
 config: {}
 
 autoscaler:
-  minCount: 5
+  minCount: 3
   maxCount: 10
   targets:
-    targetCPUUtilizationPercentage: 70
+    targetCPUUtilizationPercentage: 50
 
 secrets:
   dbUri: ""
@@ -25,4 +25,10 @@ secrets:
   secret: ""
   sentryDsn: ""
 
-resources: {}
+resources:
+  limits:
+    cpu: 8
+    memory: 8Gi 
+  requests:
+    cpu: 6
+    memory: 8Gi
