@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -29,13 +30,27 @@ func main() {
 		Run: runMineCommand,
 	}
 
+	var registerCmd = &cobra.Command{
+		Use: "register",
+		Run: runRegisterCommand,
+	}
+
+	var stakeCmd = &cobra.Command{
+		Use: "stake",
+		Run: runStakeCommand,
+	}
+
+	var withDrawCmd = &cobra.Command{
+		Use: "withdraw",
+		Run: runWithdrawCommand,
+	}
+
 	viper.AutomaticEnv()
 
 	// root command initialize
 	rootCmd.Flags().StringP("loglevel", "l", "INFO", "")
 	rootCmd.Flags().StringP("key", "k", "", "")
 	rootCmd.Flags().StringP("secret", "s", "", "")
-	rootCmd.Flags().String("smca", "0xEa91ac0B88F84e91e79Caa871d2EB04eF5133721", "")
 
 	rootCmd.MarkFlagRequired("loglevel")
 	rootCmd.MarkFlagRequired("key")
@@ -44,7 +59,6 @@ func main() {
 	viper.BindPFlag("loglevel", rootCmd.Flags().Lookup("loglevel"))
 	viper.BindPFlag("key", rootCmd.Flags().Lookup("key"))
 	viper.BindPFlag("secret", rootCmd.Flags().Lookup("secret"))
-	viper.BindPFlag("smca", rootCmd.Flags().Lookup("smca"))
 
 	// mine command initialize
 	mineCmd.Flags().String("output-dir", "/tmp", "")
@@ -60,8 +74,16 @@ func main() {
 	viper.BindPFlag("blockchain_url", mineCmd.Flags().Lookup("blockchain-url"))
 	viper.BindPFlag("syncer_url", mineCmd.Flags().Lookup("syncer-url"))
 
+	// register command initialize
+	// stake command initialize
+	// withdraw command initialize
+
 	// add commands and execute
 	rootCmd.AddCommand(mineCmd)
+	rootCmd.AddCommand(registerCmd)
+	rootCmd.AddCommand(stakeCmd)
+	rootCmd.AddCommand(withDrawCmd)
+
 	rootCmd.Execute()
 }
 
@@ -124,11 +146,10 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 	cfg.Key = viper.GetString("key")
 	cfg.Secret = viper.GetString("secret")
 	cfg.ClientID = viper.GetString("client_id")
-	cfg.SMCA = viper.GetString("smca")
 
 	cfg.OutputDir = viper.GetString("output_dir")
 	cfg.DispatcherRPCAddr = viper.GetString("dispatcher_addr")
-	cfg.BlockchainURL = viper.GetString("blockchain_url")
+	cfg.RPCNodeURL = viper.GetString("blockchain_url")
 	cfg.SyncerURL = viper.GetString("syncer_url")
 
 	svc, err := service.NewService(cfg)
@@ -159,4 +180,22 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 	}
 
 	log.Info("stopped")
+}
+
+func runRegisterCommand(cmd *cobra.Command, args []string) {
+	fmt.Println("run register command")
+	fmt.Printf("KEY=%s\n", viper.GetString("key"))
+	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
+}
+
+func runStakeCommand(cmd *cobra.Command, args []string) {
+	fmt.Println("run stake command")
+	fmt.Printf("KEY=%s\n", viper.GetString("key"))
+	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
+}
+
+func runWithdrawCommand(cmd *cobra.Command, args []string) {
+	fmt.Println("run withdraw command")
+	fmt.Printf("KEY=%s\n", viper.GetString("key"))
+	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
 }
