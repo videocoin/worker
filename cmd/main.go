@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -198,6 +199,30 @@ func runRegisterCommand(cmd *cobra.Command, args []string) {
 	fmt.Println("run register command")
 	fmt.Printf("KEY=%s\n", viper.GetString("key"))
 	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
+
+	log := GetLogger()
+
+	cfg := &service.Config{
+		Name:    ServiceName,
+		Version: Version,
+		Logger:  log,
+	}
+
+	cfg.Key = viper.GetString("key")
+	cfg.Secret = viper.GetString("secret")
+
+	cli, err := getTranscoderClient(cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = cli.Register(context.Background())
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Info("transcoder successfully registered")
+
 }
 
 func runStakeCommand(cmd *cobra.Command, args []string) {
