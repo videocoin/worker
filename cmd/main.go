@@ -24,7 +24,11 @@ var (
 	Version     string = "dev"
 )
 
+var cfg *service.Config
+
 func main() {
+	cobra.OnInitialize(preInit)
+
 	var rootCmd = &cobra.Command{
 		Use: "",
 	}
@@ -32,11 +36,6 @@ func main() {
 	var mineCmd = &cobra.Command{
 		Use: "mine",
 		Run: runMineCommand,
-	}
-
-	var registerCmd = &cobra.Command{
-		Use: "register",
-		Run: runRegisterCommand,
 	}
 
 	var stakeCmd = &cobra.Command{
@@ -68,23 +67,22 @@ func main() {
 	viper.BindPFlag("client_id", mineCmd.Flags().Lookup("client-id"))
 
 	// stake command initialize
-	stakeCmd.Flags().Int64("amount", 0, "amount of coins to stake")
-	stakeCmd.MarkFlagRequired("amount")
+	stakeCmd.Flags().Int64("amount", 10, "amount to stake (default: wei)")
+	// stakeCmd.MarkFlagRequired("amount")
 
 	// withdraw command initialize
-	withdrawCmd.Flags().Int64("amount", 0, "amount of coins to withdraw")
+	withdrawCmd.Flags().Int64("amount", 0, "amount to withdraw")
 	withdrawCmd.MarkFlagRequired("amount")
 
 	// add commands and execute
 	rootCmd.AddCommand(mineCmd)
-	rootCmd.AddCommand(registerCmd)
 	rootCmd.AddCommand(stakeCmd)
 	rootCmd.AddCommand(withdrawCmd)
 
 	rootCmd.Execute()
 }
 
-func GetLogger() *logrus.Entry {
+func preInit() {
 	loglevel := viper.GetString("loglevel")
 	level, err := logrus.ParseLevel(loglevel)
 	if err != nil {
@@ -123,23 +121,19 @@ func GetLogger() *logrus.Entry {
 		}
 	}
 
-	return logrus.NewEntry(l)
+	cfg = service.LoadConfig()
+	cfg.Logger = logrus.NewEntry(l)
+	cfg.Name = ServiceName
+	cfg.Version = Version
 }
 
 func runMineCommand(cmd *cobra.Command, args []string) {
-	log := GetLogger()
-
+	log := cfg.Logger
 	closer, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		log.Info(err.Error())
 	} else {
 		defer closer.Close()
-	}
-
-	cfg := &service.Config{
-		Name:    ServiceName,
-		Version: Version,
-		Logger:  log,
 	}
 
 	cfg.Key = viper.GetString("key")
@@ -195,18 +189,12 @@ func getTranscoderClient(cfg *service.Config) (*client.TranscoderClient, error) 
 	return tCli, nil
 }
 
-func runRegisterCommand(cmd *cobra.Command, args []string) {
-	fmt.Println("run register command")
+func runStakeCommand(cmd *cobra.Command, args []string) {
+	fmt.Println("run stake command")
 	fmt.Printf("KEY=%s\n", viper.GetString("key"))
 	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
 
-	log := GetLogger()
-
-	cfg := &service.Config{
-		Name:    ServiceName,
-		Version: Version,
-		Logger:  log,
-	}
+	log := cfg.Logger
 
 	cfg.Key = viper.GetString("key")
 	cfg.Secret = viper.GetString("secret")
@@ -216,19 +204,19 @@ func runRegisterCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	err = cli.Register(context.Background())
+	amount, err := cmd.Flags().GetInt64("amount")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	// register if it is not
+	err = cli.Register(context.Background(), amount)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	log.Info("transcoder successfully registered")
 
-}
-
-func runStakeCommand(cmd *cobra.Command, args []string) {
-	fmt.Println("run stake command")
-	fmt.Printf("KEY=%s\n", viper.GetString("key"))
-	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
 }
 
 func runWithdrawCommand(cmd *cobra.Command, args []string) {

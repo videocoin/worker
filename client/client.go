@@ -23,8 +23,8 @@ func NewTranscoderClient(managerAddr string, caller *caller.Caller) (*Transcoder
 	return &TranscoderClient{*contract, *caller}, nil
 }
 
-func (c *TranscoderClient) Register(ctx context.Context) error {
-	opts := c.TransactOpts(0)
+func (c *TranscoderClient) Register(ctx context.Context, amount int64) error {
+	opts := c.TransactOpts(amount, 0)
 
 	isTranscoder, err := c.IsTranscoder(opts.From)
 	if err != nil {
@@ -48,8 +48,8 @@ func (c *TranscoderClient) Register(ctx context.Context) error {
 	return nil
 }
 
-func (c *TranscoderClient) SelfStake(ctx context.Context) error {
-	opts := c.TransactOpts(0)
+func (c *TranscoderClient) SelfStake(ctx context.Context, amount int64) error {
+	opts := c.TransactOpts(amount, 0)
 
 	isTranscoder, err := c.IsTranscoder(opts.From)
 	if err != nil {
@@ -74,7 +74,7 @@ func (c *TranscoderClient) SelfStake(ctx context.Context) error {
 }
 
 func (c *TranscoderClient) WithdrawalProposal(ctx context.Context) error {
-	opts := c.TransactOpts(0)
+	opts := c.TransactOpts(0, 0)
 
 	isTranscoder, err := c.IsTranscoder(opts.From)
 	if err != nil {
@@ -99,7 +99,7 @@ func (c *TranscoderClient) WithdrawalProposal(ctx context.Context) error {
 }
 
 func (c *TranscoderClient) WithdrawStake(ctx context.Context, amount *big.Int) error {
-	opts := c.TransactOpts(0)
+	opts := c.TransactOpts(0, 0)
 
 	isTranscoder, err := c.IsTranscoder(opts.From)
 	if err != nil {
