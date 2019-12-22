@@ -9,15 +9,14 @@ type Config struct {
 	Name    string        `envconfig:"-"`
 	Version string        `envconfig:"-"`
 	Logger  *logrus.Entry `envconfig:"-"`
-	
-	DispatcherRPCAddr string `required:"true" envconfig:"DISPATCHER_ADDR" default:"d.snb.videocoin.network:5008"`
-	RPCNodeURL        string `required:"true" envconfig:"BLOCKCHAIN_URL" default:"http://admin:VideoCoinS3cr3t@rpc.dev.videocoin.network"`
-	SyncerURL         string `required:"true" envconfig:"SYNCER_URL" default:"https://snb.videocoin.network/api/v1/sync"`
 
-	ClientID          string `required:"true" envconfig:"CLIENT_ID"`
-	Secret            string `required:"true" envconfig:"SECRET" default:"transcoder"`
+	DispatcherRPCAddr  string `required:"true" envconfig:"DISPATCHER_ADDR" default:"d.dev.videocoin.network:5008"`
+	RPCNodeURL         string `required:"true" envconfig:"RPC_NODE_URL" default:"https://dev1:D6msEL93LJT5RaPk@rpc.dev.kili.videocoin.network"`
+	SyncerURL          string `required:"true" envconfig:"SYNCER_URL" default:"https://dev.videocoin.network/api/v1/sync"`
+	OutputDir          string `required:"true" envconfig:"OUTPUT_DIR" default:"/tmp"`
+	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0xeea159afba3969986f8dae95ab1f8eabe6b3ae93"`
 
-	OutputDir         string `required:"true" envconfig:"OUTPUT_DIR" default:"/tmp" description:"local folder for ts chunks"`
-	Key               string `required:"true" envconfig:"KEY"`
-	
+	ClientID string `required:"true" envconfig:"CLIENT_ID"`
+	Key      string `required:"true" envconfig:"KEY"`
+	Secret   string `required:"true" envconfig:"SECRET"`
 }

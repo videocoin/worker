@@ -9,8 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 type Caller struct {
@@ -43,7 +43,14 @@ func (c *Caller) Client() *ethclient.Client {
 }
 
 func (c *Caller) TransactOpts(gasLimit int) *bind.TransactOpts {
+	gasPrice, _ := c.client.SuggestGasPrice(context.Background())
+
 	opts := bind.NewKeyedTransactor(c.key.PrivateKey)
+	opts.Nonce = nil
+	opts.Value = big.NewInt(2)
+	opts.GasPrice = gasPrice
+	opts.GasLimit = uint64(gasLimit)
+
 	if gasLimit == 0 {
 		opts.GasLimit = uint64(3000000)
 	}

@@ -7,11 +7,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ethereum/go-ethereum/ethclient"
 	logrussentry "github.com/evalphobia/logrus_sentry"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/videocoin/cloud-pkg/tracer"
+	"github.com/videocoin/transcode/caller"
+	"github.com/videocoin/transcode/client"
 	"github.com/videocoin/transcode/service"
 )
 
@@ -22,7 +25,7 @@ var (
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use: "transcoder",
+		Use: "",
 	}
 
 	var mineCmd = &cobra.Command{
@@ -40,7 +43,7 @@ func main() {
 		Run: runStakeCommand,
 	}
 
-	var withDrawCmd = &cobra.Command{
+	var withdrawCmd = &cobra.Command{
 		Use: "withdraw",
 		Run: runWithdrawCommand,
 	}
@@ -49,45 +52,38 @@ func main() {
 
 	// root command initialize
 	rootCmd.Flags().StringP("loglevel", "l", "INFO", "")
-	rootCmd.Flags().StringP("key", "k", "", "")
-	rootCmd.Flags().StringP("secret", "s", "", "")
+	rootCmd.Flags().StringP("key", "k", "", "utc key file json content")
+	rootCmd.Flags().StringP("secret", "s", "", "password to decrypt key file")
 
 	rootCmd.MarkFlagRequired("loglevel")
 	rootCmd.MarkFlagRequired("key")
 	rootCmd.MarkFlagRequired("secret")
 
-	viper.BindPFlag("loglevel", rootCmd.Flags().Lookup("loglevel"))
-	viper.BindPFlag("key", rootCmd.Flags().Lookup("key"))
-	viper.BindPFlag("secret", rootCmd.Flags().Lookup("secret"))
+	viper.BindPFlags(rootCmd.Flags())
 
 	// mine command initialize
-	mineCmd.Flags().String("output-dir", "/tmp", "")
-	mineCmd.Flags().String("client-id", "", "")
-	mineCmd.Flags().String("dispatcher-addr", "d.dev.videocoin.network:5008", "")
-	mineCmd.Flags().String("blockchain-url", "https://dev1:D6msEL93LJT5RaPk@rpc.dev.kili.videocoin.network", "")
-	mineCmd.Flags().String("syncer-url", "https://dev.videocoin.network/api/v1/sync", "")
-
-	viper.BindPFlag("output_dir", mineCmd.Flags().Lookup("output-dir"))
+	mineCmd.Flags().String("client-id", "", "unique client id assigned to miner (required)")
+	mineCmd.MarkFlagRequired("client-id")
 	viper.BindPFlag("client_id", mineCmd.Flags().Lookup("client-id"))
 
-	viper.BindPFlag("dispatcher_addr", mineCmd.Flags().Lookup("dispatcher-addr"))
-	viper.BindPFlag("blockchain_url", mineCmd.Flags().Lookup("blockchain-url"))
-	viper.BindPFlag("syncer_url", mineCmd.Flags().Lookup("syncer-url"))
-
-	// register command initialize
 	// stake command initialize
+	stakeCmd.Flags().Int64("amount", 0, "amount of coins to stake")
+	stakeCmd.MarkFlagRequired("amount")
+
 	// withdraw command initialize
+	withdrawCmd.Flags().Int64("amount", 0, "amount of coins to withdraw")
+	withdrawCmd.MarkFlagRequired("amount")
 
 	// add commands and execute
 	rootCmd.AddCommand(mineCmd)
 	rootCmd.AddCommand(registerCmd)
 	rootCmd.AddCommand(stakeCmd)
-	rootCmd.AddCommand(withDrawCmd)
+	rootCmd.AddCommand(withdrawCmd)
 
 	rootCmd.Execute()
 }
 
-func runMineCommand(cmd *cobra.Command, args []string) {
+func GetLogger() *logrus.Entry {
 	loglevel := viper.GetString("loglevel")
 	level, err := logrus.ParseLevel(loglevel)
 	if err != nil {
@@ -98,10 +94,6 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 	l := logrus.New()
 	l.SetLevel(level)
 	l.SetFormatter(&logrus.TextFormatter{TimestampFormat: time.RFC3339Nano})
-	log := logrus.NewEntry(l)
-
-	// logrus.SetLevel(level)
-	// logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
 
 	sentryDSN := os.Getenv("SENTRY_DSN")
 	if sentryDSN != "" {
@@ -130,6 +122,12 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	return logrus.NewEntry(l)
+}
+
+func runMineCommand(cmd *cobra.Command, args []string) {
+	log := GetLogger()
+
 	closer, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		log.Info(err.Error())
@@ -146,11 +144,6 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 	cfg.Key = viper.GetString("key")
 	cfg.Secret = viper.GetString("secret")
 	cfg.ClientID = viper.GetString("client_id")
-
-	cfg.OutputDir = viper.GetString("output_dir")
-	cfg.DispatcherRPCAddr = viper.GetString("dispatcher_addr")
-	cfg.RPCNodeURL = viper.GetString("blockchain_url")
-	cfg.SyncerURL = viper.GetString("syncer_url")
 
 	svc, err := service.NewService(cfg)
 	if err != nil {
@@ -180,6 +173,25 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 	}
 
 	log.Info("stopped")
+}
+
+func getTranscoderClient(cfg *service.Config) (*client.TranscoderClient, error) {
+	cli, err := ethclient.Dial(cfg.RPCNodeURL)
+	if err != nil {
+		return nil, err
+	}
+
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, cli)
+	if err != nil {
+		return nil, err
+	}
+
+	tCli, err := client.NewTranscoderClient(cfg.StakingManagerAddr, caller)
+	if err != nil {
+		return nil, err
+	}
+
+	return tCli, nil
 }
 
 func runRegisterCommand(cmd *cobra.Command, args []string) {
