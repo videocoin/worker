@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -26,53 +29,102 @@ var (
 
 var cfg *service.Config
 
+func validateFlags(cmd *cobra.Command, args []string) error {
+	val, err := cmd.Flags().GetString("key")
+	if val == "" || err != nil {
+		if cfg.Key == "" {
+			return errors.New("key file path has to be specified")
+		}
+	} else {
+		if _, err := os.Stat(val); os.IsNotExist(err) {
+			return errors.New("key file does not exist")
+		}
+
+		keyjson, err := ioutil.ReadFile(val)
+		if err != nil {
+			return errors.New("failed to read key file")
+		}
+		cfg.Key = string(keyjson)
+	}
+
+	val, err = cmd.Flags().GetString("secret")
+	if val != "" {
+		cfg.Secret = val
+	}
+
+	if cmd.Name() == "mine" {
+		val, err = cmd.Flags().GetString("client-id")
+		if val == "" || err != nil {
+			if cfg.ClientID == "" {
+				return errors.New("client id has to be specified")
+			}
+		} else {
+			cfg.ClientID = val
+		}
+	}
+
+	return nil
+}
+
+func validateAmount(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		return errors.New("requires an amount argument (wei value)")
+	}
+	if _, err := strconv.Atoi(args[0]); err != nil {
+		return errors.New("amount value must be integer")
+	}
+
+	// TODO per command check min, max, etc
+
+	return nil
+}
+
 func main() {
-	cobra.OnInitialize(preInit)
+	cobra.OnInitialize(onInit)
 
 	var rootCmd = &cobra.Command{
 		Use: "",
 	}
 
 	var mineCmd = &cobra.Command{
-		Use: "mine",
-		Run: runMineCommand,
+		Use:              "mine",
+		Short:            "start miner function",
+		TraverseChildren: true,
+		PreRunE:          validateFlags,
+		Run:              runMineCommand,
 	}
 
 	var stakeCmd = &cobra.Command{
-		Use: "stake",
-		Run: runStakeCommand,
+		Use:              "stake",
+		Short:            "stake coins",
+		TraverseChildren: true,
+		Args:             validateAmount,
+		PreRunE:          validateFlags,
+		Run:              runStakeCommand,
 	}
 
 	var withdrawCmd = &cobra.Command{
-		Use: "withdraw",
-		Run: runWithdrawCommand,
+		Use:              "withdraw",
+		Short:            "withdraw staked coins",
+		TraverseChildren: true,
+		Args:             validateAmount,
+		PreRunE:          validateFlags,
+		Run:              runWithdrawCommand,
 	}
-
-	viper.AutomaticEnv()
 
 	// root command initialize
 	rootCmd.Flags().StringP("loglevel", "l", "INFO", "")
-	rootCmd.Flags().StringP("key", "k", "", "utc key file json content")
-	rootCmd.Flags().StringP("secret", "s", "", "password to decrypt key file")
-
-	rootCmd.MarkFlagRequired("loglevel")
-	rootCmd.MarkFlagRequired("key")
-	rootCmd.MarkFlagRequired("secret")
-
-	viper.BindPFlags(rootCmd.Flags())
+	rootCmd.PersistentFlags().StringP("key", "k", "", "utc key file json content")
+	rootCmd.PersistentFlags().StringP("secret", "s", "", "password to decrypt key file")
 
 	// mine command initialize
-	mineCmd.Flags().String("client-id", "", "unique client id assigned to miner (required)")
-	mineCmd.MarkFlagRequired("client-id")
-	viper.BindPFlag("client_id", mineCmd.Flags().Lookup("client-id"))
+	mineCmd.Flags().StringP("client-id", "c", "", "unique client id assigned to miner (required)")
 
 	// stake command initialize
 	stakeCmd.Flags().Int64("amount", 10, "amount to stake (default: wei)")
-	// stakeCmd.MarkFlagRequired("amount")
 
 	// withdraw command initialize
 	withdrawCmd.Flags().Int64("amount", 0, "amount to withdraw")
-	withdrawCmd.MarkFlagRequired("amount")
 
 	// add commands and execute
 	rootCmd.AddCommand(mineCmd)
@@ -82,7 +134,7 @@ func main() {
 	rootCmd.Execute()
 }
 
-func preInit() {
+func onInit() {
 	loglevel := viper.GetString("loglevel")
 	level, err := logrus.ParseLevel(loglevel)
 	if err != nil {
@@ -136,10 +188,6 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 		defer closer.Close()
 	}
 
-	cfg.Key = viper.GetString("key")
-	cfg.Secret = viper.GetString("secret")
-	cfg.ClientID = viper.GetString("client_id")
-
 	svc, err := service.NewService(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -190,15 +238,7 @@ func getTranscoderClient(cfg *service.Config) (*client.TranscoderClient, error) 
 }
 
 func runStakeCommand(cmd *cobra.Command, args []string) {
-	fmt.Println("run stake command")
-	fmt.Printf("KEY=%s\n", viper.GetString("key"))
-	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
-
 	log := cfg.Logger
-
-	cfg.Key = viper.GetString("key")
-	cfg.Secret = viper.GetString("secret")
-
 	cli, err := getTranscoderClient(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -209,7 +249,6 @@ func runStakeCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	// register if it is not
 	err = cli.Register(context.Background(), amount)
 	if err != nil {
 		log.Fatal(err.Error())

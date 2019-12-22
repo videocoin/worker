@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"sync"
 
 	"github.com/kelseyhightower/envconfig"
@@ -19,9 +20,9 @@ type Config struct {
 	OutputDir          string `required:"true" envconfig:"OUTPUT_DIR" default:"/tmp"`
 	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0xeea159afba3969986f8dae95ab1f8eabe6b3ae93"`
 
-	ClientID string `required:"true" envconfig:"CLIENT_ID" default:""`
-	Key      string `required:"true" envconfig:"KEY"`
-	Secret   string `required:"true" envconfig:"SECRET"`
+	ClientID string `envconfig:"CLIENT_ID"`
+	Key      string `envconfig:"KEY"`
+	Secret   string `envconfig:"SECRET"`
 }
 
 var cfg Config
@@ -29,8 +30,10 @@ var once sync.Once
 
 func LoadConfig() *Config {
 	once.Do(func() {
-		_ = envconfig.Process("", &cfg)
-	})
+		if err := envconfig.Process("", &cfg); err != nil {
+			log.Fatal(err.Error())
+		}
 
+	})
 	return &cfg
 }
