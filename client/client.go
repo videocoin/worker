@@ -2,11 +2,16 @@ package client
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/videocoin/transcode/caller"
+)
+
+var (
+	ErrAlreadyRegistered = errors.New("transcoder address is already registered")
 )
 
 type TranscoderClient struct {
@@ -23,16 +28,25 @@ func NewTranscoderClient(managerAddr string, caller *caller.Caller) (*Transcoder
 	return &TranscoderClient{*contract, *caller}, nil
 }
 
-func (c *TranscoderClient) Register(ctx context.Context, amount int64) error {
-	opts := c.TransactOpts(amount, 0)
-
-	isTranscoder, err := c.IsTranscoder(opts.From)
+func (c *TranscoderClient) isRegistered(addr common.Address) error {
+	isTranscoder, err := c.IsTranscoder(addr)
 	if err != nil {
 		return err
 	}
 
 	if isTranscoder {
-		return fmt.Errorf("address: %s is already a transcoder", opts.From)
+		return ErrAlreadyRegistered
+	}
+
+	return nil
+}
+
+func (c *TranscoderClient) Register(ctx context.Context, amount *big.Int) error {
+	opts := c.TransactOpts(amount, 0)
+
+	err := c.isRegistered(opts.From)
+	if err != nil {
+		return err
 	}
 
 	tx, err := c.instance.TranscoderRegister(opts)
@@ -48,17 +62,8 @@ func (c *TranscoderClient) Register(ctx context.Context, amount int64) error {
 	return nil
 }
 
-func (c *TranscoderClient) SelfStake(ctx context.Context, amount int64) error {
+func (c *TranscoderClient) SelfStake(ctx context.Context, amount *big.Int) error {
 	opts := c.TransactOpts(amount, 0)
-
-	isTranscoder, err := c.IsTranscoder(opts.From)
-	if err != nil {
-		return err
-	}
-
-	if !isTranscoder {
-		return fmt.Errorf("address: %s is not a transcoder", opts.From)
-	}
 
 	tx, err := c.instance.SelfStake(opts)
 	if err != nil {
@@ -74,15 +79,11 @@ func (c *TranscoderClient) SelfStake(ctx context.Context, amount int64) error {
 }
 
 func (c *TranscoderClient) WithdrawalProposal(ctx context.Context) error {
-	opts := c.TransactOpts(0, 0)
+	opts := c.TransactOpts(big.NewInt(0), 0)
 
-	isTranscoder, err := c.IsTranscoder(opts.From)
-	if err != nil {
+	err := c.isRegistered(opts.From)
+	if err != nil && err != ErrAlreadyRegistered {
 		return err
-	}
-
-	if !isTranscoder {
-		return fmt.Errorf("address: %s is not a transcoder", opts.From)
 	}
 
 	tx, err := c.instance.WithdrawalTranscoderProposal(opts)
@@ -99,15 +100,11 @@ func (c *TranscoderClient) WithdrawalProposal(ctx context.Context) error {
 }
 
 func (c *TranscoderClient) WithdrawStake(ctx context.Context, amount *big.Int) error {
-	opts := c.TransactOpts(0, 0)
+	opts := c.TransactOpts(big.NewInt(0), 0)
 
-	isTranscoder, err := c.IsTranscoder(opts.From)
-	if err != nil {
+	err := c.isRegistered(opts.From)
+	if err != nil && err != ErrAlreadyRegistered {
 		return err
-	}
-
-	if !isTranscoder {
-		return fmt.Errorf("address: %s is not a transcoder", opts.From)
 	}
 
 	tx, err := c.instance.WithdrawTranscoderStake(opts, amount)
@@ -121,4 +118,15 @@ func (c *TranscoderClient) WithdrawStake(ctx context.Context, amount *big.Int) e
 	}
 
 	return nil
+}
+
+func (c *TranscoderClient) GetStake() (*big.Int, error) {
+	opts := c.TransactOpts(big.NewInt(0), 0)
+
+	err := c.isRegistered(opts.From)
+	if err != nil && err != ErrAlreadyRegistered {
+		return nil, err
+	}
+
+	return c.instance.GetTranscodersStake(&bind.CallOpts{}, opts.From)
 }

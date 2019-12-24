@@ -42,7 +42,7 @@ func (sc *StreamClient) GetInChunks() ([]*big.Int, error) {
 }
 
 func (sc *StreamClient) SubmitProof(chunkID, outChunkID *big.Int, profileID *big.Int) (*types.Transaction, error) {
-	tx, err := sc.instance.SubmitProof(sc.TransactOpts(0, 0), profileID, chunkID, big.NewInt(0), outChunkID)
+	tx, err := sc.instance.SubmitProof(sc.TransactOpts(big.NewInt(0), 0), profileID, chunkID, big.NewInt(0), outChunkID)
 	if err != nil {
 		return nil, err
 	}

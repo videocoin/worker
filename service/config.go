@@ -18,7 +18,7 @@ type Config struct {
 	RPCNodeURL         string `required:"true" envconfig:"RPC_NODE_URL" default:"https://dev1:D6msEL93LJT5RaPk@rpc.dev.kili.videocoin.network"`
 	SyncerURL          string `required:"true" envconfig:"SYNCER_URL" default:"https://dev.videocoin.network/api/v1/sync"`
 	OutputDir          string `required:"true" envconfig:"OUTPUT_DIR" default:"/tmp"`
-	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0xeea159afba3969986f8dae95ab1f8eabe6b3ae93"`
+	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0x817ec8E65252E80dB27eFbBceE940AD917AC78FF"`
 
 	ClientID string `envconfig:"CLIENT_ID"`
 	Key      string `envconfig:"KEY"`

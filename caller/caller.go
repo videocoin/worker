@@ -42,12 +42,12 @@ func (c *Caller) Client() *ethclient.Client {
 	return c.client
 }
 
-func (c *Caller) TransactOpts(amount int64, gasLimit int) *bind.TransactOpts {
+func (c *Caller) TransactOpts(amount *big.Int, gasLimit int) *bind.TransactOpts {
 	gasPrice, _ := c.client.SuggestGasPrice(context.Background())
 
 	opts := bind.NewKeyedTransactor(c.key.PrivateKey)
 	opts.Nonce = nil
-	opts.Value = big.NewInt(amount)
+	opts.Value = amount
 	opts.GasPrice = gasPrice
 	opts.GasLimit = uint64(gasLimit)
 

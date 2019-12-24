@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -70,8 +70,15 @@ func validateAmount(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return errors.New("requires an amount argument (wei value)")
 	}
-	if _, err := strconv.Atoi(args[0]); err != nil {
+
+	amount := new(big.Int)
+	amount, ok := amount.SetString(args[0], 10)
+	if !ok {
 		return errors.New("amount value must be integer")
+	}
+
+	if amount.Cmp(big.NewInt(0)) <= 0 {
+		return errors.New("amount value has to be positive")
 	}
 
 	// TODO per command check min, max, etc
@@ -92,6 +99,14 @@ func main() {
 		TraverseChildren: true,
 		PreRunE:          validateFlags,
 		Run:              runMineCommand,
+	}
+
+	var balanceCmd = &cobra.Command{
+		Use:              "balance",
+		Short:            "show stake balance",
+		TraverseChildren: true,
+		PreRunE:          validateFlags,
+		Run:              runBalanceCommand,
 	}
 
 	var stakeCmd = &cobra.Command{
@@ -120,9 +135,6 @@ func main() {
 	// mine command initialize
 	mineCmd.Flags().StringP("client-id", "c", "", "unique client id assigned to miner (required)")
 
-	// stake command initialize
-	stakeCmd.Flags().Int64("amount", 10, "amount to stake (default: wei)")
-
 	// withdraw command initialize
 	withdrawCmd.Flags().Int64("amount", 0, "amount to withdraw")
 
@@ -130,6 +142,7 @@ func main() {
 	rootCmd.AddCommand(mineCmd)
 	rootCmd.AddCommand(stakeCmd)
 	rootCmd.AddCommand(withdrawCmd)
+	rootCmd.AddCommand(balanceCmd)
 
 	rootCmd.Execute()
 }
@@ -244,22 +257,86 @@ func runStakeCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	amount, err := cmd.Flags().GetInt64("amount")
-	if err != nil {
+	amount := new(big.Int)
+	amount, ok := amount.SetString(args[0], 10)
+	if !ok {
 		log.Fatal(err.Error())
 	}
 
 	err = cli.Register(context.Background(), amount)
 	if err != nil {
+		if err == client.ErrAlreadyRegistered {
+			stake, err := cli.GetStake()
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+			log.Infof("transcoder is already staking %d wei", stake.Uint64())
+		} else {
+			log.Fatal(err.Error())
+		}
+	} else {
+		log.Infof("transcoder successfully registered with stake amount of %d wei", amount)
+		return
+	}
+
+	log.Infof("adding stake in amount of %d", amount)
+
+	err = cli.SelfStake(context.Background(), amount)
+	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	log.Info("transcoder successfully registered")
-
+	log.Infof("stake of amount %d has been successfully added", amount)
 }
 
 func runWithdrawCommand(cmd *cobra.Command, args []string) {
-	fmt.Println("run withdraw command")
-	fmt.Printf("KEY=%s\n", viper.GetString("key"))
-	fmt.Printf("SECRET=%s\n", viper.GetString("secret"))
+	log := cfg.Logger
+	cli, err := getTranscoderClient(cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	stake, err := cli.GetStake()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Infof("transcoder is staking %d wei", stake.Uint64())
+
+	amount := new(big.Int)
+	amount, ok := amount.SetString(args[0], 10)
+	if !ok {
+		log.Fatal(err.Error())
+	}
+
+	if amount.Cmp(stake) > 0 {
+		log.Fatal(fmt.Errorf("amount to withdraw is bigger than stake"))
+	}
+
+	err = cli.WithdrawalProposal(context.Background())
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = cli.WithdrawStake(context.Background(), amount)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Infof("stake of amount %d has been successfully withdrawed", amount)
+}
+
+func runBalanceCommand(cmd *cobra.Command, args []string) {
+	log := cfg.Logger
+	cli, err := getTranscoderClient(cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	stake, err := cli.GetStake()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Infof("transcoder is staking %d wei", stake.Uint64())
 }
