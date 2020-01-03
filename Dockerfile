@@ -30,4 +30,4 @@ RUN touch /env/init.env
 RUN echo "LOGLEVEL=debug" > /env/init.env
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["transcoder"]
+CMD ["transcoder", "mine"]

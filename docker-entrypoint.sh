@@ -7,7 +7,7 @@ then
     transinit
     source /env/init.env
 
-    exec transcoder
+    exec transcoder mine
 else
     exec "$@"
 fi
