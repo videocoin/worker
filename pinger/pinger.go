@@ -44,7 +44,7 @@ func (p *Pinger) Start() error {
 		select {
 		case <-p.ticker.C:
 			ctx := context.Background()
-			si := &sysinfo.SystemInfo{AppVersion: p.appVersion}
+			si := &sysinfo.SystemInfo{AppVersion: p.appVersion, Logger: p.logger}
 			_, systemInfo, _ := si.GetInfo()
 			req := &minersv1.PingRequest{
 				ClientID:   p.clientID,
