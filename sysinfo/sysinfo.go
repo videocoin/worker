@@ -2,16 +2,28 @@ package sysinfo
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
+	"github.com/sirupsen/logrus"
 )
 
 type SystemInfo struct {
 	AppVersion string
+	Logger     *logrus.Entry
+}
+
+var IP_CHECKERS = []string{
+	"https://api.ipify.org/",
+	"https://api.my-ip.io/ip",
+	"http://ipv4bot.whatismyipaddress.com/",
 }
 
 func (si *SystemInfo) GetInfo() (map[string]interface{}, []byte, error) {
@@ -60,6 +72,7 @@ func (si *SystemInfo) GetInfo() (map[string]interface{}, []byte, error) {
 			"virt_system":      hostInfo.VirtualizationSystem,
 		}
 	}
+	info["ip"] = si.GetIP()
 
 	b, err := json.Marshal(info)
 	if err != nil {
@@ -76,4 +89,45 @@ func GetCPUUsage() float64 {
 	}
 
 	return -1
+}
+
+func (si *SystemInfo) GetIP() string {
+	for _, url := range IP_CHECKERS {
+		resp, err := http.Get(url)
+		if err != nil {
+			si.Logger.Error(err)
+			continue
+		}
+		defer resp.Body.Close()
+		html, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			si.Logger.Error(err)
+			continue
+		}
+		if IsIPv4(string(html)) {
+			return string(html)
+		}
+	}
+
+	return ""
+}
+
+func IsIPv4(host string) bool {
+	parts := strings.Split(host, ".")
+
+	if len(parts) < 4 {
+		return false
+	}
+
+	for _, x := range parts {
+		if i, err := strconv.Atoi(x); err == nil {
+			if i < 0 || i > 255 {
+				return false
+			}
+		} else {
+			return false
+		}
+
+	}
+	return true
 }

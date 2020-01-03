@@ -48,7 +48,7 @@ func (p *Pinger) Start() error {
 		select {
 		case <-p.ticker.C:
 			ctx := context.Background()
-			si := &sysinfo.SystemInfo{AppVersion: p.appVersion}
+			si := &sysinfo.SystemInfo{AppVersion: p.appVersion, Logger: p.logger}
 			_, systemInfo, _ := si.GetInfo()
 			_, cryptoInfo, _ := p.ci.GetInfo()
 
