@@ -21,8 +21,6 @@ spec:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: 
-            - transcoderd
           env:
             - name: LOGLEVEL
               value: DEBUG

@@ -20,4 +20,5 @@ RUN apt-get install -y --no-install-recommends \
 
 WORKDIR /
 
-CMD ["transcoder", "mine"]
+ENTRYPOINT ["transcoder"]
+CMD ["mine"]
