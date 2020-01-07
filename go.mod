@@ -13,7 +13,6 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/grafov/m3u8 v0.11.1
-	github.com/hashicorp/consul/api v1.2.0
 	github.com/huin/goupnp v1.0.0 // indirect
 	github.com/jackpal/go-nat-pmp v1.0.1 // indirect
 	github.com/karalabe/hid v1.0.0 // indirect

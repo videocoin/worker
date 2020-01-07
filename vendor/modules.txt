@@ -12,8 +12,6 @@ github.com/allegro/bigcache/queue
 github.com/aristanetworks/goarista/monotime
 # github.com/armon/circbuf v0.0.0-20190214190532-5111143e8da2
 github.com/armon/circbuf
-# github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
-github.com/armon/go-metrics
 # github.com/btcsuite/btcd v0.0.0-20190605094302-a0d1e3e36d50
 github.com/btcsuite/btcd/btcec
 # github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713
@@ -94,16 +92,6 @@ github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options
 github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/grpc-ecosystem/grpc-gateway/internal
-# github.com/hashicorp/consul/api v1.2.0
-github.com/hashicorp/consul/api
-# github.com/hashicorp/go-cleanhttp v0.5.1
-github.com/hashicorp/go-cleanhttp
-# github.com/hashicorp/go-immutable-radix v1.0.0
-github.com/hashicorp/go-immutable-radix
-# github.com/hashicorp/go-rootcerts v1.0.0
-github.com/hashicorp/go-rootcerts
-# github.com/hashicorp/golang-lru v0.5.0
-github.com/hashicorp/golang-lru/simplelru
 # github.com/hashicorp/hcl v1.0.0
 github.com/hashicorp/hcl
 github.com/hashicorp/hcl/hcl/printer
@@ -115,8 +103,6 @@ github.com/hashicorp/hcl/hcl/scanner
 github.com/hashicorp/hcl/hcl/strconv
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
-# github.com/hashicorp/serf v0.8.2
-github.com/hashicorp/serf/coordinate
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
 # github.com/kelseyhightower/envconfig v1.4.0
@@ -125,8 +111,6 @@ github.com/kelseyhightower/envconfig
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/magiconair/properties v1.8.1
 github.com/magiconair/properties
-# github.com/mitchellh/go-homedir v1.1.0
-github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/opentracing/opentracing-go v1.1.0

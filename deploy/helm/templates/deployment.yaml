@@ -26,6 +26,8 @@ spec:
           env:
             - name: LOGLEVEL
               value: DEBUG
+            - name: INTERNAL
+              value: "1"
             - name: DISPATCHER_ADDR
               valueFrom:
                 configMapKeyRef:

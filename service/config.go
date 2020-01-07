@@ -23,6 +23,8 @@ type Config struct {
 	ClientID string `envconfig:"CLIENT_ID"`
 	Key      string `envconfig:"KEY"`
 	Secret   string `envconfig:"SECRET"`
+
+	Internal bool `envconfig:"INTERNAL"`
 }
 
 var cfg Config

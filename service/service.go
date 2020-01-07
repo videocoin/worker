@@ -26,16 +26,6 @@ type Service struct {
 }
 
 func NewService(cfg *Config) (*Service, error) {
-	cli, err := ethclient.Dial(cfg.RPCNodeURL)
-	if err != nil {
-		return nil, err
-	}
-
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, cli)
-	if err != nil {
-		return nil, err
-	}
-
 	dGrpcDialOpts := []grpc.DialOption{
 		grpc.WithInsecure(),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
@@ -50,6 +40,31 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(dispatcherConn)
+
+	if cfg.Internal {
+		configReq := &dispatcherv1.InternalConfigRequest{}
+		internalConfigResp, err := dispatcher.GetInternalConfig(
+			context.Background(),
+			configReq,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		cfg.ClientID = internalConfigResp.ClientId
+		cfg.Key = internalConfigResp.Key
+		cfg.Secret = internalConfigResp.Secret
+	}
+
+	cli, err := ethclient.Dial(cfg.RPCNodeURL)
+	if err != nil {
+		return nil, err
+	}
+
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, cli)
+	if err != nil {
+		return nil, err
+	}
 
 	_, err = dispatcher.Register(
 		context.Background(),

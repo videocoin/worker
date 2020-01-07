@@ -30,36 +30,45 @@ var (
 var cfg *service.Config
 
 func validateFlags(cmd *cobra.Command, args []string) error {
-	val, err := cmd.Flags().GetString("key")
-	if val == "" || err != nil {
-		if cfg.Key == "" {
-			return errors.New("key file path has to be specified")
-		}
-	} else {
-		if _, err := os.Stat(val); os.IsNotExist(err) {
-			return errors.New("key file does not exist")
-		}
+	if !cfg.Internal {
+		val, err := cmd.Flags().GetString("key")
+		if val == "" || err != nil {
+			if cfg.Key == "" {
+				return errors.New("key file path has to be specified")
+			}
+		} else {
+			if _, err := os.Stat(val); os.IsNotExist(err) {
+				return errors.New("key file does not exist")
+			}
 
-		keyjson, err := ioutil.ReadFile(val)
-		if err != nil {
-			return errors.New("failed to read key file")
+			keyjson, err := ioutil.ReadFile(val)
+			if err != nil {
+				return errors.New("failed to read key file")
+			}
+			cfg.Key = string(keyjson)
 		}
-		cfg.Key = string(keyjson)
 	}
 
-	val, err = cmd.Flags().GetString("secret")
-	if val != "" {
-		cfg.Secret = val
+	if !cfg.Internal {
+		val, err := cmd.Flags().GetString("secret")
+		if err != nil {
+			return err
+		}
+		if val != "" {
+			cfg.Secret = val
+		}
 	}
 
 	if cmd.Name() == "mine" {
-		val, err = cmd.Flags().GetString("client-id")
-		if val == "" || err != nil {
-			if cfg.ClientID == "" {
-				return errors.New("client id has to be specified")
+		if !cfg.Internal {
+			val, err := cmd.Flags().GetString("client-id")
+			if val == "" || err != nil {
+				if cfg.ClientID == "" {
+					return errors.New("client id has to be specified")
+				}
+			} else {
+				cfg.ClientID = val
 			}
-		} else {
-			cfg.ClientID = val
 		}
 	}
 

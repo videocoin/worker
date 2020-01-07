@@ -7,7 +7,6 @@ BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
-TRANSINIT_IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/transinit:$(VERSION)
 
 ENV?=dev
 
@@ -25,10 +24,6 @@ deps:
 build:
 	@echo "==> Building..."
 	go build -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(SERVICE_NAME) cmd/main.go
-
-build-transinit:
-	@echo "==> Building transinit..."
-	go build -ldflags="-w -s" -o bin/transinit cmd/transinit.go
 
 test:
 	@echo "==> Running tests..."
