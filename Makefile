@@ -7,6 +7,7 @@ BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
 IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
+LATEST_IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):latest
 
 ENV?=dev
 
@@ -40,12 +41,16 @@ docker:
 docker-push:
 	docker push $(IMAGE_TAG)
 
+docker-latest:
+	docker tag $(IMAGE_TAG) $(LATEST_IMAGE_TAG)
+	docker push $(LATEST_IMAGE_TAG)
+
 clean:
 	rm -rf bin/*
 
 deploy:
 	ENV=${ENV} deploy/deploy.sh
 
-release: docker docker-push
+release: docker docker-push docker-latest
 
 .PHONY : build deps test push clean docker deploy release
