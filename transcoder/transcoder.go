@@ -360,6 +360,10 @@ func (t *Transcoder) uploadSegmentViaHttp(task *v1.Task, segment *hlswatcher.Seg
 		"segment_num": strconv.FormatInt(int64(segment.Num), 10),
 	}
 
+	if segment.IsLast {
+		params["last"] = "y"
+	}
+
 	request, err := newfileUploadRequest(t.syncerAddr, params, "file", segment.Source)
 	if err != nil {
 		return err
