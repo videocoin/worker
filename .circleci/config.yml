@@ -75,12 +75,12 @@ workflows:
   build-n-deploy:
     jobs:
       - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only:
-                - sandbox
-                - develop
-                - staging
+      # - deploy:
+      #     requires:
+      #       - build
+      #     filters:
+      #       branches:
+      #         only:
+      #           - sandbox
+      #           - develop
+      #           - staging
