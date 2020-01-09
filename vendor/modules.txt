@@ -19,29 +19,29 @@ github.com/certifi/gocertifi
 # github.com/deckarep/golang-set v1.7.1
 github.com/deckarep/golang-set
 # github.com/ethereum/go-ethereum v1.8.27
+github.com/ethereum/go-ethereum
+github.com/ethereum/go-ethereum/accounts
+github.com/ethereum/go-ethereum/accounts/abi
 github.com/ethereum/go-ethereum/accounts/abi/bind
 github.com/ethereum/go-ethereum/accounts/keystore
 github.com/ethereum/go-ethereum/common
-github.com/ethereum/go-ethereum/core/types
-github.com/ethereum/go-ethereum/ethclient
-github.com/ethereum/go-ethereum
-github.com/ethereum/go-ethereum/accounts/abi
-github.com/ethereum/go-ethereum/crypto
-github.com/ethereum/go-ethereum/event
-github.com/ethereum/go-ethereum/log
-github.com/ethereum/go-ethereum/accounts
-github.com/ethereum/go-ethereum/common/math
 github.com/ethereum/go-ethereum/common/hexutil
-github.com/ethereum/go-ethereum/params
-github.com/ethereum/go-ethereum/rlp
-github.com/ethereum/go-ethereum/trie
-github.com/ethereum/go-ethereum/rpc
-github.com/ethereum/go-ethereum/crypto/secp256k1
+github.com/ethereum/go-ethereum/common/math
 github.com/ethereum/go-ethereum/common/mclock
 github.com/ethereum/go-ethereum/common/prque
+github.com/ethereum/go-ethereum/core/types
+github.com/ethereum/go-ethereum/crypto
+github.com/ethereum/go-ethereum/crypto/secp256k1
+github.com/ethereum/go-ethereum/ethclient
 github.com/ethereum/go-ethereum/ethdb
+github.com/ethereum/go-ethereum/event
+github.com/ethereum/go-ethereum/log
 github.com/ethereum/go-ethereum/metrics
 github.com/ethereum/go-ethereum/p2p/netutil
+github.com/ethereum/go-ethereum/params
+github.com/ethereum/go-ethereum/rlp
+github.com/ethereum/go-ethereum/rpc
+github.com/ethereum/go-ethereum/trie
 # github.com/evalphobia/logrus_sentry v0.8.2
 github.com/evalphobia/logrus_sentry
 # github.com/fsnotify/fsnotify v1.4.7
@@ -56,31 +56,31 @@ github.com/go-stack/stack
 # github.com/gobwas/glob v0.2.3
 github.com/gobwas/glob
 github.com/gobwas/glob/compiler
-github.com/gobwas/glob/syntax
 github.com/gobwas/glob/match
+github.com/gobwas/glob/syntax
 github.com/gobwas/glob/syntax/ast
-github.com/gobwas/glob/util/runes
 github.com/gobwas/glob/syntax/lexer
+github.com/gobwas/glob/util/runes
 github.com/gobwas/glob/util/strings
 # github.com/gogo/googleapis v1.3.0
 github.com/gogo/googleapis/google/api
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
-github.com/gogo/protobuf/types
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
 github.com/gogo/protobuf/sortkeys
+github.com/gogo/protobuf/types
 # github.com/golang/protobuf v1.3.2
-github.com/golang/protobuf/proto
 github.com/golang/protobuf/descriptor
-github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/jsonpb
+github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go/descriptor
+github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
+github.com/golang/protobuf/ptypes/struct
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
-github.com/golang/protobuf/ptypes/struct
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
 # github.com/google/uuid v1.1.1
@@ -88,19 +88,19 @@ github.com/google/uuid
 # github.com/grafov/m3u8 v0.11.1
 github.com/grafov/m3u8
 # github.com/grpc-ecosystem/grpc-gateway v1.11.3
-github.com/grpc-ecosystem/grpc-gateway/runtime
-github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options
-github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/grpc-ecosystem/grpc-gateway/internal
+github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options
+github.com/grpc-ecosystem/grpc-gateway/runtime
+github.com/grpc-ecosystem/grpc-gateway/utilities
 # github.com/hashicorp/hcl v1.0.0
 github.com/hashicorp/hcl
-github.com/hashicorp/hcl/hcl/printer
 github.com/hashicorp/hcl/hcl/ast
 github.com/hashicorp/hcl/hcl/parser
-github.com/hashicorp/hcl/hcl/token
-github.com/hashicorp/hcl/json/parser
+github.com/hashicorp/hcl/hcl/printer
 github.com/hashicorp/hcl/hcl/scanner
 github.com/hashicorp/hcl/hcl/strconv
+github.com/hashicorp/hcl/hcl/token
+github.com/hashicorp/hcl/json/parser
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
 # github.com/inconshreveable/mousetrap v1.0.0
@@ -131,13 +131,13 @@ github.com/rjeczalik/notify
 github.com/rs/cors
 # github.com/shirou/gopsutil v2.18.12+incompatible
 github.com/shirou/gopsutil/cpu
+github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/host
+github.com/shirou/gopsutil/internal/common
 github.com/shirou/gopsutil/load
 github.com/shirou/gopsutil/mem
-github.com/shirou/gopsutil/internal/common
-github.com/shirou/gopsutil/process
 github.com/shirou/gopsutil/net
-github.com/shirou/gopsutil/disk
+github.com/shirou/gopsutil/process
 # github.com/shirou/w32 v0.0.0-20160930032740-bb4de0191aa4
 github.com/shirou/w32
 # github.com/sirupsen/logrus v1.4.2
@@ -161,17 +161,17 @@ github.com/streadway/amqp
 github.com/subosito/gotenv
 # github.com/syndtr/goleveldb v1.0.0
 github.com/syndtr/goleveldb/leveldb
+github.com/syndtr/goleveldb/leveldb/cache
+github.com/syndtr/goleveldb/leveldb/comparer
 github.com/syndtr/goleveldb/leveldb/errors
 github.com/syndtr/goleveldb/leveldb/filter
 github.com/syndtr/goleveldb/leveldb/iterator
-github.com/syndtr/goleveldb/leveldb/opt
-github.com/syndtr/goleveldb/leveldb/util
-github.com/syndtr/goleveldb/leveldb/cache
-github.com/syndtr/goleveldb/leveldb/comparer
 github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
+github.com/syndtr/goleveldb/leveldb/opt
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
+github.com/syndtr/goleveldb/leveldb/util
 # github.com/tidwall/gjson v1.2.1
 github.com/tidwall/gjson
 # github.com/tidwall/match v1.0.1
@@ -182,20 +182,20 @@ github.com/tidwall/pretty
 github.com/uber/jaeger-client-go
 github.com/uber/jaeger-client-go/config
 github.com/uber/jaeger-client-go/internal/baggage
+github.com/uber/jaeger-client-go/internal/baggage/remote
 github.com/uber/jaeger-client-go/internal/spanlog
 github.com/uber/jaeger-client-go/internal/throttler
+github.com/uber/jaeger-client-go/internal/throttler/remote
 github.com/uber/jaeger-client-go/log
+github.com/uber/jaeger-client-go/rpcmetrics
 github.com/uber/jaeger-client-go/thrift
+github.com/uber/jaeger-client-go/thrift-gen/agent
+github.com/uber/jaeger-client-go/thrift-gen/baggage
 github.com/uber/jaeger-client-go/thrift-gen/jaeger
 github.com/uber/jaeger-client-go/thrift-gen/sampling
 github.com/uber/jaeger-client-go/thrift-gen/zipkincore
-github.com/uber/jaeger-client-go/utils
-github.com/uber/jaeger-client-go/internal/baggage/remote
-github.com/uber/jaeger-client-go/internal/throttler/remote
-github.com/uber/jaeger-client-go/rpcmetrics
 github.com/uber/jaeger-client-go/transport
-github.com/uber/jaeger-client-go/thrift-gen/agent
-github.com/uber/jaeger-client-go/thrift-gen/baggage
+github.com/uber/jaeger-client-go/utils
 # github.com/uber/jaeger-lib v2.0.0+incompatible
 github.com/uber/jaeger-lib/metrics
 # github.com/videocoin/cloud-api v0.2.14 => ../cloud-api
@@ -204,38 +204,46 @@ github.com/videocoin/cloud-api/miners/v1
 github.com/videocoin/cloud-api/syncer/v1
 github.com/videocoin/cloud-api/validator/v1
 # github.com/videocoin/cloud-pkg v0.0.6 => ../cloud-pkg
-github.com/videocoin/cloud-pkg/stakingManager
-github.com/videocoin/cloud-pkg/tracer
-github.com/videocoin/cloud-pkg/stream
-github.com/videocoin/cloud-pkg/retry
 github.com/videocoin/cloud-pkg/mqmux
+github.com/videocoin/cloud-pkg/retry
+github.com/videocoin/cloud-pkg/stakingManager
+github.com/videocoin/cloud-pkg/stream
+github.com/videocoin/cloud-pkg/tracer
 # github.com/videocoin/telegraf v0.0.0-20190710212555-97388fb1c745
+github.com/videocoin/telegraf
 github.com/videocoin/telegraf/agent
 github.com/videocoin/telegraf/core
 github.com/videocoin/telegraf/core/config
 github.com/videocoin/telegraf/core/models
-github.com/videocoin/telegraf/plugins/aggregators/all
-github.com/videocoin/telegraf/plugins/inputs
-github.com/videocoin/telegraf/plugins/inputs/all
-github.com/videocoin/telegraf/plugins/outputs
-github.com/videocoin/telegraf/plugins/outputs/all
-github.com/videocoin/telegraf/plugins/processors/all
-github.com/videocoin/telegraf/plugins/serializers
-github.com/videocoin/telegraf
-github.com/videocoin/telegraf/metric
-github.com/videocoin/telegraf/plugins/serializers/influx
+github.com/videocoin/telegraf/core/templating
+github.com/videocoin/telegraf/core/tls
 github.com/videocoin/telegraf/filter
+github.com/videocoin/telegraf/log
+github.com/videocoin/telegraf/metric
+github.com/videocoin/telegraf/plugins/aggregators
+github.com/videocoin/telegraf/plugins/aggregators/all
 github.com/videocoin/telegraf/plugins/aggregators/basicstats
 github.com/videocoin/telegraf/plugins/aggregators/final
 github.com/videocoin/telegraf/plugins/aggregators/histogram
 github.com/videocoin/telegraf/plugins/aggregators/minmax
 github.com/videocoin/telegraf/plugins/aggregators/valuecounter
+github.com/videocoin/telegraf/plugins/inputs
+github.com/videocoin/telegraf/plugins/inputs/all
 github.com/videocoin/telegraf/plugins/inputs/cpu
 github.com/videocoin/telegraf/plugins/inputs/disk
 github.com/videocoin/telegraf/plugins/inputs/mem
 github.com/videocoin/telegraf/plugins/inputs/system
+github.com/videocoin/telegraf/plugins/outputs
+github.com/videocoin/telegraf/plugins/outputs/all
 github.com/videocoin/telegraf/plugins/outputs/file
 github.com/videocoin/telegraf/plugins/outputs/graphite
+github.com/videocoin/telegraf/plugins/parsers
+github.com/videocoin/telegraf/plugins/parsers/graphite
+github.com/videocoin/telegraf/plugins/parsers/influx
+github.com/videocoin/telegraf/plugins/parsers/json
+github.com/videocoin/telegraf/plugins/parsers/value
+github.com/videocoin/telegraf/plugins/processors
+github.com/videocoin/telegraf/plugins/processors/all
 github.com/videocoin/telegraf/plugins/processors/converter
 github.com/videocoin/telegraf/plugins/processors/enum
 github.com/videocoin/telegraf/plugins/processors/override
@@ -245,58 +253,51 @@ github.com/videocoin/telegraf/plugins/processors/regex
 github.com/videocoin/telegraf/plugins/processors/rename
 github.com/videocoin/telegraf/plugins/processors/strings
 github.com/videocoin/telegraf/plugins/processors/topk
+github.com/videocoin/telegraf/plugins/serializers
 github.com/videocoin/telegraf/plugins/serializers/carbon2
 github.com/videocoin/telegraf/plugins/serializers/graphite
+github.com/videocoin/telegraf/plugins/serializers/influx
 github.com/videocoin/telegraf/plugins/serializers/json
-github.com/videocoin/telegraf/plugins/aggregators
-github.com/videocoin/telegraf/log
-github.com/videocoin/telegraf/core/tls
-github.com/videocoin/telegraf/plugins/processors
-github.com/videocoin/telegraf/plugins/parsers
-github.com/videocoin/telegraf/plugins/parsers/graphite
-github.com/videocoin/telegraf/plugins/parsers/influx
-github.com/videocoin/telegraf/plugins/parsers/json
-github.com/videocoin/telegraf/plugins/parsers/value
-github.com/videocoin/telegraf/core/templating
 # golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/sha3
 # golang.org/x/net v0.0.0-20190613194153-d28f0bde5980
-golang.org/x/net/trace
-golang.org/x/net/websocket
-golang.org/x/net/internal/timeseries
+golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
-golang.org/x/net/http/httpguts
 golang.org/x/net/idna
+golang.org/x/net/internal/timeseries
+golang.org/x/net/trace
+golang.org/x/net/websocket
 # golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed
+golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-golang.org/x/sys/windows/svc/eventlog
-golang.org/x/sys/cpu
 golang.org/x/sys/windows/registry
+golang.org/x/sys/windows/svc/eventlog
 # golang.org/x/text v0.3.0
-golang.org/x/text/transform
-golang.org/x/text/unicode/norm
 golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
 # google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8
-google.golang.org/genproto/googleapis/rpc/status
 google.golang.org/genproto/googleapis/api/httpbody
+google.golang.org/genproto/googleapis/rpc/status
 google.golang.org/genproto/protobuf/field_mask
 # google.golang.org/grpc v1.23.1
 google.golang.org/grpc
-google.golang.org/grpc/keepalive
-google.golang.org/grpc/codes
-google.golang.org/grpc/status
-google.golang.org/grpc/grpclog
 google.golang.org/grpc/balancer
+google.golang.org/grpc/balancer/base
 google.golang.org/grpc/balancer/roundrobin
+google.golang.org/grpc/binarylog/grpc_binarylog_v1
+google.golang.org/grpc/codes
 google.golang.org/grpc/connectivity
 google.golang.org/grpc/credentials
+google.golang.org/grpc/credentials/internal
 google.golang.org/grpc/encoding
 google.golang.org/grpc/encoding/proto
+google.golang.org/grpc/grpclog
 google.golang.org/grpc/internal
 google.golang.org/grpc/internal/backoff
 google.golang.org/grpc/internal/balancerload
@@ -305,7 +306,9 @@ google.golang.org/grpc/internal/channelz
 google.golang.org/grpc/internal/envconfig
 google.golang.org/grpc/internal/grpcrand
 google.golang.org/grpc/internal/grpcsync
+google.golang.org/grpc/internal/syscall
 google.golang.org/grpc/internal/transport
+google.golang.org/grpc/keepalive
 google.golang.org/grpc/metadata
 google.golang.org/grpc/naming
 google.golang.org/grpc/peer
@@ -314,11 +317,8 @@ google.golang.org/grpc/resolver/dns
 google.golang.org/grpc/resolver/passthrough
 google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
+google.golang.org/grpc/status
 google.golang.org/grpc/tap
-google.golang.org/grpc/balancer/base
-google.golang.org/grpc/credentials/internal
-google.golang.org/grpc/binarylog/grpc_binarylog_v1
-google.golang.org/grpc/internal/syscall
 # gopkg.in/alecthomas/kingpin.v2 v2.2.6
 gopkg.in/alecthomas/kingpin.v2
 # gopkg.in/ini.v1 v1.51.0
