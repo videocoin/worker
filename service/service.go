@@ -9,6 +9,7 @@ import (
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	"github.com/videocoin/transcode/caller"
+	"github.com/videocoin/transcode/cryptoinfo"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
 	"google.golang.org/grpc"
@@ -90,8 +91,19 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
+	ci, err := cryptoinfo.NewCryptoInfo(cfg.StakingManagerAddr, caller)
+	if err != nil {
+		return nil, err
+	}
+
 	plogger := cfg.Logger.WithField("system", "pinger")
-	pinger, err := pinger.NewPinger(dispatcher, cfg.ClientID, time.Second*5, cfg.Version, plogger)
+	pinger, err := pinger.NewPinger(
+		dispatcher,
+		ci,
+		cfg.ClientID,
+		time.Second*5,
+		cfg.Version,
+		plogger)
 	if err != nil {
 		return nil, err
 	}
