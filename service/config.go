@@ -14,9 +14,9 @@ type Config struct {
 	Version string        `envconfig:"-"`
 	Logger  *logrus.Entry `envconfig:"-"`
 
-	DispatcherRPCAddr  string `required:"true" envconfig:"DISPATCHER_ADDR" default:"d.dev.videocoin.network:5008"`
+	DispatcherRPCAddr  string `required:"true" envconfig:"DISPATCHER_ADDR" default:"d.snb.videocoin.network:5008"`
 	RPCNodeURL         string `required:"true" envconfig:"RPC_NODE_URL" default:"https://dev1:D6msEL93LJT5RaPk@rpc.dev.kili.videocoin.network"`
-	SyncerURL          string `required:"true" envconfig:"SYNCER_URL" default:"https://dev.videocoin.network/api/v1/sync"`
+	SyncerURL          string `required:"true" envconfig:"SYNCER_URL" default:"https://snb.videocoin.network/api/v1/sync"`
 	OutputDir          string `required:"true" envconfig:"OUTPUT_DIR" default:"/tmp"`
 	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0x817ec8E65252E80dB27eFbBceE940AD917AC78FF"`
 
