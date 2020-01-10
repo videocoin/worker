@@ -3,6 +3,7 @@ module github.com/videocoin/transcode
 go 1.12
 
 require (
+	cloud.google.com/go v0.38.0
 	github.com/armon/circbuf v0.0.0-20190214190532-5111143e8da2
 	github.com/cespare/cp v1.1.1 // indirect
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
@@ -25,6 +26,8 @@ require (
 	github.com/videocoin/cloud-api v0.2.14
 	github.com/videocoin/cloud-pkg v0.0.6
 	github.com/videocoin/telegraf v0.0.0-20190710212555-97388fb1c745
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	google.golang.org/api v0.15.0
 	google.golang.org/grpc v1.23.1
 )
 

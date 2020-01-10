@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"cloud.google.com/go/compute/metadata"
 	"github.com/ethereum/go-ethereum/ethclient"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
@@ -12,6 +13,8 @@ import (
 	"github.com/videocoin/transcode/cryptoinfo"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
+	"golang.org/x/oauth2/google"
+	computev1 "google.golang.org/api/compute/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
@@ -127,11 +130,73 @@ func NewService(cfg *Config) (*Service, error) {
 func (s *Service) Start() error {
 	go s.transcoder.Start()
 	go s.pinger.Start()
+
+	s.markAsRunningOnGCE()
+
 	return nil
 }
 
 func (s *Service) Stop() error {
 	s.transcoder.Stop()
 	s.pinger.Stop()
+	return nil
+}
+
+func (s *Service) markAsRunningOnGCE() error {
+	if metadata.OnGCE() {
+		project, err := metadata.ProjectID()
+		if err != nil {
+			s.cfg.Logger.Error(err)
+			return err
+		}
+
+		zone, err := metadata.Zone()
+		if err != nil {
+			s.cfg.Logger.Error(err)
+			return err
+		}
+
+		instanceID, err := metadata.InstanceID()
+		if err != nil {
+			s.cfg.Logger.Error(err)
+			return err
+		}
+
+		gctx := context.Background()
+		computeCli, err := google.DefaultClient(gctx, computev1.ComputeScope)
+		if err != nil {
+			s.cfg.Logger.Error(err)
+			return err
+		}
+
+		computeSvc, err := computev1.New(computeCli)
+		if err != nil {
+			s.cfg.Logger.Error(err)
+			return err
+		}
+
+		instance, err := computeSvc.Instances.Get(project, zone, instanceID).Do()
+		if err != nil {
+			s.cfg.Logger.Error(err)
+			return err
+		}
+
+		fingerprint := instance.Metadata.Fingerprint
+
+		md := &computev1.Metadata{
+			Fingerprint: fingerprint,
+			Items: []*computev1.MetadataItems{
+				&computev1.MetadataItems{
+					Key: "vc-running",
+				},
+			},
+		}
+		_, err = computeSvc.Instances.SetMetadata(project, zone, instanceID, md).Context(gctx).Do()
+		if err != nil {
+			s.cfg.Logger.Error(err)
+			return err
+		}
+	}
+
 	return nil
 }
