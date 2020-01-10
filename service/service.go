@@ -44,6 +44,9 @@ func NewService(cfg *Config) (*Service, error) {
 
 	if cfg.Internal {
 		configReq := &dispatcherv1.InternalConfigRequest{}
+
+		cfg.Logger.Info("getting internal config")
+
 		internalConfigResp, err := dispatcher.GetInternalConfig(
 			context.Background(),
 			configReq,
@@ -66,6 +69,8 @@ func NewService(cfg *Config) (*Service, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	cfg.Logger.Info("registering")
 
 	_, err = dispatcher.Register(
 		context.Background(),
