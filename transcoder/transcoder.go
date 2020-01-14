@@ -215,6 +215,12 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 
 	logger.Info("task has been completed")
 
+	outputPath := task.Output.Path + "/index.m3u8"
+	segments, err := t.HLSWatcher.ExtractSegments(outputPath)
+
+	fmt.Printf("err %+v\n", err)
+	fmt.Printf("last segment %+v\n", segments[len(segments)-1])
+
 	return nil
 }
 
@@ -241,8 +247,6 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 	}
 
 	logger.Info("segment has been uploaded")
-
-	//
 
 	idx := -1
 	counter := 0

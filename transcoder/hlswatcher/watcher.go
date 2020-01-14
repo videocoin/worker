@@ -183,6 +183,10 @@ func (w *Watcher) Stop() {
 	w.files = make([]string, 0)
 }
 
+func (w *Watcher) ExtractSegments(name string) ([]*SegmentInfo, error) {
+	return w.extractSegments(name)
+}
+
 func (w *Watcher) extractSegments(name string) ([]*SegmentInfo, error) {
 	segments := []*SegmentInfo{}
 
