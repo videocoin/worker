@@ -7,6 +7,7 @@ require (
 	github.com/armon/circbuf v0.0.0-20190214190532-5111143e8da2
 	github.com/ethereum/go-ethereum v1.9.9
 	github.com/grafov/m3u8 v0.11.1
+	github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/shirou/gopsutil v2.19.12+incompatible
 	github.com/sirupsen/logrus v1.4.2

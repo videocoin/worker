@@ -134,7 +134,7 @@ github.com/huin/goupnp/ssdp
 github.com/inconshreveable/mousetrap
 # github.com/jackpal/go-nat-pmp v1.0.2-0.20160603034137-1fa385a6f458
 github.com/jackpal/go-nat-pmp
-# github.com/karalabe/usb v0.0.0-20190919080040-51dc0efba356
+# github.com/karalabe/usb v0.0.0-20191104083709-911d15fe12a9
 github.com/karalabe/usb
 # github.com/kelseyhightower/envconfig v1.4.0
 github.com/kelseyhightower/envconfig

@@ -21,10 +21,16 @@ deps:
 	GO111MODULE=on go mod vendor
 	cp -r $(GOPATH)/src/github.com/ethereum/go-ethereum/crypto/secp256k1/libsecp256k1 \
 	vendor/github.com/ethereum/go-ethereum/crypto/secp256k1/
+	cp -r $(GOPATH)/src/github.com/shirou/gopsutil/host/include \
+	vendor/github.com/shirou/gopsutil/host/include
+	cp -r $(GOPATH)/src/github.com/karalabe/usb/hidapi \
+	vendor/github.com/karalabe/usb/hidapi
+	cp -r $(GOPATH)/src/github.com/karalabe/usb/libusb \
+	vendor/github.com/karalabe/usb/libusb
 
 build:
 	@echo "==> Building..."
-	go build -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(SERVICE_NAME) cmd/main.go
+	go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(SERVICE_NAME) cmd/main.go
 
 test:
 	@echo "==> Running tests..."
