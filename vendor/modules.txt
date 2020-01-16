@@ -1,14 +1,9 @@
 # cloud.google.com/go v0.51.0
 cloud.google.com/go/compute/metadata
-# github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d
+# github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6
 github.com/StackExchange/wmi
 # github.com/VictoriaMetrics/fastcache v1.5.3
 github.com/VictoriaMetrics/fastcache
-# github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-github.com/alecthomas/template
-github.com/alecthomas/template/parse
-# github.com/alecthomas/units v0.0.0-20190717042225-c3de453c63f4
-github.com/alecthomas/units
 # github.com/aristanetworks/goarista v0.0.0-20190607111240-52c2a7864a08
 github.com/aristanetworks/goarista/monotime
 # github.com/armon/circbuf v0.0.0-20190214190532-5111143e8da2
@@ -83,20 +78,11 @@ github.com/ethereum/go-ethereum/signer/storage
 github.com/ethereum/go-ethereum/trie
 # github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff
 github.com/gballet/go-libpcsclite
-# github.com/go-ole/go-ole v1.2.4
+# github.com/go-ole/go-ole v1.2.1
 github.com/go-ole/go-ole
 github.com/go-ole/go-ole/oleutil
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
-# github.com/gobwas/glob v0.2.3
-github.com/gobwas/glob
-github.com/gobwas/glob/compiler
-github.com/gobwas/glob/match
-github.com/gobwas/glob/syntax
-github.com/gobwas/glob/syntax/ast
-github.com/gobwas/glob/syntax/lexer
-github.com/gobwas/glob/util/runes
-github.com/gobwas/glob/util/strings
 # github.com/gogo/googleapis v1.3.0
 github.com/gogo/googleapis/google/api
 # github.com/gogo/protobuf v1.3.1
@@ -166,8 +152,6 @@ github.com/opentracing/opentracing-go/log
 github.com/pborman/uuid
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
-# github.com/prometheus/common v0.8.0
-github.com/prometheus/common/log
 # github.com/prometheus/tsdb v0.6.2-0.20190402121629-4f204dcbc150
 github.com/prometheus/tsdb/fileutil
 # github.com/rjeczalik/notify v0.9.2
@@ -176,7 +160,6 @@ github.com/rjeczalik/notify
 github.com/rs/cors
 # github.com/shirou/gopsutil v2.19.12+incompatible
 github.com/shirou/gopsutil/cpu
-github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/host
 github.com/shirou/gopsutil/internal/common
 github.com/shirou/gopsutil/load
@@ -210,12 +193,6 @@ github.com/syndtr/goleveldb/leveldb/opt
 github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
 github.com/syndtr/goleveldb/leveldb/util
-# github.com/tidwall/gjson v1.2.1
-github.com/tidwall/gjson
-# github.com/tidwall/match v1.0.1
-github.com/tidwall/match
-# github.com/tidwall/pretty v1.0.0
-github.com/tidwall/pretty
 # github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
 github.com/tyler-smith/go-bip39
 github.com/tyler-smith/go-bip39/wordlists
@@ -250,55 +227,6 @@ github.com/videocoin/cloud-pkg/retry
 github.com/videocoin/cloud-pkg/stakingManager
 github.com/videocoin/cloud-pkg/stream
 github.com/videocoin/cloud-pkg/tracer
-# github.com/videocoin/telegraf v0.0.0-20190710212555-97388fb1c745
-github.com/videocoin/telegraf
-github.com/videocoin/telegraf/agent
-github.com/videocoin/telegraf/core
-github.com/videocoin/telegraf/core/config
-github.com/videocoin/telegraf/core/models
-github.com/videocoin/telegraf/core/templating
-github.com/videocoin/telegraf/core/tls
-github.com/videocoin/telegraf/filter
-github.com/videocoin/telegraf/log
-github.com/videocoin/telegraf/metric
-github.com/videocoin/telegraf/plugins/aggregators
-github.com/videocoin/telegraf/plugins/aggregators/all
-github.com/videocoin/telegraf/plugins/aggregators/basicstats
-github.com/videocoin/telegraf/plugins/aggregators/final
-github.com/videocoin/telegraf/plugins/aggregators/histogram
-github.com/videocoin/telegraf/plugins/aggregators/minmax
-github.com/videocoin/telegraf/plugins/aggregators/valuecounter
-github.com/videocoin/telegraf/plugins/inputs
-github.com/videocoin/telegraf/plugins/inputs/all
-github.com/videocoin/telegraf/plugins/inputs/cpu
-github.com/videocoin/telegraf/plugins/inputs/disk
-github.com/videocoin/telegraf/plugins/inputs/mem
-github.com/videocoin/telegraf/plugins/inputs/system
-github.com/videocoin/telegraf/plugins/outputs
-github.com/videocoin/telegraf/plugins/outputs/all
-github.com/videocoin/telegraf/plugins/outputs/file
-github.com/videocoin/telegraf/plugins/outputs/graphite
-github.com/videocoin/telegraf/plugins/parsers
-github.com/videocoin/telegraf/plugins/parsers/graphite
-github.com/videocoin/telegraf/plugins/parsers/influx
-github.com/videocoin/telegraf/plugins/parsers/json
-github.com/videocoin/telegraf/plugins/parsers/value
-github.com/videocoin/telegraf/plugins/processors
-github.com/videocoin/telegraf/plugins/processors/all
-github.com/videocoin/telegraf/plugins/processors/converter
-github.com/videocoin/telegraf/plugins/processors/enum
-github.com/videocoin/telegraf/plugins/processors/override
-github.com/videocoin/telegraf/plugins/processors/parser
-github.com/videocoin/telegraf/plugins/processors/printer
-github.com/videocoin/telegraf/plugins/processors/regex
-github.com/videocoin/telegraf/plugins/processors/rename
-github.com/videocoin/telegraf/plugins/processors/strings
-github.com/videocoin/telegraf/plugins/processors/topk
-github.com/videocoin/telegraf/plugins/serializers
-github.com/videocoin/telegraf/plugins/serializers/carbon2
-github.com/videocoin/telegraf/plugins/serializers/graphite
-github.com/videocoin/telegraf/plugins/serializers/influx
-github.com/videocoin/telegraf/plugins/serializers/json
 # github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208
 github.com/wsddn/go-ecdh
 # go.opencensus.io v0.22.2
@@ -347,8 +275,6 @@ golang.org/x/oauth2/jwt
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-golang.org/x/sys/windows/registry
-golang.org/x/sys/windows/svc/eventlog
 # golang.org/x/text v0.3.2
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
@@ -432,7 +358,5 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# gopkg.in/alecthomas/kingpin.v2 v2.2.6
-gopkg.in/alecthomas/kingpin.v2
 # gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 gopkg.in/natefinch/npipe.v2
