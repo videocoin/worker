@@ -80,7 +80,7 @@ func (t *Transcoder) dispatch() error {
 	req := &v1.TaskPendingRequest{ClientID: t.clientID}
 
 	for range t.t.C {
-		t.logger.Infof("waiting task...")
+		t.logger.Info("waiting task...")
 
 		ctx := context.Background()
 		task, err := t.dispatcher.GetPendingTask(ctx, req)

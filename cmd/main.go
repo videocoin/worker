@@ -11,11 +11,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ethereum/go-ethereum/ethclient"
-	logrussentry "github.com/evalphobia/logrus_sentry"
 	"github.com/sirupsen/logrus"
+
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/videocoin/cloud-pkg/tracer"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/client"
@@ -30,6 +29,19 @@ var (
 var cfg *service.Config
 
 func validateFlags(cmd *cobra.Command, args []string) error {
+	loglevel, _ := cmd.Flags().GetString("loglevel")
+	level, err := logrus.ParseLevel(loglevel)
+	if err != nil {
+		loglevel = logrus.InfoLevel.String()
+		level, _ = logrus.ParseLevel(loglevel)
+	}
+
+	l := logrus.New()
+	l.SetLevel(level)
+	l.SetFormatter(&logrus.TextFormatter{TimestampFormat: time.RFC3339Nano})
+
+	cfg.Logger = l.WithField("version", cfg.Version)
+
 	if !cfg.Internal {
 		val, err := cmd.Flags().GetString("key")
 		if val == "" || err != nil {
@@ -96,7 +108,9 @@ func validateAmount(cmd *cobra.Command, args []string) error {
 }
 
 func main() {
-	cobra.OnInitialize(onInit)
+	cfg = service.LoadConfig()
+	cfg.Name = ServiceName
+	cfg.Version = Version
 
 	var rootCmd = &cobra.Command{
 		Use: "",
@@ -137,7 +151,7 @@ func main() {
 	}
 
 	// root command initialize
-	rootCmd.Flags().StringP("loglevel", "l", "INFO", "")
+	rootCmd.PersistentFlags().StringP("loglevel", "l", "INFO", "")
 	rootCmd.PersistentFlags().StringP("key", "k", "", "utc key file json content")
 	rootCmd.PersistentFlags().StringP("secret", "s", "", "password to decrypt key file")
 
@@ -154,51 +168,6 @@ func main() {
 	rootCmd.AddCommand(balanceCmd)
 
 	rootCmd.Execute()
-}
-
-func onInit() {
-	loglevel := viper.GetString("loglevel")
-	level, err := logrus.ParseLevel(loglevel)
-	if err != nil {
-		loglevel = logrus.InfoLevel.String()
-		level, _ = logrus.ParseLevel(loglevel)
-	}
-
-	l := logrus.New()
-	l.SetLevel(level)
-	l.SetFormatter(&logrus.TextFormatter{TimestampFormat: time.RFC3339Nano})
-
-	sentryDSN := os.Getenv("SENTRY_DSN")
-	if sentryDSN != "" {
-		sentryLevels := []logrus.Level{
-			logrus.PanicLevel,
-			logrus.FatalLevel,
-			logrus.ErrorLevel,
-		}
-		sentryTags := map[string]string{
-			"service": ServiceName,
-			"version": Version,
-		}
-		sentryHook, err := logrussentry.NewAsyncWithTagsSentryHook(
-			sentryDSN,
-			sentryTags,
-			sentryLevels,
-		)
-		sentryHook.StacktraceConfiguration.Enable = true
-		sentryHook.Timeout = 5 * time.Second
-		sentryHook.SetRelease(Version)
-
-		if err != nil {
-			l.Warning(err)
-		} else {
-			l.AddHook(sentryHook)
-		}
-	}
-
-	cfg = service.LoadConfig()
-	cfg.Logger = logrus.NewEntry(l)
-	cfg.Name = ServiceName
-	cfg.Version = Version
 }
 
 func runMineCommand(cmd *cobra.Command, args []string) {
