@@ -181,15 +181,17 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	wg.Add(1)
 	go t.runTaskStatMonitor(taskStatCtx, task, wg, taskStatCancel)
 
-	t.hlsFlow(
-		taskStatCtx,
-		taskStatCancel,
-		hlssrCtx,
-		hlssrCancel,
-		wg,
-		task,
-		t.OnSegmentTranscoded,
-	)
+	if task.IsOutputHLS() {
+		t.hlsFlow(
+			taskStatCtx,
+			taskStatCancel,
+			hlssrCtx,
+			hlssrCancel,
+			wg,
+			task,
+			t.OnSegmentTranscoded,
+		)
+	}
 
 	err = <-ffmpegErrCh
 	if err != nil {
@@ -213,12 +215,27 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 		ID:       t.task.ID,
 	})
 
-	outputPath := task.Output.Path + "/index.m3u8"
-	segments, err := t.HLSWatcher.ExtractSegments(outputPath)
+	if task.IsOutputHLS() {
+		outputPath := task.Output.Path + "/index.m3u8"
+		segments, _ := t.HLSWatcher.ExtractSegments(outputPath)
+		if len(segments) > 0 {
+			logger.Info("uploading last segment")
+			t.uploadSegmentViaHttp(task, segments[len(segments)-1])
+		}
+	}
 
-	logger.Info("uploading last segment")
-
-	t.uploadSegmentViaHttp(task, segments[len(segments)-1])
+	if task.IsOutputFile() {
+		segment := &hlswatcher.SegmentInfo{
+			Source:   task.Output.Path + "/" + task.Output.Name,
+			Num:      uint64(task.Output.Num),
+			Name:     task.Output.Name,
+			Duration: 0,
+		}
+		err := t.OnSegmentTranscoded(segment)
+		if err != nil {
+			logger.Error(err)
+		}
+	}
 
 	logger.Info("task has been completed")
 
@@ -304,7 +321,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 				StreamContractAddress: t.task.StreamContractAddress,
 				ProfileId:             profileID.Bytes(),
 				OutputChunkId:         outChunkID.Bytes(),
-				StreamId:              t.task.ID,
+				StreamId:              t.task.StreamID,
 			}
 			_, err = t.dispatcher.ValidateProof(ctx, vpReq)
 			if err != nil {
@@ -336,7 +353,7 @@ func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInf
 	}
 
 	req := &syncerv1.SyncRequest{
-		Path:        fmt.Sprintf("%s/%d.ts", task.ID, segment.Num),
+		Path:        fmt.Sprintf("%s/%d.ts", task.StreamID, segment.Num),
 		ContentType: "video/MP2T",
 		Data:        data,
 		Duration:    segment.Duration,
@@ -360,7 +377,7 @@ func (t *Transcoder) uploadSegmentViaHttp(task *v1.Task, segment *hlswatcher.Seg
 		Debug("uploading segment via http")
 
 	params := map[string]string{
-		"path":        fmt.Sprintf("%s/%d.ts", task.ID, segment.Num),
+		"path":        fmt.Sprintf("%s/%d.ts", task.StreamID, segment.Num),
 		"ct":          "video/MP2T",
 		"segment_num": strconv.FormatInt(int64(segment.Num), 10),
 	}
