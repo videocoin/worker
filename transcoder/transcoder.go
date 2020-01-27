@@ -218,7 +218,7 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	if task.IsOutputHLS() {
 		outputPath := task.Output.Path + "/index.m3u8"
 		segments, _ := t.HLSWatcher.ExtractSegments(outputPath)
-		if len(segments) > 0 {
+		if segments != nil && len(segments) > 0 {
 			logger.Info("uploading last segment")
 			t.uploadSegmentViaHttp(task, segments[len(segments)-1])
 		}
