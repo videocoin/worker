@@ -29,6 +29,7 @@ type SegmentInfo struct {
 	Duration  float64 `json:"duration"`
 	IsLast    bool    `json:"is_last"`
 	VariantID string  `json:"variant_id"`
+	IsVOD     bool    `json:"is_vod"`
 }
 
 type Watcher struct {

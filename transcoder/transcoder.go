@@ -216,6 +216,8 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	})
 
 	if task.IsOutputHLS() {
+		logger.Debug("uploading segment file")
+
 		outputPath := task.Output.Path + "/index.m3u8"
 		segments, _ := t.HLSWatcher.ExtractSegments(outputPath)
 		if segments != nil && len(segments) > 0 {
@@ -225,11 +227,14 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 	}
 
 	if task.IsOutputFile() {
+		logger.Debug("uploading single segment file")
+
 		segment := &hlswatcher.SegmentInfo{
 			Source:   task.Output.Path + "/" + task.Output.Name,
 			Num:      uint64(task.Output.Num),
 			Name:     task.Output.Name,
 			Duration: 0,
+			IsVOD:    true,
 		}
 		err := t.OnSegmentTranscoded(segment)
 		if err != nil {
@@ -384,6 +389,10 @@ func (t *Transcoder) uploadSegmentViaHttp(task *v1.Task, segment *hlswatcher.Seg
 
 	if segment.IsLast {
 		params["last"] = "y"
+	}
+
+	if segment.IsVOD {
+		params["vod"] = "y"
 	}
 
 	request, err := newfileUploadRequest(t.syncerAddr, params, "file", segment.Source)
