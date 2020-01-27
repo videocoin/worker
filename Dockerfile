@@ -1,4 +1,4 @@
-FROM golang:1.12.4 AS builder
+FROM golang:1.13 AS builder
 
 LABEL maintainer="Videocoin" description="transcoding client streams"
 
