@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/armon/circbuf"
+	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
 )
 
@@ -23,18 +24,27 @@ func (t *Transcoder) runFFmpeg(task *v1.Task, wg *sync.WaitGroup, errCh chan err
 	t.logger.Debugf("starting ffmpeg")
 	t.logger.Debugf("%s", task.Cmdline)
 
-	stdoutPipe, err := t.cmd.StdoutPipe()
-	if err != nil {
-		fmtErr := fmt.Errorf("ffmpeg: %s", err)
-		errCh <- fmtErr
-		return
-	}
+	var (
+		stdoutPipe, stderrPipe io.ReadCloser
+		err                    error
+	)
 
-	stderrPipe, err := t.cmd.StderrPipe()
-	if err != nil {
-		fmtErr := fmt.Errorf("ffmpeg: %s", err)
-		errCh <- fmtErr
-		return
+	err = nil
+
+	if t.logger.Logger.GetLevel() == logrus.DebugLevel {
+		stdoutPipe, err = t.cmd.StdoutPipe()
+		if err != nil {
+			fmtErr := fmt.Errorf("ffmpeg: %s", err)
+			errCh <- fmtErr
+			return
+		}
+
+		stderrPipe, err = t.cmd.StderrPipe()
+		if err != nil {
+			fmtErr := fmt.Errorf("ffmpeg: %s", err)
+			errCh <- fmtErr
+			return
+		}
 	}
 
 	err = t.cmd.Start()
@@ -44,52 +54,54 @@ func (t *Transcoder) runFFmpeg(task *v1.Task, wg *sync.WaitGroup, errCh chan err
 		return
 	}
 
-	stdouterr := bytes.NewBuffer(nil)
-	ffmpegout, _ := circbuf.NewBuffer(1024 * 4)
+	if t.logger.Logger.GetLevel() == logrus.DebugLevel {
+		stdouterr := bytes.NewBuffer(nil)
 
-	go io.Copy(stdouterr, stderrPipe)
-	go io.Copy(stdouterr, stdoutPipe)
+		go io.Copy(stdouterr, stderrPipe)
+		go io.Copy(stdouterr, stdoutPipe)
 
-	go func(stopCh chan bool) {
-		for {
-			select {
-			case <-stopCh:
-				return
-			default:
-				buf := bytes.NewBuffer(nil)
-				for {
-					b, err := stdouterr.ReadByte()
-					if err != nil {
-						break
-					}
-
-					if b == '\x00' || b == 'x' {
-						continue
-					}
-
-					if b == '\r' || b == '\n' {
-						if ffmpegout != nil {
-							ffmpegout.Write([]byte{'\n'})
+		go func(stopCh chan bool) {
+			ffmpegout, _ := circbuf.NewBuffer(1024 * 4)
+			for {
+				select {
+				case <-stopCh:
+					return
+				default:
+					buf := bytes.NewBuffer(nil)
+					for {
+						b, err := stdouterr.ReadByte()
+						if err != nil {
+							break
 						}
 
-						line := buf.String()
-						buf.Reset()
+						if b == '\x00' || b == 'x' {
+							continue
+						}
 
-						if len(line) > 0 {
-							t.logger.
-								WithField("system", "ffmpeg").
-								Debugf("ffmpeg: %s", line)
+						if b == '\r' || b == '\n' {
+							if ffmpegout != nil {
+								ffmpegout.Write([]byte{'\n'})
+							}
+
+							line := buf.String()
+							buf.Reset()
+
+							if len(line) > 0 {
+								t.logger.
+									WithField("system", "ffmpeg").
+									Debugf("ffmpeg: %s", line)
+							}
+						} else {
+							if ffmpegout != nil {
+								ffmpegout.Write([]byte{b})
+							}
+							buf.WriteByte(b)
 						}
-					} else {
-						if ffmpegout != nil {
-							ffmpegout.Write([]byte{b})
-						}
-						buf.WriteByte(b)
 					}
 				}
 			}
-		}
-	}(stopCh)
+		}(stopCh)
+	}
 
 	t.logger.Info("transcoding")
 
