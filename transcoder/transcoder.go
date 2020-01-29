@@ -233,7 +233,7 @@ func (t *Transcoder) runTask(task *v1.Task) error {
 			Source:   task.Output.Path + "/" + task.Output.Name,
 			Num:      uint64(task.Output.Num),
 			Name:     task.Output.Name,
-			Duration: 0,
+			Duration: task.Output.Duration,
 			IsVOD:    true,
 		}
 		err := t.OnSegmentTranscoded(segment)
@@ -385,6 +385,7 @@ func (t *Transcoder) uploadSegmentViaHttp(task *v1.Task, segment *hlswatcher.Seg
 		"path":        fmt.Sprintf("%s/%d.ts", task.StreamID, segment.Num),
 		"ct":          "video/MP2T",
 		"segment_num": strconv.FormatInt(int64(segment.Num), 10),
+		"duration":    fmt.Sprintf("%f", segment.Duration),
 	}
 
 	if segment.IsLast {
