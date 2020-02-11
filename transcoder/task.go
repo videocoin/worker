@@ -9,19 +9,14 @@ import (
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
 )
 
-func (t *Transcoder) runTaskStatMonitor(
-	ctx context.Context,
-	task *v1.Task,
-	wg *sync.WaitGroup,
-	cancel context.CancelFunc,
-) {
+func (t *Transcoder) runTaskMonitor(ctx context.Context, wg *sync.WaitGroup, cancel context.CancelFunc) {
 	defer func() {
-		t.logger.Debug("task stat monitor has been stopped")
+		t.logger.Debug("task monitor has been stopped")
 		cancel()
 		wg.Done()
 	}()
 
-	t.logger.Debug("starting task stat monitor")
+	t.logger.Debug("starting task monitor")
 
 	ticker := time.NewTicker(3 * time.Second)
 	defer ticker.Stop()
@@ -34,14 +29,14 @@ func (t *Transcoder) runTaskStatMonitor(
 			ctx := context.Background()
 			taskResp, err := t.dispatcher.GetTask(
 				ctx,
-				&v1.TaskRequest{ID: task.ID, ClientID: t.clientID},
+				&v1.TaskRequest{ID: t.task.ID, ClientID: t.clientID},
 			)
 			if err != nil {
 				t.logger.Debugf("[WARN] failed to get task: %s", err)
 				continue
 			}
 
-			t.logger.Debugf("task status is %s", task.Status.String())
+			t.logger.Debugf("task status is %s", t.task.Status.String())
 
 			switch taskResp.Status {
 			case v1.TaskStatusCanceled:

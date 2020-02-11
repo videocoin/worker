@@ -17,7 +17,6 @@ func (t *Transcoder) hlsFlow(
 	hlssrCtx context.Context,
 	hlssrCancel context.CancelFunc,
 	wg *sync.WaitGroup,
-	task *v1.Task,
 	callback SegmentRecvFunc,
 ) {
 	t.logger.Debug("starting hls watcher")
@@ -26,14 +25,14 @@ func (t *Transcoder) hlsFlow(
 
 	go t.HLSWatcher.Start()
 	t.HLSWatcher.Wait()
-	t.watchAllHLSOutput(task)
+	t.watchAllHLSOutput(t.task)
 
 	t.logger.Debugf("watch playlists: %+v", t.HLSWatcher.Files())
 
 	time.Sleep(time.Second * 2)
 
 	wg.Add(1)
-	go t.runHLSSegmentReciever(hlssrCtx, task, wg, hlssrCancel, callback)
+	go t.runHLSSegmentReceiver(hlssrCtx, wg, hlssrCancel, callback)
 
 	wg.Add(1)
 	go func() {
@@ -71,9 +70,8 @@ func (t *Transcoder) unwatchAllHLSOutput(task *v1.Task) {
 	t.HLSWatcher.Remove(task.Output.Path + "/index.m3u8")
 }
 
-func (t *Transcoder) runHLSSegmentReciever(
+func (t *Transcoder) runHLSSegmentReceiver(
 	ctx context.Context,
-	task *v1.Task,
 	wg *sync.WaitGroup,
 	cancel context.CancelFunc,
 	callback SegmentRecvFunc,
@@ -102,7 +100,7 @@ func (t *Transcoder) runHLSSegmentReciever(
 			if err != nil {
 				t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
 					ClientID: t.clientID,
-					ID:       task.ID,
+					ID:       t.task.ID,
 				})
 				return
 			}

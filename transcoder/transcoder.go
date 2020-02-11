@@ -102,7 +102,7 @@ func (t *Transcoder) dispatch() error {
 
 		t.task = task
 
-		err = t.runTask(task)
+		err = t.runTask()
 		if err != nil {
 			t.logger.
 				WithField("task_id", task.ID).
@@ -118,122 +118,112 @@ func (t *Transcoder) dispatch() error {
 			continue
 		}
 
+		t.dispatcher.MarkTaskAsCompleted(context.Background(), &v1.TaskRequest{
+			ClientID: t.clientID,
+			ID:       t.task.ID,
+		})
+
 		t.task = nil
 	}
 
 	return nil
 }
 
-func (t *Transcoder) runTask(task *v1.Task) error {
-	logger := t.logger.WithField("task_id", task.ID)
-	logger.Debugf("task: %+v", task)
+func (t *Transcoder) preRunTask() error {
+	logger := t.logger.WithField("task_id", t.task.ID)
 
-	logger.Info("running task")
+	t.task.Cmdline = strings.Replace(t.task.Cmdline, "$OUTPUT", t.outputDir, -1)
+	t.task.Output.Path = strings.Replace(t.task.Output.Path, "$OUTPUT", t.outputDir, -1)
 
-	task.Cmdline = strings.Replace(task.Cmdline, "$OUTPUT", t.outputDir, -1)
-	task.Output.Path = strings.Replace(task.Output.Path, "$OUTPUT", t.outputDir, -1)
+	if _, err := os.Stat(t.task.Output.Path); os.IsNotExist(err) {
+		logger.Debugf("creating dir: %s", t.task.Output.Path)
 
-	if task.ProfileID == "test" {
-		task.Input.URI = "/tmp/in.mp4"
-	}
-
-	if _, err := os.Stat(task.Output.Path); os.IsNotExist(err) {
-		logger.Debugf("creating dir: %s", task.Output.Path)
-
-		os.RemoveAll(task.Output.Path)
-		mkdirErr := os.Mkdir(task.Output.Path, 0777)
+		os.RemoveAll(t.task.Output.Path)
+		mkdirErr := os.Mkdir(t.task.Output.Path, 0777)
 		if mkdirErr != nil {
 			return mkdirErr
 		}
 	}
 
 	err := retry.RetryWithAttempts(5, time.Second*10, func() error {
-		logger.Infof("checking source %s", task.Input.URI)
-		return checkSource(task.Input.URI)
+		logger.Infof("checking source %s", t.task.Input.URI)
+		return checkSource(t.task.Input.URI)
 	})
 	if err != nil {
 		return err
 	}
 
-	c := strings.Split(task.Cmdline, " ")
+	c := strings.Split(t.task.Cmdline, " ")
 	cmdName := c[0]
 	cmdArgs := c[1:]
 	t.cmd = exec.Command(cmdName, cmdArgs...)
 
+	sc, err := stream.NewStreamClient(t.task.StreamContractAddress, t.caller)
+	if err != nil {
+		return err
+	}
+
+	t.sc = sc
+
+	return nil
+}
+
+func (t *Transcoder) runTask() error {
+	logger := t.logger.WithField("task_id", t.task.ID)
+	logger.Debugf("task: %+v", t.task)
+	logger.Info("running task")
+
+	err := t.preRunTask()
+	if err != nil {
+		return err
+	}
+
 	wg := &sync.WaitGroup{}
-	ffmpegErrCh := make(chan error, 1)
+	errCh := make(chan error, 1)
 
-	taskStatCtx, taskStatCancel := context.WithCancel(context.Background())
-	hlssrCtx, hlssrCancel := context.WithCancel(context.Background())
+	tmCtx, tmCancel := context.WithCancel(context.Background())
+	hlsCtx, hlsCancel := context.WithCancel(context.Background())
 
-	streamClient, err := stream.NewStreamClient(
-		task.StreamContractAddress,
-		t.caller)
+	wg.Add(1)
+	go t.runFFmpeg(wg, errCh)
+
+	wg.Add(1)
+	go t.runTaskMonitor(tmCtx, wg, tmCancel)
+
+	if t.task.IsOutputHLS() {
+		t.hlsFlow(tmCtx, tmCancel, hlsCtx, hlsCancel, wg, t.OnSegmentTranscoded)
+	}
+
+	err = <-errCh
 	if err != nil {
+		tmCancel()
+		hlsCancel()
 		return err
 	}
 
-	t.sc = streamClient
-
-	wg.Add(1)
-	go t.runFFmpeg(task, wg, ffmpegErrCh)
-
-	wg.Add(1)
-	go t.runTaskStatMonitor(taskStatCtx, task, wg, taskStatCancel)
-
-	if task.IsOutputHLS() {
-		t.hlsFlow(
-			taskStatCtx,
-			taskStatCancel,
-			hlssrCtx,
-			hlssrCancel,
-			wg,
-			task,
-			t.OnSegmentTranscoded,
-		)
-	}
-
-	err = <-ffmpegErrCh
-	if err != nil {
-		taskStatCancel()
-		hlssrCancel()
-
-		t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
-			ClientID: t.clientID,
-			ID:       t.task.ID,
-		})
-
-		return err
-	}
-
-	taskStatCancel()
+	tmCancel()
 
 	wg.Wait()
 
-	t.dispatcher.MarkTaskAsCompleted(context.Background(), &v1.TaskRequest{
-		ClientID: t.clientID,
-		ID:       t.task.ID,
-	})
-
-	if task.IsOutputHLS() {
+	if t.task.IsOutputHLS() {
 		logger.Debug("uploading segment file")
 
-		outputPath := task.Output.Path + "/index.m3u8"
+		outputPath := t.task.Output.Path + "/index.m3u8"
 		segments, _ := t.HLSWatcher.ExtractSegments(outputPath)
 		if segments != nil && len(segments) > 0 {
 			logger.Info("uploading last segment")
-			t.uploadSegmentViaHttp(task, segments[len(segments)-1])
+			t.uploadSegmentViaHttp(t.task, segments[len(segments)-1])
 		}
 	}
 
-	if task.IsOutputFile() {
+	if t.task.IsOutputFile() {
 		logger.Debug("uploading single segment file")
 
 		segment := &hlswatcher.SegmentInfo{
-			Source:   task.Output.Path + "/" + task.Output.Name,
-			Num:      uint64(task.Output.Num),
-			Name:     task.Output.Name,
-			Duration: task.Output.Duration,
+			Source:   t.task.Output.Path + "/" + t.task.Output.Name,
+			Num:      uint64(t.task.Output.Num),
+			Name:     t.task.Output.Name,
+			Duration: t.task.Output.Duration,
 			IsVOD:    true,
 		}
 		err := t.OnSegmentTranscoded(segment)

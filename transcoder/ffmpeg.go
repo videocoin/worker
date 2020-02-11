@@ -8,10 +8,9 @@ import (
 
 	"github.com/armon/circbuf"
 	"github.com/sirupsen/logrus"
-	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
 )
 
-func (t *Transcoder) runFFmpeg(task *v1.Task, wg *sync.WaitGroup, errCh chan error) {
+func (t *Transcoder) runFFmpeg(wg *sync.WaitGroup, errCh chan error) {
 	stopCh := make(chan bool, 1)
 	defer func() {
 		close(errCh)
@@ -22,7 +21,7 @@ func (t *Transcoder) runFFmpeg(task *v1.Task, wg *sync.WaitGroup, errCh chan err
 	}()
 
 	t.logger.Debugf("starting ffmpeg")
-	t.logger.Debugf("%s", task.Cmdline)
+	t.logger.Debugf("%s", t.task.Cmdline)
 
 	var (
 		stdoutPipe, stderrPipe io.ReadCloser
