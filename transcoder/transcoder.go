@@ -5,8 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"math/big"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -19,8 +17,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
-	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
-	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-pkg/retry"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/stream"
@@ -245,121 +241,21 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 
 	logger.Info("segment has been transcoded")
 
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-
-	// Upload segment
-	logger.Info("uploading segment")
-
-	err := retry.RetryWithAttempts(5, time.Second*1, func() error {
-		return t.uploadSegmentViaHttp(t.task, segment)
-	})
+	err := t.uploadSegment(segment)
 	if err != nil {
-		logger.Errorf("failed to upload segment: %s", err)
 		return err
 	}
 
-	logger.Info("segment has been uploaded")
+	ok, err := t.waitGetInChunks(segment.Num)
+	if err != nil {
+		return err
+	}
 
-	idx := -1
-	counter := 0
-	for {
-		chunks, err := t.sc.GetInChunks()
+	if ok {
+		err := t.submitAndValidateProof(segment.Num)
 		if err != nil {
-			logger.Errorf("failed to get in chunks: %s", err)
 			return err
 		}
-
-		logger.Debugf("GetInChunks: %+v\n", chunks)
-
-		if len(chunks) > 0 {
-			idx = SearchBigInts(chunks, big.NewInt(int64(segment.Num)))
-			if idx >= 0 {
-				break
-			}
-			if counter >= 30 {
-				err = fmt.Errorf("failed to search in chunks: %s", err)
-				logger.Error(err)
-				return err
-			}
-			counter++
-		}
-
-		time.Sleep(time.Second * 2)
-	}
-
-	if idx >= 0 {
-		logger.Info("submitting proof")
-
-		inChunkID := big.NewInt(int64(segment.Num))
-		outChunkID := inChunkID
-
-		profileID := new(big.Int)
-		profiles, _ := t.sc.GetProfiles()
-		if len(profiles) > 0 {
-			profileID = profiles[0]
-		}
-
-		tx, err := t.sc.SubmitProof(inChunkID, outChunkID, profileID)
-		if err != nil {
-			logger.Errorf("failed to submit proof: %s", err)
-			return err
-		}
-
-		logger.Debugf("submitting proof tx %+v\n", tx.Hash().String())
-
-		if t.task != nil {
-			logger.Info("validating proof")
-
-			ctx := context.Background()
-			vpReq := &validatorv1.ValidateProofRequest{
-				StreamContractAddress: t.task.StreamContractAddress,
-				ProfileId:             profileID.Bytes(),
-				OutputChunkId:         outChunkID.Bytes(),
-				StreamId:              t.task.StreamID,
-			}
-			_, err = t.dispatcher.ValidateProof(ctx, vpReq)
-			if err != nil {
-				logger.Errorf("failed to validate proof: %s", err)
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
-func (t *Transcoder) uploadSegment(task *v1.Task, segment *hlswatcher.SegmentInfo) error {
-	t.logger.
-		WithField("segment", segment.Num).
-		WithField("path", segment.Source).
-		Debug("uploading segment")
-
-	f, err := os.Open(segment.Source)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	data, err := ioutil.ReadAll(f)
-	if err != nil {
-		return err
-	}
-
-	req := &syncerv1.SyncRequest{
-		Path:        fmt.Sprintf("%s/%d.ts", task.StreamID, segment.Num),
-		ContentType: "video/MP2T",
-		Data:        data,
-		Duration:    segment.Duration,
-	}
-
-	dctx, dcancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer dcancel()
-
-	_, err = t.dispatcher.Sync(dctx, req)
-	if err != nil {
-		return err
 	}
 
 	return nil
