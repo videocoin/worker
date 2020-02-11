@@ -26,17 +26,18 @@ import (
 )
 
 type Transcoder struct {
-	logger     *logrus.Entry
-	t          *time.Ticker
-	clientID   string
-	dispatcher v1.DispatcherServiceClient
-	outputDir  string
-	cmd        *exec.Cmd
-	caller     *caller.Caller
-	sc         *stream.StreamClient
-	task       *v1.Task
-	syncerAddr string
-	HLSWatcher *hlswatcher.Watcher
+	logger         *logrus.Entry
+	t              *time.Ticker
+	clientID       string
+	dispatcher     v1.DispatcherServiceClient
+	outputDir      string
+	cmd            *exec.Cmd
+	caller         *caller.Caller
+	sc             *stream.StreamClient
+	task           *v1.Task
+	lastSegmentNum uint64
+	syncerAddr     string
+	HLSWatcher     *hlswatcher.Watcher
 }
 
 func NewTranscoder(
@@ -201,14 +202,18 @@ func (t *Transcoder) runTask() error {
 
 	wg.Wait()
 
-	if t.task.IsOutputHLS() {
+	if t.task.IsOutputHLS() && t.lastSegmentNum > 0 {
 		logger.Debug("uploading segment file")
 
 		outputPath := t.task.Output.Path + "/index.m3u8"
 		segments, _ := t.HLSWatcher.ExtractSegments(outputPath)
 		if segments != nil && len(segments) > 0 {
-			logger.Info("uploading last segment")
-			t.uploadSegmentViaHttp(t.task, segments[len(segments)-1])
+			for _, segment := range segments {
+				if segment.Num > t.lastSegmentNum {
+					logger.WithField("segment", segment.Num).Info("uploading last segments")
+					t.uploadSegmentViaHttp(t.task, segment)
+				}
+			}
 		}
 	}
 
@@ -245,6 +250,8 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 	if err != nil {
 		return err
 	}
+
+	t.lastSegmentNum = segment.Num
 
 	ok, err := t.waitGetInChunks(segment.Num)
 	if err != nil {
