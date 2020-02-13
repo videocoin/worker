@@ -210,8 +210,15 @@ func (t *Transcoder) runTask() error {
 		if segments != nil && len(segments) > 0 {
 			for _, segment := range segments {
 				if segment.Num > t.lastSegmentNum {
-					logger.WithField("segment", segment.Num).Info("uploading last segments")
-					t.uploadSegmentViaHttp(t.task, segment)
+					logger.
+						WithField("segment", segment.Num).
+						Info("uploading last segments")
+					err := t.OnSegmentTranscoded(segment)
+					if err != nil {
+						logger.
+							WithField("segment", segment.Num).
+							Errorf("failed to call OnSegmentTranscoded for last segments: %s", err)
+					}
 				}
 			}
 		}
