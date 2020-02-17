@@ -88,14 +88,14 @@ func (t *Transcoder) waitGetInChunks(segmentNum uint64) (bool, error) {
 	return idx >= 0, nil
 }
 
-func (t *Transcoder) submitAndValidateProof(segmentNum uint64) error {
+func (t *Transcoder) submitAndValidateProof(segment *hlswatcher.SegmentInfo) error {
 	logger := t.logger.WithFields(logrus.Fields{
 		"task_id": t.task.ID,
-		"segment": segmentNum,
+		"segment": segment.Num,
 	})
 	logger.Info("submitting proof")
 
-	inChunkID := big.NewInt(int64(segmentNum))
+	inChunkID := big.NewInt(int64(segment.Num))
 	outChunkID := inChunkID
 
 	profileID := new(big.Int)
@@ -121,6 +121,7 @@ func (t *Transcoder) submitAndValidateProof(segmentNum uint64) error {
 			ProfileId:             profileID.Bytes(),
 			OutputChunkId:         outChunkID.Bytes(),
 			StreamId:              t.task.StreamID,
+			IsLast:                segment.IsLast,
 		}
 		_, err = t.dispatcher.ValidateProof(ctx, vpReq)
 		if err != nil {

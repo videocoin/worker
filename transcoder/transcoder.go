@@ -266,7 +266,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 	}
 
 	if ok {
-		err := t.submitAndValidateProof(segment.Num)
+		err := t.submitAndValidateProof(segment)
 		if err != nil {
 			return err
 		}
