@@ -45,14 +45,25 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(dispatcherConn)
 
+	configReq := new(dispatcherv1.ConfigRequest)
+	configResp, err := dispatcher.GetConfig(
+		context.Background(),
+		configReq,
+	)
+	if err != nil {
+		return nil, err
+	}
+	cfg.RPCNodeURL = configResp.RPCNodeURL
+	cfg.SyncerURL = configResp.SyncerURL
+
 	if cfg.Internal {
-		configReq := &dispatcherv1.InternalConfigRequest{}
+		internalConfigReq := &dispatcherv1.InternalConfigRequest{}
 
 		cfg.Logger.Info("getting internal config")
 
 		internalConfigResp, err := dispatcher.GetInternalConfig(
 			context.Background(),
-			configReq,
+			internalConfigReq,
 		)
 		if err != nil {
 			return nil, err
