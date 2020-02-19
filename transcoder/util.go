@@ -136,7 +136,7 @@ func (t *Transcoder) submitAndValidateProof(segment *hlswatcher.SegmentInfo) err
 func (t *Transcoder) uploadSegment(segment *hlswatcher.SegmentInfo) error {
 	logger := t.logger.WithFields(logrus.Fields{
 		"task_id": t.task.ID,
-		"segment": segment,
+		"segment": segment.Num,
 	})
 	logger.Info("uploading segment")
 
