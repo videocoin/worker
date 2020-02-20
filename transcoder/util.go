@@ -75,7 +75,7 @@ func (t *Transcoder) waitGetInChunks(segmentNum uint64) (bool, error) {
 				break
 			}
 			if counter >= 10 {
-				err = fmt.Errorf("failed to search in chunks: %s", err)
+				err = fmt.Errorf("failed to search in chunks: segment %d", segmentNum)
 				logger.Error(err)
 				return false, err
 			}
