@@ -208,7 +208,7 @@ func (t *Transcoder) runTask() error {
 		outputPath := t.task.Output.Path + "/index.m3u8"
 		segments, _ := t.HLSWatcher.ExtractSegments(outputPath)
 		if segments != nil && len(segments) > 0 {
-			for _, segment := range segments {
+			for idx, segment := range segments {
 				if segment.Num > t.lastSegmentNum {
 					logger.
 						WithField("segment", segment.Num).
@@ -218,6 +218,16 @@ func (t *Transcoder) runTask() error {
 						logger.
 							WithField("segment", segment.Num).
 							Errorf("failed to call OnSegmentTranscoded for last segments: %s", err)
+						if idx > 0 {
+							s := segments[idx-1]
+							s.IsLast = true
+							rerr := t.OnSegmentTranscoded(s)
+							if rerr != nil {
+								logger.
+									WithField("segment", s.Num).
+									Errorf("failed to retry call OnSegmentTranscoded for last segments: %s", rerr)
+							}
+						}
 					}
 				}
 			}
