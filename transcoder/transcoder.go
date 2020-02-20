@@ -206,11 +206,22 @@ func (t *Transcoder) runTask() error {
 		logger.Debug("uploading segment file")
 
 		chunks, err := t.sc.GetInChunks()
+
+		logger.Debugf("chunks: %+v", chunks)
+		logger.Debugf("chunks err: %+v", err)
+
 		if err == nil {
 			lastChunkNum := chunks[len(chunks)-1]
 
+			logger.Debugf("last chunk num: %+v", lastChunkNum.Uint64())
+			logger.Debugf("last processed segment: %+v", t.lastSegmentNum)
+
 			outputPath := t.task.Output.Path + "/index.m3u8"
 			segments, _ := t.HLSWatcher.ExtractSegments(outputPath)
+
+			for _, s := range segments {
+				logger.Debugf("segment: %+v", s)
+			}
 
 			if segments != nil && len(segments) > 0 {
 				for _, segment := range segments {
@@ -218,7 +229,7 @@ func (t *Transcoder) runTask() error {
 
 						logger.
 							WithField("segment", segment.Num).
-							Info("uploading last segments")
+							Debug("uploading last segments")
 
 						if segment.Num == lastChunkNum.Uint64() {
 							segment.IsLast = true
@@ -228,7 +239,7 @@ func (t *Transcoder) runTask() error {
 						if err != nil {
 							logger.
 								WithField("segment", segment.Num).
-								Errorf("failed to call OnSegmentTranscoded for last segments: %s", err)
+								Debugf("failed to call OnSegmentTranscoded for last segments: %s", err)
 						}
 					}
 				}
