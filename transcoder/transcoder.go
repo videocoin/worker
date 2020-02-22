@@ -129,6 +129,7 @@ func (t *Transcoder) dispatch() error {
 func (t *Transcoder) preRunTask() error {
 	logger := t.logger.WithField("task_id", t.task.ID)
 
+	t.task.Cmdline = strings.Join(strings.Fields(strings.TrimSpace(t.task.Cmdline)), " ")
 	t.task.Cmdline = strings.Replace(t.task.Cmdline, "$OUTPUT", t.outputDir, -1)
 	t.task.Output.Path = strings.Replace(t.task.Output.Path, "$OUTPUT", t.outputDir, -1)
 
