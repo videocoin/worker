@@ -8,7 +8,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
-	syncerv1 "github.com/videocoin/cloud-api/syncer/v1"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/cryptoinfo"
 	"github.com/videocoin/transcode/pinger"
@@ -23,7 +22,6 @@ type Service struct {
 	cfg        *Config
 	dispatcher dispatcherv1.DispatcherServiceClient
 	transcoder *transcoder.Transcoder
-	syncer     syncerv1.SyncerServiceClient
 	pinger     *pinger.Pinger
 
 	ClientID string
@@ -139,17 +137,23 @@ func NewService(cfg *Config) (*Service, error) {
 }
 
 func (s *Service) Start() error {
-	go s.transcoder.Start()
-	go s.pinger.Start()
+	go s.transcoder.Start()  //nolint
+	go s.pinger.Start()  //nolint
 
-	s.markAsRunningOnGCE()
+	s.markAsRunningOnGCE()  //nolint
 
 	return nil
 }
 
 func (s *Service) Stop() error {
-	s.transcoder.Stop()
-	s.pinger.Stop()
+	err := s.transcoder.Stop()
+	if err != nil {
+		return err
+	}
+	err = s.pinger.Stop()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -180,7 +184,7 @@ func (s *Service) markAsRunningOnGCE() error {
 			return err
 		}
 
-		computeSvc, err := computev1.New(computeCli)
+		computeSvc, err := computev1.New(computeCli)  //nolint
 		if err != nil {
 			s.cfg.Logger.Error(err)
 			return err
@@ -197,7 +201,7 @@ func (s *Service) markAsRunningOnGCE() error {
 		md := &computev1.Metadata{
 			Fingerprint: fingerprint,
 			Items: []*computev1.MetadataItems{
-				&computev1.MetadataItems{
+				{
 					Key: "vc-running",
 				},
 			},

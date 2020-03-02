@@ -167,7 +167,7 @@ func main() {
 	rootCmd.AddCommand(withdrawCmd)
 	rootCmd.AddCommand(balanceCmd)
 
-	rootCmd.Execute()
+	rootCmd.Execute()  //nolint
 }
 
 func runMineCommand(cmd *cobra.Command, args []string) {
@@ -196,7 +196,7 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 		exit <- true
 	}()
 
-	go svc.Start()
+	go log.Error(svc.Start())
 
 	<-exit
 

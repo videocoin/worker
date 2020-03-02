@@ -41,33 +41,28 @@ func NewPinger(
 	}, nil
 }
 
-func (p *Pinger) Start() error {
+func (p *Pinger) Start() {
 	p.logger.Debugf("starting pinger")
 
-	for {
-		select {
-		case <-p.ticker.C:
-			ctx := context.Background()
-			si := &sysinfo.SystemInfo{AppVersion: p.appVersion, Logger: p.logger}
-			_, systemInfo, _ := si.GetInfo()
-			_, cryptoInfo, _ := p.ci.GetInfo()
+	for range p.ticker.C {
+		ctx := context.Background()
+		si := &sysinfo.SystemInfo{AppVersion: p.appVersion, Logger: p.logger}
+		_, systemInfo, _ := si.GetInfo()
+		_, cryptoInfo, _ := p.ci.GetInfo()
 
-			req := &minersv1.PingRequest{
-				ClientID:   p.clientID,
-				SystemInfo: systemInfo,
-				CryptoInfo: cryptoInfo,
-			}
-			_, err := p.dispatcher.Ping(ctx, req)
-			if err != nil {
-				p.logger.Errorf("failed to ping: %s", err)
-				continue
-			}
-
-			p.logger.Debugf("ping")
+		req := &minersv1.PingRequest{
+			ClientID:   p.clientID,
+			SystemInfo: systemInfo,
+			CryptoInfo: cryptoInfo,
 		}
-	}
+		_, err := p.dispatcher.Ping(ctx, req)
+		if err != nil {
+			p.logger.Errorf("failed to ping: %s", err)
+			continue
+		}
 
-	return nil
+		p.logger.Debugf("ping")
+	}
 }
 
 func (p *Pinger) Stop() error {

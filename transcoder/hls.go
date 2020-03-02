@@ -11,7 +11,7 @@ import (
 
 type SegmentRecvFunc func(*hlswatcher.SegmentInfo) error
 
-func (t *Transcoder) hlsFlow(
+func (t *Transcoder) hlsFlow(  //nolint
 	jobStatCtx context.Context,
 	jobStatCancel context.CancelFunc,
 	hlssrCtx context.Context,
@@ -23,7 +23,7 @@ func (t *Transcoder) hlsFlow(
 
 	time.Sleep(time.Second * 2)
 
-	go t.HLSWatcher.Start()
+	go t.logger.Error(t.HLSWatcher.Start())
 	t.HLSWatcher.Wait()
 	t.watchAllHLSOutput(t.task)
 
@@ -66,10 +66,6 @@ func (t *Transcoder) watchAllHLSOutput(task *v1.Task) {
 	}
 }
 
-func (t *Transcoder) unwatchAllHLSOutput(task *v1.Task) {
-	t.HLSWatcher.Remove(task.Output.Path + "/index.m3u8")
-}
-
 func (t *Transcoder) runHLSSegmentReceiver(
 	ctx context.Context,
 	wg *sync.WaitGroup,
@@ -98,10 +94,10 @@ func (t *Transcoder) runHLSSegmentReceiver(
 
 			err := callback(segment)
 			if err != nil {
-				t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
+				t.logger.Error(t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
 					ClientID: t.clientID,
 					ID:       t.task.ID,
-				})
+				}))
 				return
 			}
 

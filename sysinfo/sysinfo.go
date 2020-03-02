@@ -20,7 +20,7 @@ type SystemInfo struct {
 	Logger     *logrus.Entry
 }
 
-var IP_CHECKERS = []string{
+var IPCheckers = []string{
 	"https://api.ipify.org/",
 	"https://api.my-ip.io/ip",
 	"http://ipv4bot.whatismyipaddress.com/",
@@ -92,7 +92,7 @@ func GetCPUUsage() float64 {
 }
 
 func (si *SystemInfo) GetIP() string {
-	for _, url := range IP_CHECKERS {
+	for _, url := range IPCheckers {
 		resp, err := http.Get(url)
 		if err != nil {
 			si.Logger.Error(err)

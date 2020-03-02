@@ -6,17 +6,17 @@ import (
 	"github.com/videocoin/transcode/caller"
 )
 
-type StreamContract struct {
+type Contract struct {
 	instance *stream.Stream
 	common.Address
 }
 
-func NewStreamContract(streamAddr string, caller *caller.Caller) (*StreamContract, error) {
+func NewContract(streamAddr string, caller *caller.Caller) (*Contract, error) {
 	addr := common.HexToAddress(streamAddr)
 	instance, err := stream.NewStream(addr, caller.Client())
 	if err != nil {
 		return nil, err
 	}
 
-	return &StreamContract{instance, addr}, nil
+	return &Contract{instance, addr}, nil
 }

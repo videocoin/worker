@@ -33,7 +33,7 @@ type Transcoder struct {
 	outputDir      string
 	cmd            *exec.Cmd
 	caller         *caller.Caller
-	sc             *stream.StreamClient
+	sc             *stream.Client
 	task           *v1.Task
 	lastSegmentNum uint64
 	syncerAddr     string
@@ -54,7 +54,7 @@ func NewTranscoder(
 		dispatcher: dispatcher,
 		outputDir:  outputDir,
 		caller:     caller,
-		sc:         &stream.StreamClient{},
+		sc:         &stream.Client{},
 		syncerAddr: syncerAddr,
 		HLSWatcher: hlswatcher.New(time.Second * 2),
 	}, nil
@@ -63,8 +63,8 @@ func NewTranscoder(
 func (t *Transcoder) Start() error {
 	t.logger.Infof("starting transcoder")
 	t.t = time.NewTicker(5 * time.Second)
-	t.dispatch()
-	return nil
+	err := t.dispatch()
+	return err
 }
 
 func (t *Transcoder) Stop() error {
@@ -105,20 +105,26 @@ func (t *Transcoder) dispatch() error {
 				WithField("task_id", task.ID).
 				Errorf("failed to transcode: %s", err)
 
-			t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
+			t.logger.Error(t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
 				ClientID: t.clientID,
 				ID:       t.task.ID,
-			})
+			}))
 
 			t.task = nil
 
 			continue
 		}
 
-		t.dispatcher.MarkTaskAsCompleted(context.Background(), &v1.TaskRequest{
+		_, err = t.dispatcher.MarkTaskAsCompleted(context.Background(), &v1.TaskRequest{
 			ClientID: t.clientID,
 			ID:       t.task.ID,
 		})
+		if err != nil {
+			t.logger.
+				WithField("task_id", task.ID).
+				Errorf("failed to complete: %s", err)
+
+		}
 
 		t.task = nil
 	}
@@ -156,7 +162,7 @@ func (t *Transcoder) preRunTask() error {
 	cmdArgs := c[1:]
 	t.cmd = exec.Command(cmdName, cmdArgs...)
 
-	sc, err := stream.NewStreamClient(t.task.StreamContractAddress, t.caller)
+	sc, err := stream.NewClient(t.task.StreamContractAddress, t.caller)
 	if err != nil {
 		return err
 	}
@@ -224,7 +230,7 @@ func (t *Transcoder) runTask() error {
 				logger.Debugf("segment: %+v", s)
 			}
 
-			if segments != nil && len(segments) > 0 {
+			if len(segments) > 0 {
 				for _, segment := range segments {
 					if segment.Num > t.lastSegmentNum && segment.Num <= lastChunkNum.Uint64() {
 
@@ -263,7 +269,8 @@ func (t *Transcoder) runTask() error {
 			logger.Error(err)
 		}
 	}
-
+	tmCancel()
+	hlsCancel()
 	logger.Info("task has been completed")
 
 	return nil
@@ -299,7 +306,7 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 	return nil
 }
 
-func (t *Transcoder) uploadSegmentViaHttp(task *v1.Task, segment *hlswatcher.SegmentInfo) error {
+func (t *Transcoder) uploadSegmentViaHTTP(task *v1.Task, segment *hlswatcher.SegmentInfo) error {
 	t.logger.
 		WithField("segment", segment.Num).
 		WithField("path", segment.Source).
@@ -352,7 +359,9 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 		return nil, err
 	}
 	_, err = io.Copy(part, file)
-
+	if err != nil {
+		return nil, err
+	}
 	for key, val := range params {
 		_ = writer.WriteField(key, val)
 	}

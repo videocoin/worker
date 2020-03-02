@@ -25,7 +25,7 @@ func checkSource(url string) error {
 		}
 	} else if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
 		hc := http.Client{
-			Timeout: time.Duration(5 * time.Second),
+			Timeout: 5 * time.Second,
 		}
 		resp, err := hc.Get(url)
 		if err != nil {
@@ -142,7 +142,7 @@ func (t *Transcoder) uploadSegment(segment *hlswatcher.SegmentInfo) error {
 	logger.Info("uploading segment")
 
 	err := retry.RetryWithAttempts(5, time.Second*1, func() error {
-		return t.uploadSegmentViaHttp(t.task, segment)
+		return t.uploadSegmentViaHTTP(t.task, segment)
 	})
 	if err != nil {
 		logger.Errorf("failed to upload segment: %s", err)
