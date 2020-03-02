@@ -28,6 +28,12 @@ deps:
 	cp -r $(GOPATH)/src/github.com/karalabe/usb/libusb \
 	vendor/github.com/karalabe/usb/libusb
 
+lint:
+	golangci-lint run -v  --timeout 120s
+
+docker-lint:
+	docker build -f Dockerfile.lint .
+
 build:
 	@echo "==> Building..."
 	go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(SERVICE_NAME) cmd/main.go
