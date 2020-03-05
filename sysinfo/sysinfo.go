@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -79,6 +80,8 @@ func (si *SystemInfo) GetInfo() (map[string]interface{}, []byte, error) {
 		return nil, nil, err
 	}
 
+	info["hw"] = GetHWInfo()
+
 	return info, b, nil
 }
 
@@ -130,4 +133,51 @@ func IsIPv4(host string) bool {
 
 	}
 	return true
+}
+
+func GetHWInfo() string {
+	const jetsonHwInfo = "/sys/module/tegra_fuse/parameters/tegra_chip_id"
+	if _, err := os.Stat(jetsonHwInfo); !os.IsNotExist(err) {
+		f, err := os.Open(jetsonHwInfo)
+		if err != nil {
+			return ""
+		}
+
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			return ""
+		}
+
+		chipID := strings.TrimSuffix(string(b), "\n")
+
+		switch chipID {
+		case "64":
+			return "tk1"
+		case "33":
+			return "tx1"
+		case "24":
+			return "tx2"
+		case "25":
+			return "xavier"
+		default:
+			return ""
+		}
+	}
+
+	const raspberryHwInfo = "/sys/firmware/devicetree/base/model"
+	if _, err := os.Stat(raspberryHwInfo); !os.IsNotExist(err) {
+		f, err := os.Open(raspberryHwInfo)
+		if err != nil {
+			return ""
+		}
+		b, err := ioutil.ReadAll(f)
+		if err != nil {
+			return ""
+		}
+		if strings.Contains(string(b), "Raspberry") {
+			return "raspberry"
+		}
+	}
+
+	return ""
 }
