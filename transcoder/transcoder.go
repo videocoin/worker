@@ -73,6 +73,10 @@ func (t *Transcoder) Stop() error {
 	return nil
 }
 
+func (t *Transcoder) IsWorking() bool {
+	return t.task != nil
+}
+
 func (t *Transcoder) dispatch() error {
 	req := &v1.TaskPendingRequest{ClientID: t.clientID}
 

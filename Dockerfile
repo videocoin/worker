@@ -11,6 +11,7 @@ RUN make build
 FROM jrottenberg/ffmpeg:4.1-ubuntu AS release
 
 COPY --from=builder /go/src/github.com/videocoin/transcode/bin/transcoder /bin/transcoder
+COPY --from=builder /go/src/github.com/videocoin/transcode/capacity_test.mp4 /opt/capacity_test.mp4
 
 RUN apt-get update
 
