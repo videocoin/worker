@@ -9,6 +9,7 @@ import (
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	"github.com/videocoin/transcode/caller"
+	"github.com/videocoin/transcode/capacity"
 	"github.com/videocoin/transcode/cryptoinfo"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
@@ -113,9 +114,13 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
+	cfg.Logger.Info("performing capacity measurements")
+	capacitor := capacity.NewCapacitor(cfg.Internal)
+
 	plogger := cfg.Logger.WithField("system", "pinger")
 	pinger, err := pinger.NewPinger(
 		dispatcher,
+		capacitor,
 		ci,
 		cfg.ClientID,
 		time.Second*5,
@@ -137,10 +142,10 @@ func NewService(cfg *Config) (*Service, error) {
 }
 
 func (s *Service) Start() error {
-	go s.transcoder.Start()  //nolint
-	go s.pinger.Start()  //nolint
+	go s.transcoder.Start() //nolint
+	go s.pinger.Start()     //nolint
 
-	s.markAsRunningOnGCE()  //nolint
+	s.markAsRunningOnGCE() //nolint
 
 	return nil
 }
@@ -184,7 +189,7 @@ func (s *Service) markAsRunningOnGCE() error {
 			return err
 		}
 
-		computeSvc, err := computev1.New(computeCli)  //nolint
+		computeSvc, err := computev1.New(computeCli) //nolint
 		if err != nil {
 			s.cfg.Logger.Error(err)
 			return err
