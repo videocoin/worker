@@ -115,7 +115,7 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 
 	cfg.Logger.Info("performing capacity measurements")
-	capacitor := capacity.NewCapacitor(cfg.Internal)
+	capacitor := capacity.NewCapacitor(cfg.Internal, trans)
 
 	plogger := cfg.Logger.WithField("system", "pinger")
 	pinger, err := pinger.NewPinger(
