@@ -28,11 +28,14 @@ deps:
 	cp -r $(GOPATH)/src/github.com/karalabe/usb/libusb \
 	vendor/github.com/karalabe/usb/libusb
 
-lint:
-	golangci-lint run -v  --timeout 120s
+lint: docker-lint
 
 docker-lint:
-	docker build -f Dockerfile.lint .
+	docker run --rm \
+		-v `PWD`:/go/src/github.com/videocoin/transcode \
+		-w /go/src/github.com/videocoin/transcode \
+		golangci/golangci-lint:v1.23.6 \
+		golangci-lint run -v
 
 build:
 	@echo "==> Building..."
