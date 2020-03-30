@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/sirupsen/logrus"
 	"github.com/videocoin/transcode/transcoder"
 )
 
@@ -14,25 +16,36 @@ const mbCount = 1920 * 1080 / (16 * 16) * (10 * 30)
 
 type Capacitor struct {
 	transcoder *transcoder.Transcoder
+	logger     *logrus.Entry
 
-	isInternal   bool
-	lastCapacity int
-	lastPeformed time.Time
+	isInternal         bool
+	lastEncodeCapacity int
+	lastCPUCapacity    int
+	lastPeformed       time.Time
 }
 
-func NewCapacitor(isInternal bool, transcoder *transcoder.Transcoder) *Capacitor {
+func NewCapacitor(isInternal bool, transcoder *transcoder.Transcoder, logger *logrus.Entry) *Capacitor {
 	capacitor := &Capacitor{
 		transcoder: transcoder,
 		isInternal: isInternal,
+		logger:     logger,
 	}
 
 	// force sync capacity update on init
-	_ = capacitor.getCapacity()
+	if !isInternal {
+		if err := capacitor.getEncodeCapacity(); err != nil {
+			logger.WithError(err).Errorf("failed to get encode capacity")
+		}
+
+		if err := capacitor.getCPUCapacity(); err != nil {
+			logger.WithError(err).Errorf("failed to get cpu capacity")
+		}
+	}
 
 	return capacitor
 }
 
-func (c *Capacitor) getCapacity() error {
+func (c *Capacitor) getEncodeCapacity() error {
 	c.transcoder.Stop()
 	defer c.transcoder.Start()
 
@@ -57,7 +70,22 @@ func (c *Capacitor) getCapacity() error {
 	}
 
 	c.lastPeformed = time.Now()
-	c.lastCapacity = mbCount / int(time.Since(start).Seconds())
+	c.lastEncodeCapacity = mbCount / int(time.Since(start).Seconds())
+
+	return nil
+}
+
+func (c *Capacitor) getCPUCapacity() error {
+	p, err := cpu.Percent(5*time.Second, false)
+	if err != nil {
+		return err
+	}
+
+	if len(p) < 1 {
+		return fmt.Errorf("failed to get cpu usage: no results")
+	}
+
+	c.lastCPUCapacity = 100 - int(p[0])
 
 	return nil
 }
@@ -67,14 +95,25 @@ func (c *Capacitor) IsUpdateTime() bool {
 }
 
 func (c *Capacitor) GetInfo() (map[string]interface{}, []byte, error) {
-	if !c.isInternal && !c.transcoder.IsWorking() && time.Since(c.lastPeformed.Add(time.Hour)) >= time.Hour {
-		go c.getCapacity()
-	}
+	defer func() {
+		if !c.isInternal && !c.transcoder.IsWorking() && time.Since(c.lastPeformed.Add(time.Hour)) >= time.Hour {
+			if err := c.getEncodeCapacity(); err != nil {
+				c.logger.WithError(err).Errorf("failed to get encode capacity")
+			}
+		}
+
+		if err := c.getCPUCapacity(); err != nil {
+			c.logger.WithError(err).Errorf("failed to get cpu capacity")
+		}
+	}()
 
 	info := map[string]interface{}{}
 	info["encode"] = 0
+	info["cpu"] = 0
+
 	if !c.isInternal {
-		info["encode"] = c.lastCapacity
+		info["encode"] = c.lastEncodeCapacity
+		info["cpu"] = c.lastCPUCapacity
 	}
 
 	b, err := json.Marshal(info)
