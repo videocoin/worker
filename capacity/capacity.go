@@ -33,12 +33,11 @@ func NewCapacitor(isInternal bool, transcoder *transcoder.Transcoder, logger *lo
 
 	// force sync capacity update on init
 	if !isInternal {
-		if err := capacitor.getEncodeCapacity(); err != nil {
-			logger.WithError(err).Errorf("failed to get encode capacity")
-		}
-
 		if err := capacitor.getCPUCapacity(); err != nil {
 			logger.WithError(err).Errorf("failed to get cpu capacity")
+		}
+		if err := capacitor.getEncodeCapacity(); err != nil {
+			logger.WithError(err).Errorf("failed to get encode capacity")
 		}
 	}
 
@@ -46,8 +45,12 @@ func NewCapacitor(isInternal bool, transcoder *transcoder.Transcoder, logger *lo
 }
 
 func (c *Capacitor) getEncodeCapacity() error {
-	c.transcoder.Stop()
-	defer c.transcoder.Start()
+	if c.transcoder.IsRunning() {
+		c.transcoder.Stop()
+		defer func() {
+			go c.transcoder.Start()
+		}()
+	}
 
 	args := []string{
 		"-i", testSamplePath,
@@ -72,11 +75,13 @@ func (c *Capacitor) getEncodeCapacity() error {
 	c.lastPeformed = time.Now()
 	c.lastEncodeCapacity = mbCount / int(time.Since(start).Seconds())
 
+	c.logger.Infof("encode capacity is %d", c.lastEncodeCapacity)
+
 	return nil
 }
 
 func (c *Capacitor) getCPUCapacity() error {
-	p, err := cpu.Percent(5*time.Second, false)
+	p, err := cpu.Percent(1*time.Second, false)
 	if err != nil {
 		return err
 	}
@@ -87,6 +92,8 @@ func (c *Capacitor) getCPUCapacity() error {
 
 	c.lastCPUCapacity = 100 - int(p[0])
 
+	c.logger.Infof("cpu capacity is %d", c.lastCPUCapacity)
+
 	return nil
 }
 
@@ -96,12 +103,11 @@ func (c *Capacitor) IsUpdateTime() bool {
 
 func (c *Capacitor) GetInfo() (map[string]interface{}, []byte, error) {
 	defer func() {
-		if !c.isInternal && !c.transcoder.IsWorking() && time.Since(c.lastPeformed.Add(time.Hour)) >= time.Hour {
+		if !c.isInternal && !c.transcoder.IsWorking() && time.Since(c.lastPeformed) >= time.Minute*15 {
 			if err := c.getEncodeCapacity(); err != nil {
 				c.logger.WithError(err).Errorf("failed to get encode capacity")
 			}
 		}
-
 		if err := c.getCPUCapacity(); err != nil {
 			c.logger.WithError(err).Errorf("failed to get cpu capacity")
 		}
