@@ -167,7 +167,7 @@ func main() {
 	rootCmd.AddCommand(withdrawCmd)
 	rootCmd.AddCommand(balanceCmd)
 
-	rootCmd.Execute()  //nolint
+	rootCmd.Execute() //nolint
 }
 
 func runMineCommand(cmd *cobra.Command, args []string) {

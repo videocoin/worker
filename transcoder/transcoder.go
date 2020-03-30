@@ -69,8 +69,14 @@ func (t *Transcoder) Start() error {
 
 func (t *Transcoder) Stop() error {
 	t.logger.Infof("stopping transcoder")
-	t.t.Stop()
+	if t.t != nil {
+		t.t.Stop()
+	}
 	return nil
+}
+
+func (t *Transcoder) IsRunning() bool {
+	return t.t != nil
 }
 
 func (t *Transcoder) IsWorking() bool {
