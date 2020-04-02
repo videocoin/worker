@@ -81,7 +81,7 @@ func (c *Capacitor) getEncodeCapacity() error {
 }
 
 func (c *Capacitor) getCPUCapacity() error {
-	p, err := cpu.Percent(1*time.Second, false)
+	p, err := cpu.Percent(5*time.Second, false)
 	if err != nil {
 		return err
 	}

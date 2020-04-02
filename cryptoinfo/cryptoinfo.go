@@ -29,7 +29,7 @@ func (ci *CryptoInfo) GetInfo() (map[string]interface{}, []byte, error) {
 
 	stake, err := ci.tclient.GetStake()
 	if err == nil {
-		info["self_stake"] = stake.String()
+		info["stake"] = stake.String()
 	}
 
 	balance, err := ci.caller.Balance()
