@@ -11,7 +11,7 @@ import (
 
 type SegmentRecvFunc func(*hlswatcher.SegmentInfo) error
 
-func (t *Transcoder) hlsFlow(  //nolint
+func (t *Transcoder) hlsFlow( //nolint
 	jobStatCtx context.Context,
 	jobStatCancel context.CancelFunc,
 	hlssrCtx context.Context,
@@ -23,7 +23,13 @@ func (t *Transcoder) hlsFlow(  //nolint
 
 	time.Sleep(time.Second * 2)
 
-	go t.logger.Error(t.HLSWatcher.Start())
+	go func() {
+		err := t.HLSWatcher.Start()
+		if err != nil {
+			t.logger.Error(err)
+		}
+	}()
+
 	t.HLSWatcher.Wait()
 	t.watchAllHLSOutput(t.task)
 
@@ -94,10 +100,14 @@ func (t *Transcoder) runHLSSegmentReceiver(
 
 			err := callback(segment)
 			if err != nil {
-				t.logger.Error(t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
+				_, err := t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
 					ClientID: t.clientID,
 					ID:       t.task.ID,
-				}))
+				})
+				if err != nil {
+					t.logger.Error(err)
+				}
+
 				return
 			}
 

@@ -112,6 +112,11 @@ func main() {
 	cfg.Name = ServiceName
 	cfg.Version = Version
 
+	log := logrus.WithFields(logrus.Fields{
+		"service": ServiceName,
+		"version": Version,
+	})
+
 	var rootCmd = &cobra.Command{
 		Use: "",
 	}
@@ -167,7 +172,10 @@ func main() {
 	rootCmd.AddCommand(withdrawCmd)
 	rootCmd.AddCommand(balanceCmd)
 
-	rootCmd.Execute() //nolint
+	err := rootCmd.Execute()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func runMineCommand(cmd *cobra.Command, args []string) {
@@ -186,6 +194,7 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 
 	signals := make(chan os.Signal, 1)
 	exit := make(chan bool, 1)
+	errCh := make(chan error, 1)
 
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
@@ -196,9 +205,17 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 		exit <- true
 	}()
 
-	go log.Error(svc.Start())
+	go svc.Start(errCh)
 
-	<-exit
+	select {
+	case <-exit:
+		break
+	case err := <-errCh:
+		if err != nil {
+			log.Error(err)
+		}
+		break
+	}
 
 	err = svc.Stop()
 	if err != nil {
