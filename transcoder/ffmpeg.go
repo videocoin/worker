@@ -56,8 +56,18 @@ func (t *Transcoder) runFFmpeg(wg *sync.WaitGroup, errCh chan error) {
 	if t.logger.Logger.GetLevel() == logrus.DebugLevel {
 		stdouterr := bytes.NewBuffer(nil)
 
-		go t.logger.Error(io.Copy(stdouterr, stderrPipe))
-		go t.logger.Error(io.Copy(stdouterr, stdoutPipe))
+		go func() {
+			_, err := io.Copy(stdouterr, stderrPipe)
+			if err != nil {
+				t.logger.Error(err)
+			}
+		}()
+		go func() {
+			_, err := io.Copy(stdouterr, stdoutPipe)
+			if err != nil {
+				t.logger.Error(err)
+			}
+		}()
 
 		go func(stopCh chan bool) {
 			ffmpegout, _ := circbuf.NewBuffer(1024 * 4)

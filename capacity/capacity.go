@@ -46,9 +46,18 @@ func NewCapacitor(isInternal bool, transcoder *transcoder.Transcoder, logger *lo
 
 func (c *Capacitor) getEncodeCapacity() error {
 	if c.transcoder.IsRunning() {
-		c.transcoder.Stop()
+		err := c.transcoder.Stop()
+		if err != nil {
+			return err
+		}
 		defer func() {
-			go c.transcoder.Start()
+			go func() {
+				err := c.transcoder.Start()
+				if err != nil {
+					c.logger.Error(err)
+				}
+
+			}()
 		}()
 	}
 

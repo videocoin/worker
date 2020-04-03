@@ -15,6 +15,7 @@ import (
 	"github.com/videocoin/transcode/transcoder"
 	"golang.org/x/oauth2/google"
 	computev1 "google.golang.org/api/compute/v1"
+	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
@@ -141,13 +142,16 @@ func NewService(cfg *Config) (*Service, error) {
 	return svc, nil
 }
 
-func (s *Service) Start() error {
-	go s.transcoder.Start() //nolint
-	go s.pinger.Start()     //nolint
+func (s *Service) Start(errCh chan error) {
+	go func() {
+		errCh <- s.transcoder.Start()
+	}()
 
-	s.markAsRunningOnGCE() //nolint
-
-	return nil
+	s.pinger.Start()
+	err := s.markAsRunningOnGCE()
+	if err != nil {
+		errCh <- err
+	}
 }
 
 func (s *Service) Stop() error {
@@ -188,8 +192,8 @@ func (s *Service) markAsRunningOnGCE() error {
 			s.cfg.Logger.Error(err)
 			return err
 		}
-
-		computeSvc, err := computev1.New(computeCli) //nolint
+		ctx := context.Background()
+		computeSvc, err := computev1.NewService(ctx, option.WithHTTPClient(computeCli))
 		if err != nil {
 			s.cfg.Logger.Error(err)
 			return err
