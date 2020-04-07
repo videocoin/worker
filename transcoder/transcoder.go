@@ -297,23 +297,9 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 
 	logger.Info("segment has been transcoded")
 
-	segmentReq := &v1.SegmentRequest{
-		TaskID:    t.task.ID,
-		StreamID:  t.task.StreamID,
-		ClientID:  t.task.ClientID,
-		ProfileID: t.task.ProfileID,
-		UserID:    t.task.OwnerID,
-		Num:       segment.Num,
-		Duration:  segment.Duration,
-	}
-	_, err := t.dispatcher.MarkSegmentAsTranscoded(context.Background(), segmentReq)
-	if err != nil {
-		logger.Debugf("[ERR] failed to mark segment as transcoded: %s", err)
-	}
-
 	logger.Debug("uploading segment")
 
-	err = t.uploadSegment(segment)
+	err := t.uploadSegment(segment)
 	if err != nil {
 		return err
 	}
