@@ -13,7 +13,7 @@ type Contract struct {
 
 func NewContract(streamAddr string, caller *caller.Caller) (*Contract, error) {
 	addr := common.HexToAddress(streamAddr)
-	instance, err := stream.NewStream(addr, caller.Client())
+	instance, err := stream.NewStream(addr, caller.EthClient())
 	if err != nil {
 		return nil, err
 	}

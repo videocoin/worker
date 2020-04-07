@@ -2,6 +2,7 @@ package caller
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"fmt"
 	"math/big"
 	"time"
@@ -30,6 +31,10 @@ func NewCaller(jsonkey, pwd string, client *ethclient.Client) (*Caller, error) {
 	}, nil
 }
 
+func (c *Caller) PrivateKey() *ecdsa.PrivateKey {
+	return c.key.PrivateKey
+}
+
 func (c *Caller) Addr() common.Address {
 	return c.key.Address
 }
@@ -38,22 +43,18 @@ func (c *Caller) Balance() (*big.Int, error) {
 	return c.client.BalanceAt(context.Background(), c.key.Address, nil)
 }
 
-func (c *Caller) Client() *ethclient.Client {
+func (c *Caller) EthClient() *ethclient.Client {
 	return c.client
 }
 
-func (c *Caller) TransactOpts(amount *big.Int, gasLimit int) *bind.TransactOpts {
+func (c *Caller) Opts(amount *big.Int) *bind.TransactOpts {
 	gasPrice, _ := c.client.SuggestGasPrice(context.Background())
 
 	opts := bind.NewKeyedTransactor(c.key.PrivateKey)
 	opts.Nonce = nil
 	opts.Value = amount
 	opts.GasPrice = gasPrice
-	opts.GasLimit = uint64(gasLimit)
-
-	if gasLimit == 0 {
-		opts.GasLimit = uint64(3000000)
-	}
+	opts.GasLimit = uint64(8000000)
 
 	return opts
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/videocoin/cloud-pkg/grpcutil"
+
 	"cloud.google.com/go/compute/metadata"
 	"github.com/ethereum/go-ethereum/ethclient"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
@@ -16,8 +18,6 @@ import (
 	"golang.org/x/oauth2/google"
 	computev1 "google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/keepalive"
 )
 
 type Service struct {
@@ -30,20 +30,11 @@ type Service struct {
 }
 
 func NewService(cfg *Config) (*Service, error) {
-	dGrpcDialOpts := []grpc.DialOption{
-		grpc.WithInsecure(),
-		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:                time.Second * 10,
-			Timeout:             time.Second * 10,
-			PermitWithoutStream: true,
-		}),
-	}
-
-	dispatcherConn, err := grpc.Dial(cfg.DispatcherRPCAddr, dGrpcDialOpts...)
+	conn, err := grpcutil.Connect(cfg.DispatcherRPCAddr, cfg.Logger.WithField("system", "dispatcher"))
 	if err != nil {
 		return nil, err
 	}
-	dispatcher := dispatcherv1.NewDispatcherServiceClient(dispatcherConn)
+	dispatcher := dispatcherv1.NewDispatcherServiceClient(conn)
 
 	configReq := new(dispatcherv1.ConfigRequest)
 	configResp, err := dispatcher.GetConfig(
@@ -74,12 +65,12 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg.Secret = internalConfigResp.Secret
 	}
 
-	cli, err := ethclient.Dial(cfg.RPCNodeURL)
+	ethClient, err := ethclient.Dial(cfg.RPCNodeURL)
 	if err != nil {
 		return nil, err
 	}
 
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, cli)
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, ethClient)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +101,7 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	ci, err := cryptoinfo.NewCryptoInfo(cfg.StakingManagerAddr, caller)
+	ci, err := cryptoinfo.NewCryptoInfo(caller, cfg.StakingManagerAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +109,6 @@ func NewService(cfg *Config) (*Service, error) {
 	cfg.Logger.Info("performing capacity measurements")
 	capacitor := capacity.NewCapacitor(cfg.Internal, trans, cfg.Logger)
 
-	plogger := cfg.Logger.WithField("system", "pinger")
 	pinger, err := pinger.NewPinger(
 		dispatcher,
 		capacitor,
@@ -126,7 +116,7 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg.ClientID,
 		time.Second*5,
 		cfg.Version,
-		plogger)
+		cfg.Logger.WithField("system", "pinger"))
 	if err != nil {
 		return nil, err
 	}

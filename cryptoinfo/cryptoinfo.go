@@ -1,33 +1,36 @@
 package cryptoinfo
 
 import (
+	"context"
 	"encoding/json"
 
+	"github.com/ethereum/go-ethereum/common"
+
+	staking "github.com/videocoin/go-staking"
 	"github.com/videocoin/transcode/caller"
-	"github.com/videocoin/transcode/client"
 )
 
 type CryptoInfo struct {
-	caller  *caller.Caller
-	tclient *client.TranscoderClient
+	caller *caller.Caller
+	client *staking.Client
 }
 
-func NewCryptoInfo(addr string, caller *caller.Caller) (*CryptoInfo, error) {
-	tcli, err := client.NewTranscoderClient(addr, caller)
+func NewCryptoInfo(caller *caller.Caller, addr string) (*CryptoInfo, error) {
+	client, err := staking.NewClient(caller.EthClient(), common.HexToAddress(addr))
 	if err != nil {
 		return nil, err
 	}
 
 	return &CryptoInfo{
-		caller:  caller,
-		tclient: tcli,
+		caller: caller,
+		client: client,
 	}, nil
 }
 
 func (ci *CryptoInfo) GetInfo() (map[string]interface{}, []byte, error) {
 	info := map[string]interface{}{}
 
-	stake, err := ci.tclient.GetStake()
+	stake, err := ci.client.GetTranscoderStake(context.Background(), ci.caller.Addr())
 	if err == nil {
 		info["stake"] = stake.String()
 	}

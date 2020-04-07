@@ -16,9 +16,9 @@ type Config struct {
 	RPCNodeURL string        `envconfig:"-"`
 	SyncerURL  string        `envconfig:"-"`
 
-	DispatcherRPCAddr  string `required:"true" envconfig:"DISPATCHER_ADDR" default:"d.k2.videocoin.network:5008"`
+	DispatcherRPCAddr  string `required:"true" envconfig:"DISPATCHER_ADDR" default:"d.dev.videocoin.network:5008"`
 	OutputDir          string `required:"true" envconfig:"OUTPUT_DIR" default:"/tmp"`
-	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0x817ec8E65252E80dB27eFbBceE940AD917AC78FF"`
+	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0x8Dcbc47852aC4aB74535D375d525a03Ae28E0296"`
 
 	ClientID string `envconfig:"CLIENT_ID"`
 	Key      string `envconfig:"KEY"`
