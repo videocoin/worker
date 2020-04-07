@@ -42,12 +42,12 @@ func (sc *Client) GetInChunks() ([]*big.Int, error) {
 }
 
 func (sc *Client) SubmitProof(chunkID, outChunkID *big.Int, profileID *big.Int) (*types.Transaction, error) {
-	tx, err := sc.instance.SubmitProof(sc.TransactOpts(big.NewInt(0), 0), profileID, chunkID, big.NewInt(0), outChunkID)
+	tx, err := sc.instance.SubmitProof(sc.Opts(nil), profileID, chunkID, big.NewInt(0), outChunkID)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = bind.WaitMined(context.Background(), sc.Client(), tx)
+	_, err = bind.WaitMined(context.Background(), sc.EthClient(), tx)
 	if err != nil {
 		return nil, err
 	}
