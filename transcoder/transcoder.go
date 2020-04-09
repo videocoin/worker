@@ -306,6 +306,18 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 
 	t.lastSegmentNum = segment.Num
 
+	if t.task.Output != nil && t.task.Output.Num == 0 {
+		_, err := t.dispatcher.MarkSegmentAsTranscoded(context.Background(), &v1.TaskSegmentRequest{
+			ClientID: t.clientID,
+			ID:       t.task.ID,
+			Num:      segment.Num,
+			Duration: segment.Duration,
+		})
+		if err != nil {
+			logger.Debugf("[ERR] failed to mark segment as transcoded: %s", err)
+		}
+	}
+
 	ok, err := t.waitGetInChunks(segment.Num)
 	if err != nil {
 		return err
