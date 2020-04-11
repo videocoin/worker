@@ -292,7 +292,7 @@ github.com/videocoin/cloud-pkg/tracer
 # github.com/videocoin/go-protocol v0.0.6
 ## explicit
 github.com/videocoin/go-protocol/staking
-# github.com/videocoin/go-staking v0.0.0-20200409074447-9f0fa83e06fb
+# github.com/videocoin/go-staking v0.0.0-20200410180201-6944f4d9a28b
 ## explicit
 github.com/videocoin/go-staking
 # github.com/wsddn/go-ecdh v0.0.0-20161211032359-48726bab9208

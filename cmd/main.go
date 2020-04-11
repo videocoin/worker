@@ -213,6 +213,15 @@ func main() {
 		Run:              runDelegateWithdrawCommand,
 	}
 
+	var withdrawCompleteCmd = &cobra.Command{
+		Use:              "complete",
+		Short:            "complete pending withdraw after unbonding period finish",
+		TraverseChildren: true,
+		Args:             nil,
+		PreRunE:          validateFlags,
+		Run:              runWithdrawCompleteCommand,
+	}
+
 	// root command initialize
 	rootCmd.PersistentFlags().StringP("loglevel", "l", "INFO", "")
 	rootCmd.PersistentFlags().StringP("key", "k", "", "utc key file json content")
@@ -232,6 +241,9 @@ func main() {
 	rootCmd.AddCommand(delegateCmd)
 	delegateCmd.AddCommand(dwithdrawCmd)
 	delegateCmd.AddCommand(daddCmd)
+
+	withdrawCmd.AddCommand(withdrawCompleteCmd)
+	dwithdrawCmd.AddCommand(withdrawCompleteCmd)
 
 	err := rootCmd.Execute()
 	if err != nil {
@@ -351,7 +363,7 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	stake, err := client.GetTranscoderStake(context.Background(), caller.Addr())
+	t, err := client.GetTranscoder(context.Background(), caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -361,7 +373,7 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	if stake.Uint64() == 0 && requiredStake.Cmp(amount) > 0 {
+	if t.SelfStake.Uint64() == 0 && requiredStake.Cmp(amount) > 0 {
 		log.Fatal("stake amount is insufficient")
 	}
 
@@ -394,12 +406,12 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	stake, err := client.GetTranscoderStake(context.Background(), caller.Addr())
+	t, err := client.GetTranscoder(context.Background(), caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	if amount.Cmp(stake) > 0 {
+	if amount.Cmp(t.SelfStake) > 0 {
 		log.Fatal(fmt.Errorf("amount to withdraw is bigger than existent stake"))
 	}
 
@@ -407,13 +419,14 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	if _, err := client.WaitWithdrawalsCompleted(timeoutCtx, caller.PrivateKey()); err != nil {
-		log.Fatal(err.Error())
-	}
+	unbondingTime, _ := client.GetUnbondingPeriod(context.Background())
+	log.Infof("stake withdraw of amount %s has been successfully submitted and be available to complete after %s unbonding periods", amount.String(), unbondingTime.String())
 
-	log.Infof("stake of amount %s has been successfully withdrawn", amount.String())
+	if t.State >= staking.StateUnbonded {
+		log.Infof("withdraw has been finished")
+	} else {
+		log.Infof("finish withdraw with `stake withdraw complete` command")
+	}
 }
 
 func runDelegateCommand(cmd *cobra.Command, args []string) {
@@ -457,6 +470,15 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
+	t, err := client.GetTranscoder(context.Background(), addr)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if t.State >= staking.StateUnbonded {
+		log.Fatal("transcoder is unbonded")
+	}
+
 	if err := client.Delegate(context.Background(), caller.PrivateKey(), addr, amount); err != nil {
 		log.Fatal(err.Error())
 	}
@@ -484,6 +506,15 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
+	t, err := client.GetTranscoder(context.Background(), addr)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if t.State >= staking.StateUnbonded {
+		log.Fatal("transcoder is unbonded")
+	}
+
 	stake, err := client.GetDelegatorStake(context.Background(), addr, caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
@@ -497,11 +528,37 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	if _, err := client.WaitWithdrawalsCompleted(timeoutCtx, caller.PrivateKey()); err != nil {
+	unbondingTime, _ := client.GetUnbondingPeriod(context.Background())
+	log.Infof("stake withdraw of amount %s has been successfully submitted and be available to complete after %s unbonding periods", amount.String(), unbondingTime.String())
+
+	if t.State >= staking.StateUnbonded {
+		log.Infof("withdraw has been finished")
+	} else {
+		log.Infof("finish withdraw with `delegate withdraw complete` command")
+	}
+}
+
+func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
+	log := cfg.Logger
+	client, err := getStakingClient(cfg)
+	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	log.Infof("stake of amount %s has been successfully withdrawn", amount.String())
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	info, err := client.CompleteWithdrawals(context.Background(), caller.PrivateKey())
+	if err != nil {
+		if errors.Is(err, staking.ErrNoPendingWithdrawals) {
+			log.Infof("there are no pending complete withdrawals")
+			return
+		} else {
+			log.Fatal(err.Error())
+		}
+	}
+
+	log.Infof("stake withdraw of amount %s has been successfully completed", info.Amount.String())
 }
