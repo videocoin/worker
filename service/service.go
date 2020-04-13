@@ -70,7 +70,7 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient, nil)
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient)
 	if err != nil {
 		return nil, err
 	}
