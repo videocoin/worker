@@ -15,19 +15,20 @@ import (
 )
 
 type Caller struct {
-	client *ethclient.Client
-	key    *keystore.Key
+	ethClient *ethclient.Client
+	natClient *ethclient.Client
+	key       *keystore.Key
 }
 
-func NewCaller(jsonkey, pwd string, client *ethclient.Client) (*Caller, error) {
+func NewCaller(jsonkey, pwd string, natClient *ethclient.Client, ethClient *ethclient.Client) (*Caller, error) {
 	key, err := keystore.DecryptKey([]byte(jsonkey), pwd)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Caller{
-		client: client,
-		key:    key,
+		natClient: natClient,
+		key:       key,
 	}, nil
 }
 
@@ -40,15 +41,19 @@ func (c *Caller) Addr() common.Address {
 }
 
 func (c *Caller) Balance() (*big.Int, error) {
-	return c.client.BalanceAt(context.Background(), c.key.Address, nil)
+	return c.natClient.BalanceAt(context.Background(), c.key.Address, nil)
 }
 
-func (c *Caller) EthClient() *ethclient.Client {
-	return c.client
+func (c *Caller) NatClient() *ethclient.Client {
+	return c.natClient
 }
+
+//func (c *Caller) EthClient() *ethclient.Client {
+//	return c.ethClient
+//}
 
 func (c *Caller) Opts(amount *big.Int) *bind.TransactOpts {
-	gasPrice, _ := c.client.SuggestGasPrice(context.Background())
+	gasPrice, _ := c.natClient.SuggestGasPrice(context.Background())
 
 	opts := bind.NewKeyedTransactor(c.key.PrivateKey)
 	opts.Nonce = nil
@@ -63,7 +68,7 @@ func (c *Caller) WaitMinedAndCheck(tx *types.Transaction) error {
 	cancelCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	receipt, err := bind.WaitMined(cancelCtx, c.client, tx)
+	receipt, err := bind.WaitMined(cancelCtx, c.natClient, tx)
 	if err != nil {
 		return err
 	}

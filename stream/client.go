@@ -47,7 +47,7 @@ func (sc *Client) SubmitProof(chunkID, outChunkID *big.Int, profileID *big.Int) 
 		return nil, err
 	}
 
-	_, err = bind.WaitMined(context.Background(), sc.EthClient(), tx)
+	_, err = bind.WaitMined(context.Background(), sc.NatClient(), tx)
 	if err != nil {
 		return nil, err
 	}

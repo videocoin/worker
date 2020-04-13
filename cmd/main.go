@@ -16,8 +16,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	"github.com/videocoin/cloud-pkg/ethutils"
 	"github.com/videocoin/cloud-pkg/grpcutil"
 	"github.com/videocoin/cloud-pkg/tracer"
+	bridge "github.com/videocoin/go-bridge/client"
 	staking "github.com/videocoin/go-staking"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/service"
@@ -90,8 +92,13 @@ func validateFlags(cmd *cobra.Command, args []string) error {
 }
 
 func validateStakeOps(cmd *cobra.Command, args []string) error {
+	println(cmd.Name())
 	if len(args) < 1 {
-		return errors.New("requires an amount (wei value) argument")
+		if cmd.Name() == "add" {
+			return errors.New("requires an amount (tokens value) argument")
+		} else if cmd.Name() == "withdraw" {
+			return errors.New("requires an amount (wei value) argument")
+		}
 	}
 
 	amount := new(big.Int)
@@ -104,8 +111,6 @@ func validateStakeOps(cmd *cobra.Command, args []string) error {
 		return errors.New("amount value has to be positive")
 	}
 
-	// TODO per command check min, max, etc
-
 	return nil
 }
 
@@ -115,7 +120,11 @@ func validateDelegateOps(cmd *cobra.Command, args []string) error {
 			return errors.New("requires worker address argument")
 		}
 	} else if len(args) < 2 {
-		return errors.New("requires worker address and amount (wei value) arguments")
+		if cmd.Name() == "add" {
+			return errors.New("requires worker address and amount (tokens value) arguments")
+		} else if cmd.Name() == "withdraw" {
+			return errors.New("requires worker address and amount (wei value) arguments")
+		}
 	}
 
 	addr := args[0]
@@ -170,7 +179,7 @@ func main() {
 
 	var addCmd = &cobra.Command{
 		Use:              "add",
-		Short:            "add stake of specified amount",
+		Short:            "add stake of specified VideoCoin token amount",
 		TraverseChildren: true,
 		Args:             validateStakeOps,
 		PreRunE:          validateFlags,
@@ -179,7 +188,7 @@ func main() {
 
 	var withdrawCmd = &cobra.Command{
 		Use:              "withdraw",
-		Short:            "withdraw stake of specified amount",
+		Short:            "withdraw stake of specified wei amount",
 		TraverseChildren: true,
 		Args:             validateStakeOps,
 		PreRunE:          validateFlags,
@@ -197,7 +206,7 @@ func main() {
 
 	var daddCmd = &cobra.Command{
 		Use:              "add",
-		Short:            "delegate stake of specified amount to worker",
+		Short:            "delegate stake of specified VideoCoin token amount to worker",
 		TraverseChildren: true,
 		Args:             validateDelegateOps,
 		PreRunE:          validateFlags,
@@ -206,7 +215,7 @@ func main() {
 
 	var dwithdrawCmd = &cobra.Command{
 		Use:              "withdraw",
-		Short:            "withdraw delegate stake of specified amount from worker",
+		Short:            "withdraw delegate stake of specified wei amount from worker",
 		TraverseChildren: true,
 		Args:             validateDelegateOps,
 		PreRunE:          validateFlags,
@@ -299,10 +308,10 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 	log.Info("stopped")
 }
 
-func getStakingClient(cfg *service.Config) (*staking.Client, error) {
+func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.Caller, error) {
 	conn, err := grpcutil.Connect(cfg.DispatcherRPCAddr, cfg.Logger.WithField("system", "dispatcher"))
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(conn)
 
@@ -312,31 +321,48 @@ func getStakingClient(cfg *service.Config) (*staking.Client, error) {
 		configReq,
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
-	cfg.RPCNodeURL = configResp.RPCNodeURL
 
-	ethClient, err := ethclient.Dial(cfg.RPCNodeURL)
+	natClient, err := ethclient.Dial(configResp.RPCNodeURL)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
-	return staking.NewClient(ethClient, common.HexToAddress(cfg.StakingManagerAddr))
+	stakingClient, err := staking.NewClient(natClient, common.HexToAddress(cfg.StakingManagerAddr))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	ethClient, err := ethclient.Dial(cfg.ETHNodeURL)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient, ethClient)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	bridgeClient, err := bridge.Dial(natClient, ethClient, bridge.Config{
+		ProxyAddress:         common.HexToAddress(cfg.ProxyAddr),
+		ERC20Address:         common.HexToAddress(cfg.ERC20Addr),
+		LocalBridgeAddress:   common.HexToAddress(cfg.LocalBridgeAddr),
+		ForeignBridgeAddress: common.HexToAddress(cfg.ForeignBridgeAddr),
+	})
+
+	return stakingClient, bridgeClient, caller, nil
 }
 
 func runStakeCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	client, err := getStakingClient(cfg)
+
+	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	stake, err := client.GetTranscoderStake(context.Background(), caller.Addr())
+	stake, err := sClient.GetTranscoderStake(context.Background(), caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -346,42 +372,48 @@ func runStakeCommand(cmd *cobra.Command, args []string) {
 
 func runStakeAddCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	client, err := getStakingClient(cfg)
+	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	amount := new(big.Int)
-	amount, ok := amount.SetString(args[0], 10)
+	tokenAmount := new(big.Int)
+	tokenAmount, ok := tokenAmount.SetString(args[0], 10)
 	if !ok {
 		log.Fatal(err.Error())
 	}
 
-	t, err := client.GetTranscoder(context.Background(), caller.Addr())
+	if err := sClient.RegisterTranscoder(context.Background(), caller.PrivateKey(), 0); err != nil && !errors.Is(err, staking.ErrAlreadyRegistered) {
+		log.Fatal(err.Error())
+	}
+
+	t, err := sClient.GetTranscoder(context.Background(), caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	requiredStake, err := client.GetRequiredSelfStake(context.Background())
+	requiredStake, err := sClient.GetRequiredSelfStake(context.Background())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	if t.SelfStake.Uint64() == 0 && requiredStake.Cmp(amount) > 0 {
+	fVidValue, _ := ethutils.WeiToEth(requiredStake)
+	vidValue, _ := fVidValue.Int(nil)
+	if t.SelfStake.Uint64() == 0 && vidValue.Cmp(tokenAmount) > 0 {
 		log.Fatal("stake amount is insufficient")
 	}
 
-	if err := client.RegisterTranscoder(context.Background(), caller.PrivateKey(), 0); err != nil && !errors.Is(err, staking.ErrAlreadyRegistered) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	_, err = bClient.WaitDeposit(ctx, caller.PrivateKey(), common.HexToAddress(cfg.TokenBankAddr), tokenAmount)
+	if err != nil {
 		log.Fatal(err.Error())
 	}
+	cancel()
 
-	if err := client.Delegate(context.Background(), caller.PrivateKey(), caller.Addr(), amount); err != nil {
+	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
+	amount := ethutils.EthToWei(fAmount)
+	if err := sClient.Delegate(context.Background(), caller.PrivateKey(), caller.Addr(), amount); err != nil {
 		log.Fatal(err.Error())
 	}
 
@@ -390,12 +422,7 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 
 func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	client, err := getStakingClient(cfg)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
+	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -406,7 +433,7 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	t, err := client.GetTranscoder(context.Background(), caller.Addr())
+	t, err := sClient.GetTranscoder(context.Background(), caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -415,12 +442,12 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(fmt.Errorf("amount to withdraw is bigger than existent stake"))
 	}
 
-	if _, err := client.RequestWithdrawal(context.Background(), caller.PrivateKey(), caller.Addr(), amount); err != nil {
+	if _, err := sClient.RequestWithdrawal(context.Background(), caller.PrivateKey(), caller.Addr(), amount); err != nil {
 		log.Fatal(err.Error())
 	}
 
-	unbondingTime, _ := client.GetUnbondingPeriod(context.Background())
-	log.Infof("stake withdraw of amount %s has been successfully submitted and be available to complete after %s unbonding periods", amount.String(), unbondingTime.String())
+	unbondingTime, _ := sClient.GetUnbondingPeriod(context.Background())
+	log.Infof("stake withdraw of amount %s wei has been successfully submitted and be available to complete after %s unbonding periods", amount.String(), unbondingTime.String())
 
 	if t.State >= staking.StateUnbonded {
 		log.Infof("withdraw has been finished")
@@ -431,18 +458,13 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 
 func runDelegateCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	client, err := getStakingClient(cfg)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
+	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	addr := common.HexToAddress(args[0])
-	stake, err := client.GetDelegatorStake(context.Background(), addr, caller.Addr())
+	stake, err := sClient.GetDelegatorStake(context.Background(), addr, caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -452,34 +474,22 @@ func runDelegateCommand(cmd *cobra.Command, args []string) {
 
 func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	client, err := getStakingClient(cfg)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
+	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	addr := common.HexToAddress(args[0])
 
-	amount := new(big.Int)
-	amount, ok := amount.SetString(args[1], 10)
+	tokenAmount := new(big.Int)
+	tokenAmount, ok := tokenAmount.SetString(args[1], 10)
 	if !ok {
 		log.Fatal(err.Error())
 	}
 
-	t, err := client.GetTranscoder(context.Background(), addr)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	if t.State >= staking.StateUnbonded {
-		log.Fatal("transcoder is unbonded")
-	}
-
-	if err := client.Delegate(context.Background(), caller.PrivateKey(), addr, amount); err != nil {
+	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
+	amount := ethutils.EthToWei(fAmount)
+	if err := sClient.Delegate(context.Background(), caller.PrivateKey(), addr, amount); err != nil {
 		log.Fatal(err.Error())
 	}
 
@@ -488,12 +498,7 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 
 func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	client, err := getStakingClient(cfg)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
+	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -506,7 +511,7 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	t, err := client.GetTranscoder(context.Background(), addr)
+	t, err := sClient.GetTranscoder(context.Background(), addr)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -515,7 +520,7 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal("transcoder is unbonded")
 	}
 
-	stake, err := client.GetDelegatorStake(context.Background(), addr, caller.Addr())
+	stake, err := sClient.GetDelegatorStake(context.Background(), addr, caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -524,11 +529,11 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(fmt.Errorf("amount to withdraw is bigger than existent stake"))
 	}
 
-	if _, err := client.RequestWithdrawal(context.Background(), caller.PrivateKey(), addr, amount); err != nil {
+	if _, err := sClient.RequestWithdrawal(context.Background(), caller.PrivateKey(), addr, amount); err != nil {
 		log.Fatal(err.Error())
 	}
 
-	unbondingTime, _ := client.GetUnbondingPeriod(context.Background())
+	unbondingTime, _ := sClient.GetUnbondingPeriod(context.Background())
 	log.Infof("stake withdraw of amount %s has been successfully submitted and be available to complete after %s unbonding periods", amount.String(), unbondingTime.String())
 
 	if t.State >= staking.StateUnbonded {
@@ -540,17 +545,12 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 
 func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	client, err := getStakingClient(cfg)
+	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, nil)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	info, err := client.CompleteWithdrawals(context.Background(), caller.PrivateKey())
+	info, err := sClient.CompleteWithdrawals(context.Background(), caller.PrivateKey())
 	if err != nil {
 		if errors.Is(err, staking.ErrNoPendingWithdrawals) {
 			log.Infof("there are no pending complete withdrawals")
