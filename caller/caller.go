@@ -15,12 +15,11 @@ import (
 )
 
 type Caller struct {
-	ethClient *ethclient.Client
 	natClient *ethclient.Client
 	key       *keystore.Key
 }
 
-func NewCaller(jsonkey, pwd string, natClient *ethclient.Client, ethClient *ethclient.Client) (*Caller, error) {
+func NewCaller(jsonkey, pwd string, natClient *ethclient.Client) (*Caller, error) {
 	key, err := keystore.DecryptKey([]byte(jsonkey), pwd)
 	if err != nil {
 		return nil, err
@@ -47,10 +46,6 @@ func (c *Caller) Balance() (*big.Int, error) {
 func (c *Caller) NatClient() *ethclient.Client {
 	return c.natClient
 }
-
-//func (c *Caller) EthClient() *ethclient.Client {
-//	return c.ethClient
-//}
 
 func (c *Caller) Opts(amount *big.Int) *bind.TransactOpts {
 	gasPrice, _ := c.natClient.SuggestGasPrice(context.Background())

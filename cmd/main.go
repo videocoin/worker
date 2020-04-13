@@ -339,7 +339,7 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 		return nil, nil, nil, err
 	}
 
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient, ethClient)
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient)
 	if err != nil {
 		return nil, nil, nil, err
 	}
