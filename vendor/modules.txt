@@ -221,13 +221,13 @@ github.com/shirou/gopsutil/load
 github.com/shirou/gopsutil/mem
 github.com/shirou/gopsutil/net
 github.com/shirou/gopsutil/process
-# github.com/sirupsen/logrus v1.4.2
+# github.com/sirupsen/logrus v1.5.0
 ## explicit
 github.com/sirupsen/logrus
 # github.com/spf13/cobra v0.0.7
 ## explicit
 github.com/spf13/cobra
-# github.com/spf13/pflag v1.0.3
+# github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
 # github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969
 ## explicit
@@ -284,11 +284,19 @@ github.com/videocoin/cloud-api/rpc
 github.com/videocoin/cloud-api/validator/v1
 # github.com/videocoin/cloud-pkg v0.0.7 => ../cloud-pkg
 ## explicit
+github.com/videocoin/cloud-pkg/ethutils
 github.com/videocoin/cloud-pkg/grpcutil
 github.com/videocoin/cloud-pkg/mqmux
 github.com/videocoin/cloud-pkg/retry
 github.com/videocoin/cloud-pkg/stream
 github.com/videocoin/cloud-pkg/tracer
+# github.com/videocoin/go-bridge v0.0.2
+## explicit
+github.com/videocoin/go-bridge/client
+github.com/videocoin/go-bridge/erc20
+github.com/videocoin/go-bridge/nativebridge
+github.com/videocoin/go-bridge/nativeproxy
+github.com/videocoin/go-bridge/remotebridge
 # github.com/videocoin/go-protocol v0.0.6
 ## explicit
 github.com/videocoin/go-protocol/staking

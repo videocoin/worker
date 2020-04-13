@@ -65,12 +65,12 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg.Secret = internalConfigResp.Secret
 	}
 
-	ethClient, err := ethclient.Dial(cfg.RPCNodeURL)
+	natClient, err := ethclient.Dial(cfg.RPCNodeURL)
 	if err != nil {
 		return nil, err
 	}
 
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, ethClient)
+	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient, nil)
 	if err != nil {
 		return nil, err
 	}

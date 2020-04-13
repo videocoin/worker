@@ -26,12 +26,13 @@ require (
 	github.com/robertkrimen/otto v0.0.0-20170205013659-6a77b7cbc37d // indirect
 	github.com/rs/cors v1.7.0 // indirect
 	github.com/shirou/gopsutil v2.20.2+incompatible
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v0.0.7
 	github.com/status-im/keycard-go v0.0.0-20200402102358-957c09536969 // indirect
 	github.com/tyler-smith/go-bip39 v1.0.2 // indirect
 	github.com/videocoin/cloud-api v0.3.0
 	github.com/videocoin/cloud-pkg v0.0.7
+	github.com/videocoin/go-bridge v0.0.2
 	github.com/videocoin/go-protocol v0.0.6 // indirect
 	github.com/videocoin/go-staking v0.0.0-20200410180201-6944f4d9a28b
 	golang.org/x/crypto v0.0.0-20200406173513-056763e48d71 // indirect

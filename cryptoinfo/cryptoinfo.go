@@ -16,7 +16,7 @@ type CryptoInfo struct {
 }
 
 func NewCryptoInfo(caller *caller.Caller, addr string) (*CryptoInfo, error) {
-	client, err := staking.NewClient(caller.EthClient(), common.HexToAddress(addr))
+	client, err := staking.NewClient(caller.NatClient(), common.HexToAddress(addr))
 	if err != nil {
 		return nil, err
 	}
