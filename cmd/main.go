@@ -545,12 +545,12 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 
 func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
-	sClient, _, caller, err := getClients(cfg)
+	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	info, err := sClient.CompleteWithdrawals(context.Background(), caller.PrivateKey())
+	winfo, err := sClient.CompleteWithdrawals(context.Background(), caller.PrivateKey())
 	if err != nil {
 		if errors.Is(err, staking.ErrNoPendingWithdrawals) {
 			log.Infof("there are no pending complete withdrawals")
@@ -560,5 +560,18 @@ func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	log.Infof("stake withdraw of amount %s has been successfully completed", info.Amount.String())
+	if winfo.Amount.Cmp(big.NewInt(0)) > 0 {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		defer cancel()
+
+		fVidValue, _ := ethutils.WeiToEth(winfo.Amount)
+		vidValue, _ := fVidValue.Int(nil)
+
+		_, err := bClient.WaitWithdraw(ctx, caller.PrivateKey(), common.HexToAddress(cfg.NativeBankAddr), vidValue)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		log.Infof("stake withdraw of amount %s VID tokens have been successfully completed", vidValue.String())
+	}
 }
