@@ -60,7 +60,9 @@ func NewService(cfg *Config) (*Service, error) {
 			return nil, err
 		}
 
-		cfg.ClientID = internalConfigResp.ClientId
+		if cfg.ClientID == "" {
+			cfg.ClientID = internalConfigResp.ClientId
+		}
 		cfg.Key = internalConfigResp.Key
 		cfg.Secret = internalConfigResp.Secret
 	}

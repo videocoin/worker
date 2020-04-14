@@ -85,6 +85,11 @@ func validateFlags(cmd *cobra.Command, args []string) error {
 			} else {
 				cfg.ClientID = val
 			}
+		} else {
+			val, err := cmd.Flags().GetString("client-id")
+			if err != nil && val != "" {
+				cfg.ClientID = val
+			}
 		}
 	}
 
