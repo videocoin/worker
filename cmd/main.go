@@ -97,7 +97,6 @@ func validateFlags(cmd *cobra.Command, args []string) error {
 }
 
 func validateStakeOps(cmd *cobra.Command, args []string) error {
-	println(cmd.Name())
 	if len(args) < 1 {
 		if cmd.Name() == "add" || cmd.Name() == "withdraw" {
 			return errors.New("requires an amount (tokens value) argument")
@@ -419,7 +418,7 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	log.Infof("stake of amount %s wei has been successfully added", amount.String())
+	log.Infof("stake of amount %s tokens has been successfully added", tokenAmount.String())
 }
 
 func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {

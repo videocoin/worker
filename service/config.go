@@ -20,7 +20,7 @@ type Config struct {
 	DispatcherRPCAddr string `required:"true" envconfig:"DISPATCHER_ADDR" default:"d.dev.videocoin.network:5008"`
 	OutputDir         string `required:"true" envconfig:"OUTPUT_DIR" default:"/tmp"`
 
-	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0x74073Ab93402f9b91986c052269306c88b5DeD03"`
+	StakingManagerAddr string `required:"true" envconfig:"STAKING_MANAGER_ADDR" default:"0x8Dcbc47852aC4aB74535D375d525a03Ae28E0296"`
 	ProxyAddr          string `required:"true" envconfig:"PROXY_ADDR" default:"0x68896bAEcc5186284d5985903e86158F8e803Ca9"`
 	ERC20Addr          string `required:"true" envconfig:"ERC20_ADDR" default:"0x7bc345BE17AF288a0CFcFF8E673714635C847aa0"`
 	LocalBridgeAddr    string `required:"true" envconfig:"LOCAL_BRIDGE_ADDR" default:"0xfD8c66B99919F291AefE756DA506446FB227f17D"`
