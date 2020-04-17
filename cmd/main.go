@@ -99,10 +99,8 @@ func validateFlags(cmd *cobra.Command, args []string) error {
 func validateStakeOps(cmd *cobra.Command, args []string) error {
 	println(cmd.Name())
 	if len(args) < 1 {
-		if cmd.Name() == "add" {
+		if cmd.Name() == "add" || cmd.Name() == "withdraw" {
 			return errors.New("requires an amount (tokens value) argument")
-		} else if cmd.Name() == "withdraw" {
-			return errors.New("requires an amount (wei value) argument")
 		}
 	}
 
@@ -125,10 +123,8 @@ func validateDelegateOps(cmd *cobra.Command, args []string) error {
 			return errors.New("requires worker address argument")
 		}
 	} else if len(args) < 2 {
-		if cmd.Name() == "add" {
+		if cmd.Name() == "add" || cmd.Name() == "withdraw" {
 			return errors.New("requires worker address and amount (tokens value) arguments")
-		} else if cmd.Name() == "withdraw" {
-			return errors.New("requires worker address and amount (wei value) arguments")
 		}
 	}
 
@@ -193,7 +189,7 @@ func main() {
 
 	var withdrawCmd = &cobra.Command{
 		Use:              "withdraw",
-		Short:            "withdraw stake of specified wei amount",
+		Short:            "withdraw stake of specified tokens amount",
 		TraverseChildren: true,
 		Args:             validateStakeOps,
 		PreRunE:          validateFlags,
@@ -220,7 +216,7 @@ func main() {
 
 	var dwithdrawCmd = &cobra.Command{
 		Use:              "withdraw",
-		Short:            "withdraw delegate stake of specified wei amount from worker",
+		Short:            "withdraw delegate stake of specified tokens amount from worker",
 		TraverseChildren: true,
 		Args:             validateDelegateOps,
 		PreRunE:          validateFlags,
@@ -288,7 +284,7 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 	go func() {
 		sig := <-signals
 
-		log.Infof("recieved signal %s", sig)
+		log.Infof("received signal %s", sig)
 		exit <- true
 	}()
 
@@ -367,12 +363,13 @@ func runStakeCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	stake, err := sClient.GetTranscoderStake(context.Background(), caller.Addr())
+	t, err := sClient.GetTranscoder(context.Background(), caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	log.Infof("worker is staking %s wei", stake.String())
+	tokenAmount, _ := ethutils.WeiToEth(t.SelfStake)
+	log.Infof("worker is staking %s tokens and state is %v", tokenAmount.String(), t.State)
 }
 
 func runStakeAddCommand(cmd *cobra.Command, args []string) {
@@ -432,8 +429,8 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	amount := new(big.Int)
-	amount, ok := amount.SetString(args[0], 10)
+	tokenAmount := new(big.Int)
+	tokenAmount, ok := tokenAmount.SetString(args[0], 10)
 	if !ok {
 		log.Fatal(err.Error())
 	}
@@ -442,6 +439,9 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
+	amount := ethutils.EthToWei(fAmount)
 
 	if amount.Cmp(t.SelfStake) > 0 {
 		log.Fatal(fmt.Errorf("amount to withdraw is bigger than existent stake"))
@@ -452,9 +452,9 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 	}
 
 	unbondingTime, _ := sClient.GetUnbondingPeriod(context.Background())
-	log.Infof("stake withdraw of amount %s wei has been successfully submitted and be available to complete after %s unbonding periods", amount.String(), unbondingTime.String())
+	log.Infof("stake withdraw of amount %s tokens has been successfully submitted and be available to complete after %s unbonding periods", tokenAmount.String(), unbondingTime.String())
 
-	if t.State >= staking.StateUnbonded {
+	if t.State != staking.StateBonded {
 		log.Infof("withdraw has been finished")
 	} else {
 		log.Infof("finish withdraw with `stake withdraw complete` command")
@@ -474,7 +474,8 @@ func runDelegateCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	log.Infof("delegator is staking %s wei", stake.String())
+	tokenAmount, _ := ethutils.WeiToEth(stake)
+	log.Infof("delegator is staking %s tokens", tokenAmount.String())
 }
 
 func runDelegateAddCommand(cmd *cobra.Command, args []string) {
@@ -498,7 +499,7 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	log.Infof("stake of amount %s wei has been successfully delegated", amount.String())
+	log.Infof("stake of amount %s tokens has been successfully delegated", tokenAmount.String())
 }
 
 func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
@@ -510,8 +511,8 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 
 	addr := common.HexToAddress(args[0])
 
-	amount := new(big.Int)
-	amount, ok := amount.SetString(args[1], 10)
+	tokenAmount := new(big.Int)
+	tokenAmount, ok := tokenAmount.SetString(args[1], 10)
 	if !ok {
 		log.Fatal(err.Error())
 	}
@@ -524,6 +525,9 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 	if t.State >= staking.StateUnbonded {
 		log.Fatal("transcoder is unbonded")
 	}
+
+	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
+	amount := ethutils.EthToWei(fAmount)
 
 	stake, err := sClient.GetDelegatorStake(context.Background(), addr, caller.Addr())
 	if err != nil {
@@ -539,9 +543,9 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 	}
 
 	unbondingTime, _ := sClient.GetUnbondingPeriod(context.Background())
-	log.Infof("stake withdraw of amount %s has been successfully submitted and be available to complete after %s unbonding periods", amount.String(), unbondingTime.String())
+	log.Infof("stake withdraw of amount %s tokens has been successfully submitted and be available to complete after %s unbonding periods", tokenAmount.String(), unbondingTime.String())
 
-	if t.State >= staking.StateUnbonded {
+	if t.State != staking.StateBonded {
 		log.Infof("withdraw has been finished")
 	} else {
 		log.Infof("finish withdraw with `delegate withdraw complete` command")
@@ -558,7 +562,7 @@ func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 	winfo, err := sClient.CompleteWithdrawals(context.Background(), caller.PrivateKey())
 	if err != nil {
 		if errors.Is(err, staking.ErrNoPendingWithdrawals) {
-			log.Infof("there are no pending complete withdrawals")
+			log.Infof("there are no pending withdrawals")
 			return
 		} else {
 			log.Fatal(err.Error())
@@ -566,7 +570,7 @@ func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if winfo.Amount.Cmp(big.NewInt(0)) > 0 {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
 		fVidValue, _ := ethutils.WeiToEth(winfo.Amount)
@@ -577,6 +581,6 @@ func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 			log.Fatal(err.Error())
 		}
 
-		log.Infof("stake withdraw of amount %s VID tokens have been successfully completed", vidValue.String())
+		log.Infof("stake withdraw of amount %s tokens have been successfully completed", vidValue.String())
 	}
 }
