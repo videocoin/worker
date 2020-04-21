@@ -84,10 +84,12 @@ func (t *Transcoder) IsWorking() bool {
 }
 
 func (t *Transcoder) dispatch() error {
-	req := &v1.TaskPendingRequest{ClientID: t.clientID}
+	req := &v1.TaskPendingRequest{}
 
 	for range t.t.C {
 		t.logger.Info("waiting task...")
+
+		t.task = nil
 
 		ctx := context.Background()
 		task, err := t.dispatcher.GetPendingTask(ctx, req)
@@ -115,31 +117,21 @@ func (t *Transcoder) dispatch() error {
 				WithField("task_id", task.ID).
 				Errorf("failed to transcode: %s", err)
 
-			_, err = t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
-				ClientID: t.clientID,
-				ID:       t.task.ID,
-			})
+			_, err = t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{ID: t.task.ID})
 			if err != nil {
 				t.logger.Error(err)
 			}
 
-			t.task = nil
-
 			continue
 		}
 
-		_, err = t.dispatcher.MarkTaskAsCompleted(context.Background(), &v1.TaskRequest{
-			ClientID: t.clientID,
-			ID:       t.task.ID,
-		})
+		_, err = t.dispatcher.MarkTaskAsCompleted(context.Background(), &v1.TaskRequest{ID: t.task.ID})
 		if err != nil {
 			t.logger.
 				WithField("task_id", task.ID).
 				Errorf("failed to complete: %s", err)
 
 		}
-
-		t.task = nil
 	}
 
 	return nil
@@ -308,7 +300,6 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 
 	if t.task.Output != nil && t.task.Output.Num == 0 {
 		_, err := t.dispatcher.MarkSegmentAsTranscoded(context.Background(), &v1.TaskSegmentRequest{
-			ClientID: t.clientID,
 			ID:       t.task.ID,
 			Num:      segment.Num,
 			Duration: segment.Duration,

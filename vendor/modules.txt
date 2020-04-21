@@ -279,6 +279,7 @@ github.com/uber/jaeger-lib/metrics
 # github.com/videocoin/cloud-api v0.3.0 => ../cloud-api
 ## explicit
 github.com/videocoin/cloud-api/dispatcher/v1
+github.com/videocoin/cloud-api/emitter/v1
 github.com/videocoin/cloud-api/miners/v1
 github.com/videocoin/cloud-api/rpc
 github.com/videocoin/cloud-api/validator/v1
@@ -322,7 +323,7 @@ go.opencensus.io/trace
 go.opencensus.io/trace/internal
 go.opencensus.io/trace/propagation
 go.opencensus.io/trace/tracestate
-# go.uber.org/atomic v1.5.1
+# go.uber.org/atomic v1.6.0
 go.uber.org/atomic
 # golang.org/x/crypto v0.0.0-20200406173513-056763e48d71
 ## explicit
@@ -332,9 +333,6 @@ golang.org/x/crypto/ripemd160
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/sha3
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
-golang.org/x/lint
-golang.org/x/lint/golint
 # golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 ## explicit
 golang.org/x/net/context
@@ -381,10 +379,6 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.0.0-20200221224223-e1da425f72fd
-golang.org/x/tools/go/ast/astutil
-golang.org/x/tools/go/gcexportdata
-golang.org/x/tools/go/internal/gcimporter
 # google.golang.org/api v0.20.0
 ## explicit
 google.golang.org/api/compute/v1

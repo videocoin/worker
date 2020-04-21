@@ -4,12 +4,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/videocoin/cloud-pkg/grpcutil"
-
 	"cloud.google.com/go/compute/metadata"
 	"github.com/ethereum/go-ethereum/ethclient"
+	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
+	grpctracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/opentracing/opentracing-go"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
+	"github.com/videocoin/cloud-api/rpc"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/capacity"
 	"github.com/videocoin/transcode/cryptoinfo"
@@ -18,6 +22,8 @@ import (
 	"golang.org/x/oauth2/google"
 	computev1 "google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 )
 
 type Service struct {
@@ -25,27 +31,33 @@ type Service struct {
 	dispatcher dispatcherv1.DispatcherServiceClient
 	transcoder *transcoder.Transcoder
 	pinger     *pinger.Pinger
-
-	ClientID string
 }
 
 func NewService(cfg *Config) (*Service, error) {
-	conn, err := grpcutil.Connect(cfg.DispatcherRPCAddr, cfg.Logger.WithField("system", "dispatcher"))
+	grpcDialOpts := []grpc.DialOption{
+		grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(
+			grpc.UnaryClientInterceptor(grpcmiddleware.ChainUnaryClient(
+				grpctracing.UnaryClientInterceptor(
+					grpctracing.WithTracer(opentracing.GlobalTracer()),
+				),
+				grpcprometheus.UnaryClientInterceptor,
+				grpclogrus.UnaryClientInterceptor(cfg.Logger),
+			)),
+		),
+		grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:                time.Second * 10,
+			Timeout:             time.Second * 10,
+			PermitWithoutStream: true,
+		}),
+		grpc.WithPerRPCCredentials(rpc.TokenAuth{Token: cfg.ClientID}),
+	}
+
+	conn, err := grpc.Dial(cfg.DispatcherRPCAddr, grpcDialOpts...)
 	if err != nil {
 		return nil, err
 	}
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(conn)
-
-	configReq := new(dispatcherv1.ConfigRequest)
-	configResp, err := dispatcher.GetConfig(
-		context.Background(),
-		configReq,
-	)
-	if err != nil {
-		return nil, err
-	}
-	cfg.RPCNodeURL = configResp.RPCNodeURL
-	cfg.SyncerURL = configResp.SyncerURL
 
 	if cfg.Internal {
 		internalConfigReq := &dispatcherv1.InternalConfigRequest{}
@@ -65,7 +77,42 @@ func NewService(cfg *Config) (*Service, error) {
 		}
 		cfg.Key = internalConfigResp.Key
 		cfg.Secret = internalConfigResp.Secret
+
+		grpcDialOpts = []grpc.DialOption{
+			grpc.WithInsecure(),
+			grpc.WithUnaryInterceptor(
+				grpc.UnaryClientInterceptor(grpcmiddleware.ChainUnaryClient(
+					grpctracing.UnaryClientInterceptor(
+						grpctracing.WithTracer(opentracing.GlobalTracer()),
+					),
+					grpcprometheus.UnaryClientInterceptor,
+					grpclogrus.UnaryClientInterceptor(cfg.Logger),
+				)),
+			),
+			grpc.WithKeepaliveParams(keepalive.ClientParameters{
+				Time:                time.Second * 10,
+				Timeout:             time.Second * 10,
+				PermitWithoutStream: true,
+			}),
+			grpc.WithPerRPCCredentials(rpc.TokenAuth{Token: cfg.ClientID}),
+		}
+		conn, err := grpc.Dial(cfg.DispatcherRPCAddr, grpcDialOpts...)
+		if err != nil {
+			return nil, err
+		}
+		dispatcher = dispatcherv1.NewDispatcherServiceClient(conn)
 	}
+
+	configReq := new(dispatcherv1.ConfigRequest)
+	configResp, err := dispatcher.GetConfig(
+		context.Background(),
+		configReq,
+	)
+	if err != nil {
+		return nil, err
+	}
+	cfg.RPCNodeURL = configResp.RPCNodeURL
+	cfg.SyncerURL = configResp.SyncerURL
 
 	natClient, err := ethclient.Dial(cfg.RPCNodeURL)
 	if err != nil {
@@ -128,7 +175,6 @@ func NewService(cfg *Config) (*Service, error) {
 		dispatcher: dispatcher,
 		transcoder: trans,
 		pinger:     pinger,
-		ClientID:   cfg.ClientID,
 	}
 
 	return svc, nil

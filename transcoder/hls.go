@@ -100,10 +100,7 @@ func (t *Transcoder) runHLSSegmentReceiver(
 
 			err := callback(segment)
 			if err != nil {
-				_, err := t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{
-					ClientID: t.clientID,
-					ID:       t.task.ID,
-				})
+				_, err := t.dispatcher.MarkTaskAsFailed(context.Background(), &v1.TaskRequest{ID: t.task.ID})
 				if err != nil {
 					t.logger.Error(err)
 				}

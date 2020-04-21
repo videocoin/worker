@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/videocoin/transcode/transcoder/hlswatcher"
-
 	"github.com/sirupsen/logrus"
+	emitterv1 "github.com/videocoin/cloud-api/emitter/v1"
 	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-pkg/retry"
+	"github.com/videocoin/transcode/transcoder/hlswatcher"
 )
 
 func checkSource(url string) error {
@@ -105,30 +105,36 @@ func (t *Transcoder) submitAndValidateProof(segment *hlswatcher.SegmentInfo) err
 		profileID = profiles[0]
 	}
 
+	vpReq := &validatorv1.ValidateProofRequest{
+		StreamId:              t.task.StreamID,
+		StreamContractAddress: t.task.StreamContractAddress,
+		ProfileId:             profileID.Bytes(),
+		ChunkId:               outChunkID.Bytes(),
+	}
+
 	tx, err := t.sc.SubmitProof(inChunkID, outChunkID, profileID)
 	if err != nil {
 		logger.Errorf("failed to submit proof: %s", err)
 		return err
 	}
 
-	logger.Debugf("submitting proof tx %+v\n", tx.Hash().String())
+	vpReq.SubmitProofTx = tx.Hash().String()
+	vpReq.SubmitProofTxStatus = emitterv1.ReceiptStatusSuccess
 
-	if t.task != nil {
-		logger.Info("validating proof")
+	err = t.sc.WaitMinedAndCheck(tx)
+	if err != nil {
+		vpReq.SubmitProofTxStatus = emitterv1.ReceiptStatusFailed
+		logger.Errorf("failed to submit proof: %s", err)
+	}
 
-		ctx := context.Background()
-		vpReq := &validatorv1.ValidateProofRequest{
-			StreamContractAddress: t.task.StreamContractAddress,
-			ProfileId:             profileID.Bytes(),
-			OutputChunkId:         outChunkID.Bytes(),
-			StreamId:              t.task.StreamID,
-			IsLast:                segment.IsLast,
-		}
-		_, err = t.dispatcher.ValidateProof(ctx, vpReq)
-		if err != nil {
-			logger.Errorf("failed to validate proof: %s", err)
-			return err
-		}
+	logger.Debugf("submit proof tx %+v\n", vpReq.SubmitProofTx)
+	logger.Info("validating proof")
+
+	ctx := context.Background()
+	_, err = t.dispatcher.ValidateProof(ctx, vpReq)
+	if err != nil {
+		logger.Errorf("failed to validate proof: %s", err)
+		return err
 	}
 
 	return nil

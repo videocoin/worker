@@ -21,7 +21,7 @@ service DispatcherService {
   rpc GetTask(TaskRequest) returns (cloud.api.dispatcher.v1.Task) {}
   rpc MarkTaskAsCompleted(TaskRequest) returns (cloud.api.dispatcher.v1.Task) {}
   rpc MarkTaskAsFailed(TaskRequest) returns (cloud.api.dispatcher.v1.Task) {}
-  rpc ValidateProof(cloud.api.validator.v1.ValidateProofRequest) returns (google.protobuf.Empty) {}
+  rpc ValidateProof(cloud.api.validator.v1.ValidateProofRequest) returns (cloud.api.validator.v1.ValidateProofResponse) {}
   rpc Ping(cloud.api.miners.v1.PingRequest) returns (cloud.api.miners.v1.PingResponse) {}
   rpc Register(cloud.api.miners.v1.RegistrationRequest) returns (google.protobuf.Empty) {}
   rpc GetInternalConfig(InternalConfigRequest) returns (InternalConfigResponse) {}
@@ -29,13 +29,10 @@ service DispatcherService {
   rpc MarkSegmentAsTranscoded(TaskSegmentRequest) returns (google.protobuf.Empty) {}
 }
 
-message TaskPendingRequest {
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
-}
+message TaskPendingRequest {}
 
 message TaskRequest {
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
-  string id = 2 [(gogoproto.customname) = "ID"];
+  string id = 1 [(gogoproto.customname) = "ID"];
 }
 
 message InternalConfigRequest {}
@@ -54,8 +51,7 @@ message ConfigResponse {
 }
 
 message TaskSegmentRequest {
-  string client_id = 1 [(gogoproto.customname) = "ClientID"];
-  string id = 2 [(gogoproto.customname) = "ID"];
-  uint64 num = 3;
-  double duration = 4;
+  string id = 1 [(gogoproto.customname) = "ID"];
+  uint64 num = 2;
+  double duration = 3;
 }
