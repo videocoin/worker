@@ -16,7 +16,6 @@ import (
 	"github.com/videocoin/cloud-api/rpc"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/capacity"
-	"github.com/videocoin/transcode/cryptoinfo"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
 	"golang.org/x/oauth2/google"
@@ -150,18 +149,12 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	ci, err := cryptoinfo.NewCryptoInfo(caller, cfg.StakingManagerAddr)
-	if err != nil {
-		return nil, err
-	}
-
 	cfg.Logger.Info("performing capacity measurements")
 	capacitor := capacity.NewCapacitor(cfg.Internal, trans, cfg.Logger)
 
 	pinger, err := pinger.NewPinger(
 		dispatcher,
 		capacitor,
-		ci,
 		cfg.ClientID,
 		time.Second*5,
 		cfg.Version,
