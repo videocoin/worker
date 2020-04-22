@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -22,14 +21,13 @@ var (
 )
 
 type SegmentInfo struct {
-	Source    string  `json:"source"`
-	Num       uint64  `json:"num"`
-	Angle     uint32  `json:"angle"`
-	Name      string  `json:"name"`
-	Duration  float64 `json:"duration"`
-	IsLast    bool    `json:"is_last"`
-	VariantID string  `json:"variant_id"`
-	IsVOD     bool    `json:"is_vod"`
+	Index    uint64  `json:"index"`
+	Source   string  `json:"source"`
+	Name     string  `json:"name"`
+	Num      uint64  `json:"num"`
+	Duration float64 `json:"duration"`
+	IsLast   bool    `json:"is_last"`
+	IsVOD    bool    `json:"is_vod"`
 }
 
 type Watcher struct {
@@ -40,7 +38,7 @@ type Watcher struct {
 	mu          *sync.Mutex
 	running     bool
 	files       []string
-	segmentsNum map[string]uint64
+	segmentsNum map[string]int64
 	period      time.Duration
 }
 
@@ -51,7 +49,7 @@ func New(period time.Duration) *Watcher {
 		wg:          &sync.WaitGroup{},
 		mu:          new(sync.Mutex),
 		files:       make([]string, 0),
-		segmentsNum: make(map[string]uint64),
+		segmentsNum: make(map[string]int64),
 		period:      period,
 	}
 }
@@ -73,7 +71,7 @@ func (w *Watcher) Start() error {
 	w.ErrCh = make(chan error, 1)
 
 	segments := make(map[string][]*SegmentInfo)
-	segmentsNum := make(map[string]uint64)
+	segmentsNum := make(map[string]int64)
 
 	w.mu.Unlock()
 	w.wg.Done()
@@ -103,12 +101,12 @@ func (w *Watcher) Start() error {
 			}
 
 			segments[path] = segmentList
-			segmentsNum[path] = uint64(len(segmentList))
+			segmentsNum[path] = int64(segmentList[len(segmentList)-1].Index)
 		}
 
 		for path, ss := range segments {
 			for _, s := range ss {
-				if s.Num <= w.segmentsNum[path] {
+				if int64(s.Index) <= w.segmentsNum[path] {
 					continue
 				}
 
@@ -139,7 +137,7 @@ func (w *Watcher) Add(name string) (err error) {
 	}
 
 	w.files = append(w.files, name)
-	w.segmentsNum[name] = 0
+	w.segmentsNum[name] = -1
 
 	return nil
 }
@@ -189,7 +187,7 @@ func (w *Watcher) ExtractSegments(name string) ([]*SegmentInfo, error) {
 }
 
 func (w *Watcher) extractSegments(name string) ([]*SegmentInfo, error) {
-	segments := []*SegmentInfo{}
+	var segments []*SegmentInfo
 
 	content, err := ioutil.ReadFile(name)
 	if err != nil {
@@ -210,17 +208,12 @@ func (w *Watcher) extractSegments(name string) ([]*SegmentInfo, error) {
 				continue
 			}
 
-			pathParts := strings.Split(name, "/")
-			plFileName := pathParts[len(pathParts)-1]
-			variantID := plFileName[0 : len(plFileName)-6]
-
 			ts := &SegmentInfo{
-				Num:       uint64(idx) + 1,
-				Angle:     extractAngle(segment.URI),
-				Name:      segment.URI,
-				Duration:  segment.Duration,
-				Source:    path.Join(filepath.Dir(name), segment.URI),
-				VariantID: variantID,
+				Index:    uint64(idx),
+				Num:      uint64(idx) + 1,
+				Name:     segment.URI,
+				Duration: segment.Duration,
+				Source:   path.Join(filepath.Dir(name), segment.URI),
 			}
 
 			segments = append(segments, ts)
@@ -234,18 +227,4 @@ func (w *Watcher) extractSegments(name string) ([]*SegmentInfo, error) {
 	}
 
 	return segments, nil
-}
-
-func extractAngle(name string) uint32 {
-	angle := uint64(0)
-	p1 := strings.Split(name, ".")
-	if len(p1) == 2 {
-		p2 := strings.Split(p1[0], "-")
-		if len(p2) >= 5 {
-			angleStr := p2[len(p2)-2]
-			angle, _ = strconv.ParseUint(angleStr, 10, 32)
-		}
-	}
-
-	return uint32(angle)
 }
