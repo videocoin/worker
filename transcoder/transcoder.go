@@ -222,7 +222,7 @@ func (t *Transcoder) runTask() error {
 		logger.Debugf("chunks: %+v", chunks)
 		logger.Debugf("chunks err: %+v", err)
 
-		if err == nil {
+		if err == nil && len(chunks) > 0 {
 			lastChunkNum := chunks[len(chunks)-1]
 
 			logger.Debugf("last chunk num: %+v", lastChunkNum.Uint64())
