@@ -112,11 +112,14 @@ func (c *Capacitor) IsUpdateTime() bool {
 
 func (c *Capacitor) GetInfo() (map[string]interface{}, []byte, error) {
 	defer func() {
-		if !c.isInternal && !c.transcoder.IsWorking() && time.Since(c.lastPeformed) >= time.Minute*15 {
-			if err := c.getEncodeCapacity(); err != nil {
-				c.logger.WithError(err).Errorf("failed to get encode capacity")
-			}
-		}
+		// if !c.isInternal && !c.transcoder.IsWorking() && time.Since(c.lastPeformed) >= time.Minute*15 {
+		// 	c.logger.Info("get encode capacity")
+		// 	if err := c.getEncodeCapacity(); err != nil {
+		// 		c.logger.WithError(err).Errorf("failed to get encode capacity")
+		// 	}
+		// }
+
+		c.logger.Info("get cpu capacity")
 		if err := c.getCPUCapacity(); err != nil {
 			c.logger.WithError(err).Errorf("failed to get cpu capacity")
 		}
