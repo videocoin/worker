@@ -6,11 +6,7 @@ import (
 
 	"cloud.google.com/go/compute/metadata"
 	"github.com/ethereum/go-ethereum/ethclient"
-	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
-	grpctracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
-	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/opentracing/opentracing-go"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	"github.com/videocoin/cloud-api/rpc"
@@ -35,15 +31,7 @@ type Service struct {
 func NewService(cfg *Config) (*Service, error) {
 	grpcDialOpts := []grpc.DialOption{
 		grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(
-			grpc.UnaryClientInterceptor(grpcmiddleware.ChainUnaryClient(
-				grpctracing.UnaryClientInterceptor(
-					grpctracing.WithTracer(opentracing.GlobalTracer()),
-				),
-				grpcprometheus.UnaryClientInterceptor,
-				grpclogrus.UnaryClientInterceptor(cfg.Logger),
-			)),
-		),
+		grpc.WithUnaryInterceptor(grpclogrus.UnaryClientInterceptor(cfg.Logger)),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
 			Time:                time.Second * 10,
 			Timeout:             time.Second * 10,
@@ -77,17 +65,9 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg.Key = internalConfigResp.Key
 		cfg.Secret = internalConfigResp.Secret
 
-		grpcDialOpts = []grpc.DialOption{
+		grpcDialOpts := []grpc.DialOption{
 			grpc.WithInsecure(),
-			grpc.WithUnaryInterceptor(
-				grpc.UnaryClientInterceptor(grpcmiddleware.ChainUnaryClient(
-					grpctracing.UnaryClientInterceptor(
-						grpctracing.WithTracer(opentracing.GlobalTracer()),
-					),
-					grpcprometheus.UnaryClientInterceptor,
-					grpclogrus.UnaryClientInterceptor(cfg.Logger),
-				)),
-			),
+			grpc.WithUnaryInterceptor(grpclogrus.UnaryClientInterceptor(cfg.Logger)),
 			grpc.WithKeepaliveParams(keepalive.ClientParameters{
 				Time:                time.Second * 10,
 				Timeout:             time.Second * 10,

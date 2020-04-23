@@ -12,8 +12,9 @@ import (
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
 	golang_proto "github.com/golang/protobuf/proto"
+	v1 "github.com/videocoin/cloud-api/emitter/v1"
 	v11 "github.com/videocoin/cloud-api/miners/v1"
-	v1 "github.com/videocoin/cloud-api/validator/v1"
+	v12 "github.com/videocoin/cloud-api/validator/v1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -406,6 +407,140 @@ func (m *TaskSegmentRequest) GetDuration() float64 {
 func (*TaskSegmentRequest) XXX_MessageName() string {
 	return "cloud.api.dispatcher.v1.TaskSegmentRequest"
 }
+
+type AddInputChunkRequest struct {
+	StreamId             string   `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
+	StreamContractId     uint64   `protobuf:"varint,2,opt,name=stream_contract_id,json=streamContractId,proto3" json:"stream_contract_id,omitempty"`
+	ChunkId              uint64   `protobuf:"varint,3,opt,name=chunk_id,json=chunkId,proto3" json:"chunk_id,omitempty"`
+	Reward               float64  `protobuf:"fixed64,4,opt,name=reward,proto3" json:"reward,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddInputChunkRequest) Reset()         { *m = AddInputChunkRequest{} }
+func (m *AddInputChunkRequest) String() string { return proto.CompactTextString(m) }
+func (*AddInputChunkRequest) ProtoMessage()    {}
+func (*AddInputChunkRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_008866cbcf1626a3, []int{7}
+}
+func (m *AddInputChunkRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AddInputChunkRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AddInputChunkRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AddInputChunkRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddInputChunkRequest.Merge(m, src)
+}
+func (m *AddInputChunkRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *AddInputChunkRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddInputChunkRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddInputChunkRequest proto.InternalMessageInfo
+
+func (m *AddInputChunkRequest) GetStreamId() string {
+	if m != nil {
+		return m.StreamId
+	}
+	return ""
+}
+
+func (m *AddInputChunkRequest) GetStreamContractId() uint64 {
+	if m != nil {
+		return m.StreamContractId
+	}
+	return 0
+}
+
+func (m *AddInputChunkRequest) GetChunkId() uint64 {
+	if m != nil {
+		return m.ChunkId
+	}
+	return 0
+}
+
+func (m *AddInputChunkRequest) GetReward() float64 {
+	if m != nil {
+		return m.Reward
+	}
+	return 0
+}
+
+func (*AddInputChunkRequest) XXX_MessageName() string {
+	return "cloud.api.dispatcher.v1.AddInputChunkRequest"
+}
+
+type AddInputChunkResponse struct {
+	Tx                   string           `protobuf:"bytes,1,opt,name=tx,proto3" json:"tx,omitempty"`
+	Status               v1.ReceiptStatus `protobuf:"varint,2,opt,name=status,proto3,enum=cloud.api.emitter.v1.ReceiptStatus" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
+}
+
+func (m *AddInputChunkResponse) Reset()         { *m = AddInputChunkResponse{} }
+func (m *AddInputChunkResponse) String() string { return proto.CompactTextString(m) }
+func (*AddInputChunkResponse) ProtoMessage()    {}
+func (*AddInputChunkResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_008866cbcf1626a3, []int{8}
+}
+func (m *AddInputChunkResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AddInputChunkResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AddInputChunkResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AddInputChunkResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddInputChunkResponse.Merge(m, src)
+}
+func (m *AddInputChunkResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *AddInputChunkResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddInputChunkResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddInputChunkResponse proto.InternalMessageInfo
+
+func (m *AddInputChunkResponse) GetTx() string {
+	if m != nil {
+		return m.Tx
+	}
+	return ""
+}
+
+func (m *AddInputChunkResponse) GetStatus() v1.ReceiptStatus {
+	if m != nil {
+		return m.Status
+	}
+	return v1.ReceiptStatusUnknown
+}
+
+func (*AddInputChunkResponse) XXX_MessageName() string {
+	return "cloud.api.dispatcher.v1.AddInputChunkResponse"
+}
 func init() {
 	proto.RegisterType((*TaskPendingRequest)(nil), "cloud.api.dispatcher.v1.TaskPendingRequest")
 	golang_proto.RegisterType((*TaskPendingRequest)(nil), "cloud.api.dispatcher.v1.TaskPendingRequest")
@@ -421,6 +556,10 @@ func init() {
 	golang_proto.RegisterType((*ConfigResponse)(nil), "cloud.api.dispatcher.v1.ConfigResponse")
 	proto.RegisterType((*TaskSegmentRequest)(nil), "cloud.api.dispatcher.v1.TaskSegmentRequest")
 	golang_proto.RegisterType((*TaskSegmentRequest)(nil), "cloud.api.dispatcher.v1.TaskSegmentRequest")
+	proto.RegisterType((*AddInputChunkRequest)(nil), "cloud.api.dispatcher.v1.AddInputChunkRequest")
+	golang_proto.RegisterType((*AddInputChunkRequest)(nil), "cloud.api.dispatcher.v1.AddInputChunkRequest")
+	proto.RegisterType((*AddInputChunkResponse)(nil), "cloud.api.dispatcher.v1.AddInputChunkResponse")
+	golang_proto.RegisterType((*AddInputChunkResponse)(nil), "cloud.api.dispatcher.v1.AddInputChunkResponse")
 }
 
 func init() {
@@ -431,50 +570,60 @@ func init() {
 }
 
 var fileDescriptor_008866cbcf1626a3 = []byte{
-	// 680 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x5f, 0x4f, 0x13, 0x4f,
-	0x14, 0x65, 0x0b, 0x01, 0x3a, 0xbf, 0x1f, 0x08, 0xa3, 0x96, 0xa6, 0x68, 0xc1, 0x8d, 0x22, 0x89,
-	0xb0, 0x2b, 0xfa, 0xea, 0x0b, 0x14, 0x6d, 0x48, 0x84, 0x34, 0x0b, 0x98, 0x48, 0x0c, 0x75, 0xd9,
-	0xb9, 0x2c, 0x93, 0x6e, 0x67, 0xd6, 0x99, 0x69, 0x13, 0xbe, 0x9d, 0x6f, 0xf2, 0xe8, 0x27, 0x20,
-	0xa6, 0x7c, 0x11, 0x33, 0xb3, 0xcb, 0xb6, 0x8b, 0x94, 0xf2, 0xc0, 0xdb, 0x3d, 0x73, 0xcf, 0x39,
-	0x77, 0xfe, 0xdc, 0x3b, 0x68, 0x85, 0x50, 0x19, 0xfb, 0x2a, 0x38, 0x03, 0xe1, 0x76, 0x37, 0xdc,
-	0x3e, 0x6a, 0x4a, 0x10, 0x5d, 0x1a, 0x80, 0x13, 0x0b, 0xae, 0x38, 0x5e, 0x08, 0x22, 0xde, 0x21,
-	0x8e, 0x1f, 0x53, 0xa7, 0xcf, 0x71, 0xba, 0x1b, 0x95, 0xc5, 0x90, 0xf3, 0x30, 0x02, 0xd7, 0xd0,
-	0x4e, 0x3a, 0xa7, 0x2e, 0xb4, 0x63, 0x75, 0x9e, 0xa8, 0x2a, 0xcf, 0xd2, 0xa4, 0x1f, 0x53, 0xd7,
-	0x67, 0x8c, 0x2b, 0x5f, 0x51, 0xce, 0x64, 0x9a, 0x5d, 0x0f, 0xa9, 0x3a, 0xeb, 0x9c, 0x38, 0x01,
-	0x6f, 0xbb, 0x21, 0x0f, 0x79, 0xdf, 0x43, 0x23, 0x03, 0x4c, 0x94, 0xd2, 0xcb, 0xf9, 0xad, 0x2a,
-	0x5f, 0xb6, 0xd2, 0x4c, 0x6d, 0xc0, 0xa8, 0x4b, 0x09, 0xf0, 0x80, 0x53, 0xe6, 0x9a, 0x1d, 0xaf,
-	0xeb, 0xd2, 0x5d, 0x3f, 0xa2, 0xc4, 0x57, 0xdc, 0xe8, 0x32, 0x90, 0x3f, 0x61, 0xe5, 0xc3, 0x08,
-	0x93, 0x36, 0x65, 0x20, 0xa4, 0x76, 0x30, 0x51, 0x5e, 0x6d, 0x3f, 0x41, 0xf8, 0xc0, 0x97, 0xad,
-	0x06, 0x30, 0x42, 0x59, 0xe8, 0xc1, 0x8f, 0x0e, 0x48, 0x65, 0xbf, 0x42, 0xff, 0xe9, 0xd5, 0x14,
-	0xe2, 0x12, 0x2a, 0x50, 0x52, 0xb6, 0x96, 0xad, 0xd5, 0xe2, 0xd6, 0x64, 0xef, 0x72, 0xa9, 0xb0,
-	0xb3, 0xed, 0x15, 0x28, 0xb1, 0x17, 0xd0, 0xd3, 0x1d, 0xa6, 0x40, 0x30, 0x3f, 0xaa, 0x71, 0x76,
-	0x4a, 0x33, 0x7d, 0x13, 0x95, 0x6e, 0x26, 0x64, 0xcc, 0x99, 0x04, 0x3c, 0x87, 0xc6, 0x5b, 0x70,
-	0x9e, 0x78, 0x79, 0x3a, 0xc4, 0x25, 0x34, 0x29, 0x21, 0x10, 0xa0, 0xca, 0x05, 0xb3, 0x98, 0x22,
-	0xbc, 0x88, 0x8a, 0x41, 0x44, 0x81, 0xa9, 0x26, 0x25, 0xe5, 0x71, 0x93, 0x9a, 0x4e, 0x16, 0x76,
-	0x88, 0xfd, 0x08, 0xcd, 0xe4, 0x2b, 0xc6, 0x68, 0xf6, 0x46, 0xa5, 0xb7, 0xe8, 0x7f, 0x11, 0x07,
-	0x4d, 0xc6, 0x09, 0x34, 0x3b, 0x22, 0x4a, 0xb7, 0x3f, 0xdb, 0xbb, 0x5c, 0x42, 0x5e, 0xa3, 0xb6,
-	0xc7, 0x09, 0x1c, 0x7a, 0x9f, 0x3d, 0x24, 0xe2, 0xc0, 0xc4, 0x22, 0xc2, 0x6b, 0x08, 0xc9, 0x73,
-	0x16, 0x80, 0x30, 0x7c, 0xb3, 0x9b, 0xad, 0x99, 0xde, 0xe5, 0x52, 0x71, 0xdf, 0xac, 0x6a, 0x7a,
-	0x31, 0x21, 0x1c, 0x8a, 0xc8, 0x3e, 0x4a, 0x6e, 0x6e, 0x1f, 0xc2, 0x36, 0x30, 0x35, 0xe2, 0xaa,
-	0xf4, 0xb9, 0x59, 0xa7, 0x6d, 0x4c, 0x27, 0x3c, 0x1d, 0xe2, 0x0a, 0x9a, 0x26, 0x1d, 0x61, 0x1a,
-	0xcb, 0x1c, 0xcf, 0xf2, 0x32, 0xfc, 0xee, 0xd7, 0x14, 0x9a, 0xdf, 0xce, 0xba, 0x66, 0x3f, 0x79,
-	0x31, 0x7c, 0x8c, 0x66, 0xeb, 0xa0, 0xd2, 0xa7, 0xd2, 0xb5, 0xf1, 0x1b, 0x67, 0x48, 0x7b, 0x3b,
-	0xff, 0x3e, 0x6a, 0xe5, 0xf9, 0x9d, 0x64, 0x7b, 0x0c, 0x37, 0xd0, 0x54, 0x1d, 0x94, 0x31, 0x7e,
-	0x79, 0x27, 0xf7, 0xde, 0x8e, 0xdf, 0xd0, 0xe3, 0x5d, 0x5f, 0xb4, 0x34, 0xda, 0x94, 0x35, 0xde,
-	0x8e, 0x23, 0x50, 0x40, 0x1e, 0xca, 0xfd, 0x2b, 0x9a, 0xeb, 0xbb, 0x7f, 0xf2, 0x69, 0xf4, 0x70,
-	0xd6, 0x0c, 0xcd, 0x7c, 0x49, 0xe6, 0x0d, 0x1a, 0x82, 0xf3, 0x53, 0xbc, 0x36, 0xa0, 0xc8, 0x26,
-	0x51, 0x0b, 0x72, 0xb4, 0x6b, 0xff, 0xf5, 0x7b, 0xb2, 0x93, 0x56, 0xb5, 0xc7, 0xf0, 0x2e, 0x9a,
-	0x68, 0x50, 0x16, 0xe2, 0xe5, 0x01, 0x61, 0x32, 0xb8, 0x5a, 0xd5, 0x18, 0x78, 0xc5, 0x17, 0x77,
-	0x30, 0x32, 0xbb, 0x3d, 0x34, 0xed, 0x41, 0x48, 0xa5, 0x02, 0x81, 0x57, 0x6f, 0x15, 0x24, 0xe9,
-	0xa4, 0xdd, 0xae, 0xad, 0x4b, 0x4e, 0xf2, 0xed, 0x39, 0xd7, 0xff, 0x99, 0xf3, 0x51, 0xff, 0x89,
-	0xf6, 0x18, 0xee, 0xa2, 0xf9, 0x3a, 0xa8, 0xfc, 0x48, 0x63, 0x67, 0xe8, 0x25, 0xde, 0xfa, 0x29,
-	0x54, 0xdc, 0x7b, 0xf3, 0xb3, 0x73, 0x1c, 0xa3, 0x62, 0x1d, 0x54, 0x5a, 0x6f, 0x65, 0xa8, 0x3e,
-	0x5f, 0xe7, 0xf5, 0x48, 0x5e, 0xe6, 0xff, 0x1d, 0x2d, 0xe8, 0x0e, 0x4a, 0x67, 0x78, 0x53, 0x1e,
-	0x08, 0x9f, 0xc9, 0x80, 0x13, 0x20, 0x23, 0x46, 0x2b, 0x3f, 0xf5, 0xc3, 0x6f, 0x6e, 0xab, 0x7c,
-	0xd1, 0xab, 0x5a, 0xbf, 0x7b, 0x55, 0xeb, 0x4f, 0xaf, 0x6a, 0xfd, 0xbc, 0xaa, 0x5a, 0x17, 0x57,
-	0x55, 0xeb, 0xa8, 0xd0, 0xdd, 0x38, 0x99, 0x34, 0xdc, 0xf7, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff,
-	0x43, 0x79, 0xb1, 0xb6, 0xca, 0x06, 0x00, 0x00,
+	// 846 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xc1, 0x72, 0x1b, 0x45,
+	0x13, 0xf6, 0x2a, 0x2e, 0x47, 0xea, 0xff, 0xb7, 0x70, 0x86, 0xc4, 0x16, 0x32, 0xc8, 0x61, 0x81,
+	0x90, 0x2a, 0xec, 0x15, 0x0e, 0x07, 0x0e, 0x70, 0xb1, 0x15, 0x70, 0xa9, 0x8a, 0xa4, 0x54, 0xeb,
+	0x84, 0x2a, 0x52, 0x14, 0x62, 0xbc, 0xd3, 0x5e, 0x4f, 0x79, 0x35, 0xb3, 0xcc, 0xcc, 0x8a, 0xf8,
+	0x3d, 0x78, 0x19, 0x6e, 0x1c, 0x73, 0xe4, 0x09, 0x5c, 0x94, 0xf2, 0x22, 0xd4, 0xce, 0x8c, 0x24,
+	0xaf, 0xb1, 0x2d, 0x1f, 0x72, 0x9b, 0x9e, 0xfe, 0xfa, 0xfb, 0xba, 0x7b, 0x7b, 0x7a, 0xe1, 0x11,
+	0xe3, 0x3a, 0xa7, 0x26, 0x39, 0x41, 0xd5, 0x1d, 0xef, 0x76, 0xe7, 0xd6, 0x50, 0xa3, 0x1a, 0xf3,
+	0x04, 0xa3, 0x5c, 0x49, 0x23, 0xc9, 0x46, 0x92, 0xc9, 0x82, 0x45, 0x34, 0xe7, 0xd1, 0x1c, 0x13,
+	0x8d, 0x77, 0xdb, 0x9b, 0xa9, 0x94, 0x69, 0x86, 0x5d, 0x0b, 0x3b, 0x2a, 0x8e, 0xbb, 0x38, 0xca,
+	0xcd, 0x99, 0x8b, 0x6a, 0x7f, 0xe8, 0x9d, 0x34, 0xe7, 0x5d, 0x2a, 0x84, 0x34, 0xd4, 0x70, 0x29,
+	0xb4, 0xf7, 0xee, 0xa4, 0xdc, 0x9c, 0x14, 0x47, 0x51, 0x22, 0x47, 0xdd, 0x54, 0xa6, 0x72, 0xce,
+	0x51, 0x5a, 0xd6, 0xb0, 0x27, 0x0f, 0x6f, 0x55, 0x53, 0x35, 0x54, 0x9f, 0x7a, 0x4f, 0xef, 0x02,
+	0xd1, 0x98, 0x33, 0x94, 0x89, 0xe4, 0xa2, 0x6b, 0x33, 0xde, 0x29, 0xa5, 0xc7, 0x34, 0xe3, 0x8c,
+	0x1a, 0x69, 0xe3, 0x66, 0x46, 0xb5, 0xc2, 0xf6, 0xd7, 0x0b, 0x48, 0x70, 0xc4, 0x8d, 0x71, 0xd2,
+	0x0a, 0x13, 0xe4, 0xb9, 0xf1, 0x81, 0xdf, 0x2e, 0x08, 0x1c, 0x71, 0x81, 0x4a, 0x97, 0x71, 0xf6,
+	0x54, 0x95, 0x0d, 0xef, 0x03, 0x79, 0x41, 0xf5, 0xe9, 0x00, 0x05, 0xe3, 0x22, 0x8d, 0xf1, 0xb7,
+	0x02, 0xb5, 0x09, 0x3f, 0x83, 0xff, 0x95, 0xb7, 0xde, 0x24, 0xeb, 0x50, 0xe3, 0xac, 0x15, 0x3c,
+	0x0c, 0x1e, 0x37, 0xf6, 0x57, 0x26, 0xe7, 0x5b, 0xb5, 0xfe, 0xd3, 0xb8, 0xc6, 0x59, 0xb8, 0x01,
+	0x0f, 0xfa, 0xc2, 0xa0, 0x12, 0x34, 0xeb, 0x49, 0x71, 0xcc, 0x67, 0xf1, 0x43, 0x58, 0xbf, 0xec,
+	0xd0, 0xb9, 0x14, 0x1a, 0xc9, 0x1a, 0xdc, 0x39, 0xc5, 0x33, 0xc7, 0x15, 0x97, 0x47, 0xb2, 0x0e,
+	0x2b, 0x1a, 0x13, 0x85, 0xa6, 0x55, 0xb3, 0x97, 0xde, 0x22, 0x9b, 0xd0, 0x48, 0x32, 0x8e, 0xc2,
+	0x0c, 0x39, 0x6b, 0xdd, 0xb1, 0xae, 0xba, 0xbb, 0xe8, 0xb3, 0xf0, 0x3d, 0x58, 0xad, 0x2a, 0xe6,
+	0xd0, 0xbc, 0xa4, 0xf4, 0x25, 0xfc, 0x5f, 0xe5, 0xc9, 0x50, 0x48, 0x86, 0xc3, 0x42, 0x65, 0x3e,
+	0xfd, 0xe6, 0xe4, 0x7c, 0x0b, 0xe2, 0x41, 0xef, 0xb9, 0x64, 0xf8, 0x32, 0xfe, 0x21, 0x06, 0x95,
+	0x27, 0xf6, 0xac, 0x32, 0xb2, 0x0d, 0xa0, 0xcf, 0x44, 0x82, 0xca, 0xe2, 0x6d, 0x36, 0xfb, 0xab,
+	0x93, 0xf3, 0xad, 0xc6, 0xa1, 0xbd, 0x2d, 0xe1, 0x0d, 0x07, 0x78, 0xa9, 0xb2, 0xf0, 0x95, 0xeb,
+	0xdc, 0x21, 0xa6, 0x23, 0x14, 0x66, 0x41, 0xab, 0xca, 0xba, 0x45, 0x31, 0xb2, 0xa4, 0xcb, 0x71,
+	0x79, 0x24, 0x6d, 0xa8, 0xb3, 0x42, 0xd9, 0x89, 0xb4, 0xe5, 0x05, 0xf1, 0xcc, 0x0e, 0xff, 0x08,
+	0xe0, 0xfe, 0x1e, 0x63, 0x7d, 0x91, 0x17, 0xa6, 0x77, 0x52, 0x88, 0xd9, 0x97, 0xd8, 0x84, 0x86,
+	0x36, 0x0a, 0xe9, 0x68, 0x38, 0x55, 0x89, 0xeb, 0xee, 0xa2, 0xcf, 0xc8, 0x36, 0x10, 0xef, 0x4c,
+	0xa4, 0x30, 0x8a, 0x26, 0xb6, 0x75, 0x4e, 0x72, 0xcd, 0x79, 0x7a, 0xde, 0xd1, 0x67, 0xe4, 0x03,
+	0xa8, 0x27, 0x25, 0xf5, 0xb4, 0xbd, 0xcb, 0xf1, 0x5d, 0x6b, 0xf7, 0x59, 0xf9, 0x49, 0x14, 0xfe,
+	0x4e, 0x15, 0x6b, 0x2d, 0xdb, 0xc4, 0xbc, 0x15, 0x32, 0x78, 0x70, 0x29, 0x2b, 0xdf, 0xeb, 0x26,
+	0xd4, 0xcc, 0x6b, 0x9f, 0x4f, 0xcd, 0xbc, 0x26, 0xdf, 0xc0, 0x8a, 0x36, 0xd4, 0x14, 0xda, 0xaa,
+	0x37, 0x9f, 0x7c, 0x12, 0xcd, 0xdf, 0xaf, 0x1f, 0xe4, 0x68, 0xbc, 0x1b, 0xc5, 0x6e, 0x90, 0x0f,
+	0x2d, 0x34, 0xf6, 0x21, 0x4f, 0xfe, 0xac, 0xc3, 0xbd, 0xa7, 0xb3, 0xb7, 0x76, 0xe8, 0xc6, 0x95,
+	0x8c, 0xe1, 0xde, 0x01, 0x9a, 0xea, 0x54, 0x91, 0x28, 0xba, 0x66, 0x2f, 0x44, 0x57, 0xce, 0x65,
+	0xbb, 0x7b, 0x6b, 0xbc, 0x2b, 0x2c, 0x5c, 0x22, 0xbf, 0x40, 0xe3, 0x00, 0x8d, 0xd7, 0x7b, 0x74,
+	0x6d, 0x7c, 0x55, 0xe7, 0xf3, 0x85, 0xb8, 0x19, 0xff, 0x73, 0xa8, 0xc7, 0x98, 0x72, 0x6d, 0x50,
+	0x91, 0xc7, 0x17, 0xc2, 0xdc, 0xb3, 0x75, 0x5d, 0x2a, 0xdd, 0x6e, 0x32, 0xa6, 0x02, 0xeb, 0x91,
+	0x5b, 0x6d, 0xd1, 0x74, 0x67, 0x45, 0xdf, 0x95, 0x7b, 0x2f, 0x5c, 0x22, 0xcf, 0x60, 0x79, 0xc0,
+	0x45, 0x4a, 0x1e, 0x5e, 0xc9, 0x35, 0x98, 0x3f, 0xf2, 0xf6, 0xc7, 0x37, 0x20, 0x2e, 0x94, 0xdf,
+	0x3c, 0x40, 0xe3, 0xd7, 0x43, 0x39, 0xef, 0xe4, 0x8b, 0x6b, 0x6b, 0xfb, 0xef, 0x22, 0x69, 0x7f,
+	0x74, 0x23, 0x38, 0x5c, 0x22, 0x03, 0xb8, 0x7b, 0x80, 0xc6, 0x12, 0x7f, 0x7a, 0x23, 0xf6, 0xd6,
+	0x8c, 0x3f, 0xc3, 0xfb, 0xcf, 0xa8, 0x3a, 0x2d, 0xad, 0x3d, 0xdd, 0x93, 0xa3, 0x3c, 0x43, 0x83,
+	0xec, 0x5d, 0xb1, 0xff, 0x04, 0x6b, 0x73, 0xf6, 0xef, 0x29, 0xcf, 0xde, 0x1d, 0xf5, 0xaf, 0xb0,
+	0x51, 0x52, 0xfb, 0x85, 0xb2, 0xa7, 0x5f, 0x28, 0x2a, 0x74, 0x22, 0x19, 0xb2, 0x05, 0x3d, 0xaf,
+	0xae, 0xa0, 0x1b, 0x66, 0x43, 0xc0, 0xea, 0x8f, 0xee, 0xf7, 0x83, 0x03, 0x25, 0xe5, 0x31, 0xd9,
+	0xbe, 0xc0, 0x3b, 0xfb, 0x31, 0x95, 0xb4, 0x15, 0xd8, 0x94, 0x78, 0xe7, 0x96, 0xe8, 0xd9, 0xf0,
+	0xe4, 0xb0, 0x5a, 0xd9, 0x17, 0x64, 0xe7, 0xda, 0x3a, 0xae, 0xda, 0x76, 0xed, 0xe8, 0xb6, 0xf0,
+	0xa9, 0xe2, 0x7e, 0xeb, 0xcd, 0xa4, 0x13, 0xfc, 0x3d, 0xe9, 0x04, 0xff, 0x4c, 0x3a, 0xc1, 0x5f,
+	0x6f, 0x3b, 0xc1, 0x9b, 0xb7, 0x9d, 0xe0, 0x55, 0x6d, 0xbc, 0x7b, 0xb4, 0x62, 0xbb, 0xf1, 0xd5,
+	0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x22, 0x6e, 0x26, 0xcd, 0x72, 0x08, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -489,16 +638,17 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DispatcherServiceClient interface {
+	GetInternalConfig(ctx context.Context, in *InternalConfigRequest, opts ...grpc.CallOption) (*InternalConfigResponse, error)
+	GetConfig(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error)
+	Register(ctx context.Context, in *v11.RegistrationRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	Ping(ctx context.Context, in *v11.PingRequest, opts ...grpc.CallOption) (*v11.PingResponse, error)
 	GetPendingTask(ctx context.Context, in *TaskPendingRequest, opts ...grpc.CallOption) (*Task, error)
 	GetTask(ctx context.Context, in *TaskRequest, opts ...grpc.CallOption) (*Task, error)
 	MarkTaskAsCompleted(ctx context.Context, in *TaskRequest, opts ...grpc.CallOption) (*Task, error)
 	MarkTaskAsFailed(ctx context.Context, in *TaskRequest, opts ...grpc.CallOption) (*Task, error)
-	ValidateProof(ctx context.Context, in *v1.ValidateProofRequest, opts ...grpc.CallOption) (*v1.ValidateProofResponse, error)
-	Ping(ctx context.Context, in *v11.PingRequest, opts ...grpc.CallOption) (*v11.PingResponse, error)
-	Register(ctx context.Context, in *v11.RegistrationRequest, opts ...grpc.CallOption) (*types.Empty, error)
-	GetInternalConfig(ctx context.Context, in *InternalConfigRequest, opts ...grpc.CallOption) (*InternalConfigResponse, error)
-	GetConfig(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error)
 	MarkSegmentAsTranscoded(ctx context.Context, in *TaskSegmentRequest, opts ...grpc.CallOption) (*types.Empty, error)
+	ValidateProof(ctx context.Context, in *v12.ValidateProofRequest, opts ...grpc.CallOption) (*v12.ValidateProofResponse, error)
+	AddInputChunk(ctx context.Context, in *AddInputChunkRequest, opts ...grpc.CallOption) (*AddInputChunkResponse, error)
 }
 
 type dispatcherServiceClient struct {
@@ -507,6 +657,42 @@ type dispatcherServiceClient struct {
 
 func NewDispatcherServiceClient(cc *grpc.ClientConn) DispatcherServiceClient {
 	return &dispatcherServiceClient{cc}
+}
+
+func (c *dispatcherServiceClient) GetInternalConfig(ctx context.Context, in *InternalConfigRequest, opts ...grpc.CallOption) (*InternalConfigResponse, error) {
+	out := new(InternalConfigResponse)
+	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/GetInternalConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dispatcherServiceClient) GetConfig(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error) {
+	out := new(ConfigResponse)
+	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/GetConfig", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dispatcherServiceClient) Register(ctx context.Context, in *v11.RegistrationRequest, opts ...grpc.CallOption) (*types.Empty, error) {
+	out := new(types.Empty)
+	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/Register", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dispatcherServiceClient) Ping(ctx context.Context, in *v11.PingRequest, opts ...grpc.CallOption) (*v11.PingResponse, error) {
+	out := new(v11.PingResponse)
+	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/Ping", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *dispatcherServiceClient) GetPendingTask(ctx context.Context, in *TaskPendingRequest, opts ...grpc.CallOption) (*Task, error) {
@@ -545,51 +731,6 @@ func (c *dispatcherServiceClient) MarkTaskAsFailed(ctx context.Context, in *Task
 	return out, nil
 }
 
-func (c *dispatcherServiceClient) ValidateProof(ctx context.Context, in *v1.ValidateProofRequest, opts ...grpc.CallOption) (*v1.ValidateProofResponse, error) {
-	out := new(v1.ValidateProofResponse)
-	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/ValidateProof", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dispatcherServiceClient) Ping(ctx context.Context, in *v11.PingRequest, opts ...grpc.CallOption) (*v11.PingResponse, error) {
-	out := new(v11.PingResponse)
-	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/Ping", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dispatcherServiceClient) Register(ctx context.Context, in *v11.RegistrationRequest, opts ...grpc.CallOption) (*types.Empty, error) {
-	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/Register", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dispatcherServiceClient) GetInternalConfig(ctx context.Context, in *InternalConfigRequest, opts ...grpc.CallOption) (*InternalConfigResponse, error) {
-	out := new(InternalConfigResponse)
-	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/GetInternalConfig", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dispatcherServiceClient) GetConfig(ctx context.Context, in *ConfigRequest, opts ...grpc.CallOption) (*ConfigResponse, error) {
-	out := new(ConfigResponse)
-	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/GetConfig", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *dispatcherServiceClient) MarkSegmentAsTranscoded(ctx context.Context, in *TaskSegmentRequest, opts ...grpc.CallOption) (*types.Empty, error) {
 	out := new(types.Empty)
 	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/MarkSegmentAsTranscoded", in, out, opts...)
@@ -599,24 +740,55 @@ func (c *dispatcherServiceClient) MarkSegmentAsTranscoded(ctx context.Context, i
 	return out, nil
 }
 
+func (c *dispatcherServiceClient) ValidateProof(ctx context.Context, in *v12.ValidateProofRequest, opts ...grpc.CallOption) (*v12.ValidateProofResponse, error) {
+	out := new(v12.ValidateProofResponse)
+	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/ValidateProof", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dispatcherServiceClient) AddInputChunk(ctx context.Context, in *AddInputChunkRequest, opts ...grpc.CallOption) (*AddInputChunkResponse, error) {
+	out := new(AddInputChunkResponse)
+	err := c.cc.Invoke(ctx, "/cloud.api.dispatcher.v1.DispatcherService/AddInputChunk", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DispatcherServiceServer is the server API for DispatcherService service.
 type DispatcherServiceServer interface {
+	GetInternalConfig(context.Context, *InternalConfigRequest) (*InternalConfigResponse, error)
+	GetConfig(context.Context, *ConfigRequest) (*ConfigResponse, error)
+	Register(context.Context, *v11.RegistrationRequest) (*types.Empty, error)
+	Ping(context.Context, *v11.PingRequest) (*v11.PingResponse, error)
 	GetPendingTask(context.Context, *TaskPendingRequest) (*Task, error)
 	GetTask(context.Context, *TaskRequest) (*Task, error)
 	MarkTaskAsCompleted(context.Context, *TaskRequest) (*Task, error)
 	MarkTaskAsFailed(context.Context, *TaskRequest) (*Task, error)
-	ValidateProof(context.Context, *v1.ValidateProofRequest) (*v1.ValidateProofResponse, error)
-	Ping(context.Context, *v11.PingRequest) (*v11.PingResponse, error)
-	Register(context.Context, *v11.RegistrationRequest) (*types.Empty, error)
-	GetInternalConfig(context.Context, *InternalConfigRequest) (*InternalConfigResponse, error)
-	GetConfig(context.Context, *ConfigRequest) (*ConfigResponse, error)
 	MarkSegmentAsTranscoded(context.Context, *TaskSegmentRequest) (*types.Empty, error)
+	ValidateProof(context.Context, *v12.ValidateProofRequest) (*v12.ValidateProofResponse, error)
+	AddInputChunk(context.Context, *AddInputChunkRequest) (*AddInputChunkResponse, error)
 }
 
 // UnimplementedDispatcherServiceServer can be embedded to have forward compatible implementations.
 type UnimplementedDispatcherServiceServer struct {
 }
 
+func (*UnimplementedDispatcherServiceServer) GetInternalConfig(ctx context.Context, req *InternalConfigRequest) (*InternalConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInternalConfig not implemented")
+}
+func (*UnimplementedDispatcherServiceServer) GetConfig(ctx context.Context, req *ConfigRequest) (*ConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
+}
+func (*UnimplementedDispatcherServiceServer) Register(ctx context.Context, req *v11.RegistrationRequest) (*types.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (*UnimplementedDispatcherServiceServer) Ping(ctx context.Context, req *v11.PingRequest) (*v11.PingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
 func (*UnimplementedDispatcherServiceServer) GetPendingTask(ctx context.Context, req *TaskPendingRequest) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPendingTask not implemented")
 }
@@ -629,27 +801,90 @@ func (*UnimplementedDispatcherServiceServer) MarkTaskAsCompleted(ctx context.Con
 func (*UnimplementedDispatcherServiceServer) MarkTaskAsFailed(ctx context.Context, req *TaskRequest) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MarkTaskAsFailed not implemented")
 }
-func (*UnimplementedDispatcherServiceServer) ValidateProof(ctx context.Context, req *v1.ValidateProofRequest) (*v1.ValidateProofResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateProof not implemented")
-}
-func (*UnimplementedDispatcherServiceServer) Ping(ctx context.Context, req *v11.PingRequest) (*v11.PingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
-}
-func (*UnimplementedDispatcherServiceServer) Register(ctx context.Context, req *v11.RegistrationRequest) (*types.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
-}
-func (*UnimplementedDispatcherServiceServer) GetInternalConfig(ctx context.Context, req *InternalConfigRequest) (*InternalConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetInternalConfig not implemented")
-}
-func (*UnimplementedDispatcherServiceServer) GetConfig(ctx context.Context, req *ConfigRequest) (*ConfigResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
-}
 func (*UnimplementedDispatcherServiceServer) MarkSegmentAsTranscoded(ctx context.Context, req *TaskSegmentRequest) (*types.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MarkSegmentAsTranscoded not implemented")
+}
+func (*UnimplementedDispatcherServiceServer) ValidateProof(ctx context.Context, req *v12.ValidateProofRequest) (*v12.ValidateProofResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateProof not implemented")
+}
+func (*UnimplementedDispatcherServiceServer) AddInputChunk(ctx context.Context, req *AddInputChunkRequest) (*AddInputChunkResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddInputChunk not implemented")
 }
 
 func RegisterDispatcherServiceServer(s *grpc.Server, srv DispatcherServiceServer) {
 	s.RegisterService(&_DispatcherService_serviceDesc, srv)
+}
+
+func _DispatcherService_GetInternalConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InternalConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DispatcherServiceServer).GetInternalConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/GetInternalConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DispatcherServiceServer).GetInternalConfig(ctx, req.(*InternalConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DispatcherService_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DispatcherServiceServer).GetConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/GetConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DispatcherServiceServer).GetConfig(ctx, req.(*ConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DispatcherService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v11.RegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DispatcherServiceServer).Register(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/Register",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DispatcherServiceServer).Register(ctx, req.(*v11.RegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DispatcherService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v11.PingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DispatcherServiceServer).Ping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/Ping",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DispatcherServiceServer).Ping(ctx, req.(*v11.PingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _DispatcherService_GetPendingTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -724,96 +959,6 @@ func _DispatcherService_MarkTaskAsFailed_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DispatcherService_ValidateProof_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v1.ValidateProofRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DispatcherServiceServer).ValidateProof(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/ValidateProof",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DispatcherServiceServer).ValidateProof(ctx, req.(*v1.ValidateProofRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DispatcherService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v11.PingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DispatcherServiceServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/Ping",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DispatcherServiceServer).Ping(ctx, req.(*v11.PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DispatcherService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v11.RegistrationRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DispatcherServiceServer).Register(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/Register",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DispatcherServiceServer).Register(ctx, req.(*v11.RegistrationRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DispatcherService_GetInternalConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InternalConfigRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DispatcherServiceServer).GetInternalConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/GetInternalConfig",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DispatcherServiceServer).GetInternalConfig(ctx, req.(*InternalConfigRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DispatcherService_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConfigRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DispatcherServiceServer).GetConfig(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/GetConfig",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DispatcherServiceServer).GetConfig(ctx, req.(*ConfigRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _DispatcherService_MarkSegmentAsTranscoded_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TaskSegmentRequest)
 	if err := dec(in); err != nil {
@@ -832,10 +977,62 @@ func _DispatcherService_MarkSegmentAsTranscoded_Handler(srv interface{}, ctx con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DispatcherService_ValidateProof_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v12.ValidateProofRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DispatcherServiceServer).ValidateProof(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/ValidateProof",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DispatcherServiceServer).ValidateProof(ctx, req.(*v12.ValidateProofRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DispatcherService_AddInputChunk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddInputChunkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DispatcherServiceServer).AddInputChunk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.dispatcher.v1.DispatcherService/AddInputChunk",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DispatcherServiceServer).AddInputChunk(ctx, req.(*AddInputChunkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _DispatcherService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "cloud.api.dispatcher.v1.DispatcherService",
 	HandlerType: (*DispatcherServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetInternalConfig",
+			Handler:    _DispatcherService_GetInternalConfig_Handler,
+		},
+		{
+			MethodName: "GetConfig",
+			Handler:    _DispatcherService_GetConfig_Handler,
+		},
+		{
+			MethodName: "Register",
+			Handler:    _DispatcherService_Register_Handler,
+		},
+		{
+			MethodName: "Ping",
+			Handler:    _DispatcherService_Ping_Handler,
+		},
 		{
 			MethodName: "GetPendingTask",
 			Handler:    _DispatcherService_GetPendingTask_Handler,
@@ -853,28 +1050,16 @@ var _DispatcherService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _DispatcherService_MarkTaskAsFailed_Handler,
 		},
 		{
+			MethodName: "MarkSegmentAsTranscoded",
+			Handler:    _DispatcherService_MarkSegmentAsTranscoded_Handler,
+		},
+		{
 			MethodName: "ValidateProof",
 			Handler:    _DispatcherService_ValidateProof_Handler,
 		},
 		{
-			MethodName: "Ping",
-			Handler:    _DispatcherService_Ping_Handler,
-		},
-		{
-			MethodName: "Register",
-			Handler:    _DispatcherService_Register_Handler,
-		},
-		{
-			MethodName: "GetInternalConfig",
-			Handler:    _DispatcherService_GetInternalConfig_Handler,
-		},
-		{
-			MethodName: "GetConfig",
-			Handler:    _DispatcherService_GetConfig_Handler,
-		},
-		{
-			MethodName: "MarkSegmentAsTranscoded",
-			Handler:    _DispatcherService_MarkSegmentAsTranscoded_Handler,
+			MethodName: "AddInputChunk",
+			Handler:    _DispatcherService_AddInputChunk_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1130,6 +1315,95 @@ func (m *TaskSegmentRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *AddInputChunkRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddInputChunkRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AddInputChunkRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.Reward != 0 {
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Reward))))
+		i--
+		dAtA[i] = 0x21
+	}
+	if m.ChunkId != 0 {
+		i = encodeVarintDispatcherService(dAtA, i, uint64(m.ChunkId))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.StreamContractId != 0 {
+		i = encodeVarintDispatcherService(dAtA, i, uint64(m.StreamContractId))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.StreamId) > 0 {
+		i -= len(m.StreamId)
+		copy(dAtA[i:], m.StreamId)
+		i = encodeVarintDispatcherService(dAtA, i, uint64(len(m.StreamId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AddInputChunkResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddInputChunkResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AddInputChunkResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.Status != 0 {
+		i = encodeVarintDispatcherService(dAtA, i, uint64(m.Status))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Tx) > 0 {
+		i -= len(m.Tx)
+		copy(dAtA[i:], m.Tx)
+		i = encodeVarintDispatcherService(dAtA, i, uint64(len(m.Tx)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintDispatcherService(dAtA []byte, offset int, v uint64) int {
 	offset -= sovDispatcherService(v)
 	base := offset
@@ -1252,6 +1526,50 @@ func (m *TaskSegmentRequest) Size() (n int) {
 	}
 	if m.Duration != 0 {
 		n += 9
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *AddInputChunkRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.StreamId)
+	if l > 0 {
+		n += 1 + l + sovDispatcherService(uint64(l))
+	}
+	if m.StreamContractId != 0 {
+		n += 1 + sovDispatcherService(uint64(m.StreamContractId))
+	}
+	if m.ChunkId != 0 {
+		n += 1 + sovDispatcherService(uint64(m.ChunkId))
+	}
+	if m.Reward != 0 {
+		n += 9
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *AddInputChunkResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Tx)
+	if l > 0 {
+		n += 1 + l + sovDispatcherService(uint64(l))
+	}
+	if m.Status != 0 {
+		n += 1 + sovDispatcherService(uint64(m.Status))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -1872,6 +2190,246 @@ func (m *TaskSegmentRequest) Unmarshal(dAtA []byte) error {
 			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.Duration = float64(math.Float64frombits(v))
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDispatcherService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddInputChunkRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDispatcherService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddInputChunkRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddInputChunkRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StreamId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatcherService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.StreamId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StreamContractId", wireType)
+			}
+			m.StreamContractId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatcherService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StreamContractId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ChunkId", wireType)
+			}
+			m.ChunkId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatcherService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ChunkId |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Reward", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Reward = float64(math.Float64frombits(v))
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDispatcherService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddInputChunkResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDispatcherService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddInputChunkResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddInputChunkResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tx", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatcherService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDispatcherService
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Tx = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			m.Status = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatcherService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Status |= v1.ReceiptStatus(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatcherService(dAtA[iNdEx:])

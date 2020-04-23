@@ -350,6 +350,9 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 		LocalBridgeAddress:   common.HexToAddress(cfg.LocalBridgeAddr),
 		ForeignBridgeAddress: common.HexToAddress(cfg.ForeignBridgeAddr),
 	})
+	if err != nil {
+		return nil, nil, nil, err
+	}
 
 	return stakingClient, bridgeClient, caller, nil
 }
@@ -563,9 +566,9 @@ func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 		if errors.Is(err, staking.ErrNoPendingWithdrawals) {
 			log.Infof("there are no pending withdrawals")
 			return
-		} else {
-			log.Fatal(err.Error())
 		}
+
+		log.Fatal(err.Error())
 	}
 
 	if winfo.Amount.Cmp(big.NewInt(0)) > 0 {

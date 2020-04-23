@@ -244,8 +244,8 @@ type Conn struct {
 	subprotocol string
 
 	// Write fields
-	mu            chan struct{} // used as mutex to protect write to conn
-	writeBuf      []byte        // frame is constructed in this buffer.
+	mu            chan bool // used as mutex to protect write to conn
+	writeBuf      []byte    // frame is constructed in this buffer.
 	writePool     BufferPool
 	writeBufSize  int
 	writeDeadline time.Time
@@ -260,12 +260,10 @@ type Conn struct {
 	newCompressionWriter   func(io.WriteCloser, int) io.WriteCloser
 
 	// Read fields
-	reader  io.ReadCloser // the current reader returned to the application
-	readErr error
-	br      *bufio.Reader
-	// bytes remaining in current frame.
-	// set setReadRemaining to safely update this value and prevent overflow
-	readRemaining int64
+	reader        io.ReadCloser // the current reader returned to the application
+	readErr       error
+	br            *bufio.Reader
+	readRemaining int64 // bytes remaining in current frame.
 	readFinal     bool  // true the current message has more frames.
 	readLength    int64 // Message size.
 	readLimit     int64 // Maximum message size.
@@ -302,8 +300,8 @@ func newConn(conn net.Conn, isServer bool, readBufferSize, writeBufferSize int, 
 		writeBuf = make([]byte, writeBufferSize)
 	}
 
-	mu := make(chan struct{}, 1)
-	mu <- struct{}{}
+	mu := make(chan bool, 1)
+	mu <- true
 	c := &Conn{
 		isServer:               isServer,
 		br:                     br,
@@ -320,17 +318,6 @@ func newConn(conn net.Conn, isServer bool, readBufferSize, writeBufferSize int, 
 	c.SetPingHandler(nil)
 	c.SetPongHandler(nil)
 	return c
-}
-
-// setReadRemaining tracks the number of bytes remaining on the connection. If n
-// overflows, an ErrReadLimit is returned.
-func (c *Conn) setReadRemaining(n int64) error {
-	if n < 0 {
-		return ErrReadLimit
-	}
-
-	c.readRemaining = n
-	return nil
 }
 
 // Subprotocol returns the negotiated protocol for the connection.
@@ -377,7 +364,7 @@ func (c *Conn) read(n int) ([]byte, error) {
 
 func (c *Conn) write(frameType int, deadline time.Time, buf0, buf1 []byte) error {
 	<-c.mu
-	defer func() { c.mu <- struct{}{} }()
+	defer func() { c.mu <- true }()
 
 	c.writeErrMu.Lock()
 	err := c.writeErr
@@ -429,7 +416,7 @@ func (c *Conn) WriteControl(messageType int, data []byte, deadline time.Time) er
 		maskBytes(key, 0, buf[6:])
 	}
 
-	d := 1000 * time.Hour
+	d := time.Hour * 1000
 	if !deadline.IsZero() {
 		d = deadline.Sub(time.Now())
 		if d < 0 {
@@ -444,7 +431,7 @@ func (c *Conn) WriteControl(messageType int, data []byte, deadline time.Time) er
 	case <-timer.C:
 		return errWriteTimeout
 	}
-	defer func() { c.mu <- struct{}{} }()
+	defer func() { c.mu <- true }()
 
 	c.writeErrMu.Lock()
 	err := c.writeErr
@@ -803,7 +790,7 @@ func (c *Conn) advanceFrame() (int, error) {
 	final := p[0]&finalBit != 0
 	frameType := int(p[0] & 0xf)
 	mask := p[1]&maskBit != 0
-	c.setReadRemaining(int64(p[1] & 0x7f))
+	c.readRemaining = int64(p[1] & 0x7f)
 
 	c.readDecompress = false
 	if c.newDecompressionReader != nil && (p[0]&rsv1Bit) != 0 {
@@ -837,17 +824,7 @@ func (c *Conn) advanceFrame() (int, error) {
 		return noFrame, c.handleProtocolError("unknown opcode " + strconv.Itoa(frameType))
 	}
 
-	// 3. Read and parse frame length as per
-	// https://tools.ietf.org/html/rfc6455#section-5.2
-	//
-	// The length of the "Payload data", in bytes: if 0-125, that is the payload
-	// length.
-	// - If 126, the following 2 bytes interpreted as a 16-bit unsigned
-	// integer are the payload length.
-	// - If 127, the following 8 bytes interpreted as
-	// a 64-bit unsigned integer (the most significant bit MUST be 0) are the
-	// payload length. Multibyte length quantities are expressed in network byte
-	// order.
+	// 3. Read and parse frame length.
 
 	switch c.readRemaining {
 	case 126:
@@ -855,19 +832,13 @@ func (c *Conn) advanceFrame() (int, error) {
 		if err != nil {
 			return noFrame, err
 		}
-
-		if err := c.setReadRemaining(int64(binary.BigEndian.Uint16(p))); err != nil {
-			return noFrame, err
-		}
+		c.readRemaining = int64(binary.BigEndian.Uint16(p))
 	case 127:
 		p, err := c.read(8)
 		if err != nil {
 			return noFrame, err
 		}
-
-		if err := c.setReadRemaining(int64(binary.BigEndian.Uint64(p))); err != nil {
-			return noFrame, err
-		}
+		c.readRemaining = int64(binary.BigEndian.Uint64(p))
 	}
 
 	// 4. Handle frame masking.
@@ -890,12 +861,6 @@ func (c *Conn) advanceFrame() (int, error) {
 	if frameType == continuationFrame || frameType == TextMessage || frameType == BinaryMessage {
 
 		c.readLength += c.readRemaining
-		// Don't allow readLength to overflow in the presence of a large readRemaining
-		// counter.
-		if c.readLength < 0 {
-			return noFrame, ErrReadLimit
-		}
-
 		if c.readLimit > 0 && c.readLength > c.readLimit {
 			c.WriteControl(CloseMessage, FormatCloseMessage(CloseMessageTooBig, ""), time.Now().Add(writeWait))
 			return noFrame, ErrReadLimit
@@ -909,7 +874,7 @@ func (c *Conn) advanceFrame() (int, error) {
 	var payload []byte
 	if c.readRemaining > 0 {
 		payload, err = c.read(int(c.readRemaining))
-		c.setReadRemaining(0)
+		c.readRemaining = 0
 		if err != nil {
 			return noFrame, err
 		}
@@ -982,7 +947,6 @@ func (c *Conn) NextReader() (messageType int, r io.Reader, err error) {
 			c.readErr = hideTempErr(err)
 			break
 		}
-
 		if frameType == TextMessage || frameType == BinaryMessage {
 			c.messageReader = &messageReader{c}
 			c.reader = c.messageReader
@@ -1023,9 +987,7 @@ func (r *messageReader) Read(b []byte) (int, error) {
 			if c.isServer {
 				c.readMaskPos = maskBytes(c.readMaskKey, c.readMaskPos, b[:n])
 			}
-			rem := c.readRemaining
-			rem -= int64(n)
-			c.setReadRemaining(rem)
+			c.readRemaining -= int64(n)
 			if c.readRemaining > 0 && c.readErr == io.EOF {
 				c.readErr = errUnexpectedEOF
 			}
