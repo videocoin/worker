@@ -48,7 +48,11 @@ func (p *Pinger) Start() {
 		ctx := context.Background()
 		si := &sysinfo.SystemInfo{AppVersion: p.appVersion, Logger: p.logger}
 		_, systemInfo, _ := si.GetInfo()
-		_, capacityInfo, _ := p.capacitor.GetInfo()
+
+		var capacityInfo []byte
+		if p.capacitor != nil {
+			_, capacityInfo, _ = p.capacitor.GetInfo()
+		}
 
 		req := &minersv1.PingRequest{
 			ClientID:     p.clientID,

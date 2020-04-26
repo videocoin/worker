@@ -129,8 +129,14 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	cfg.Logger.Info("performing capacity measurements")
-	capacitor := capacity.NewCapacitor(cfg.Internal, trans, cfg.Logger)
+	var capacitor *capacity.Capacitor
+
+	if !cfg.Internal {
+		cfg.Logger.Info("performing capacity measurements")
+		capacitor = capacity.NewCapacitor(cfg.Internal, trans, cfg.Logger)
+	} else {
+		capacitor = nil
+	}
 
 	pinger, err := pinger.NewPinger(
 		dispatcher,
@@ -159,6 +165,7 @@ func (s *Service) Start(errCh chan error) {
 	}()
 
 	s.pinger.Start()
+
 	err := s.markAsRunningOnGCE()
 	if err != nil {
 		errCh <- err
