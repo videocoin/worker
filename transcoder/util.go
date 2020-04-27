@@ -136,8 +136,6 @@ func (t *Transcoder) submitAndValidateProof(segment *hlswatcher.SegmentInfo) {
 		logger.Errorf("failed to validate proof: %s", err)
 		return
 	}
-
-	return
 }
 
 func (t *Transcoder) uploadSegment(segment *hlswatcher.SegmentInfo) error {
