@@ -13,6 +13,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	logrussentry "github.com/evalphobia/logrus_sentry"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
@@ -262,6 +263,34 @@ func main() {
 
 func runMineCommand(cmd *cobra.Command, args []string) {
 	log := cfg.Logger
+
+	sentryDSN := os.Getenv("SENTRY_DSN")
+	if sentryDSN != "" {
+		sentryLevels := []logrus.Level{
+			logrus.PanicLevel,
+			logrus.FatalLevel,
+			logrus.ErrorLevel,
+		}
+		sentryTags := map[string]string{
+			"service": ServiceName,
+			"version": Version,
+		}
+		sentryHook, err := logrussentry.NewAsyncWithTagsSentryHook(
+			sentryDSN,
+			sentryTags,
+			sentryLevels,
+		)
+		sentryHook.StacktraceConfiguration.Enable = true
+		sentryHook.Timeout = 5 * time.Second
+		sentryHook.SetRelease(Version)
+
+		if err != nil {
+			log.Warning(err)
+		} else {
+			log.Logger.AddHook(sentryHook)
+		}
+	}
+
 	closer, err := tracer.NewTracer(ServiceName)
 	if err != nil {
 		log.Info(err.Error())
