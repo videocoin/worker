@@ -296,6 +296,12 @@ func (t *Transcoder) OnSegmentTranscoded(segment *hlswatcher.SegmentInfo) error 
 		return err
 	}
 
+	defer func() {
+		if err := os.Remove(segment.Source); err != nil {
+			logger.Errorf("failed to delete segment: %s", err)
+		}
+	}()
+
 	t.lastSegmentNum = segment.Num
 
 	if t.task.Output != nil && t.task.Output.Num == 0 {
@@ -342,12 +348,6 @@ func (t *Transcoder) uploadSegmentViaHTTP(task *v1.Task, segment *hlswatcher.Seg
 	if segment.IsVOD {
 		params["vod"] = "y"
 	}
-
-	defer func() {
-		if err := os.Remove(segment.Source); err != nil {
-			t.logger.Errorf("failed to delete segment: %s", err)
-		}
-	}()
 
 	request, err := newfileUploadRequest(t.syncerAddr, params, "file", segment.Source)
 	if err != nil {
