@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go v0.51.0
 	github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
 	github.com/ethereum/go-ethereum v1.9.12
-	github.com/evalphobia/logrus_sentry v0.8.2
+	github.com/evalphobia/logrus_sentry v0.8.2 // indirect
 	github.com/grafov/m3u8 v0.11.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/kelseyhightower/envconfig v1.4.0

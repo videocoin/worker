@@ -13,13 +13,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	logrussentry "github.com/evalphobia/logrus_sentry"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	"github.com/videocoin/cloud-pkg/ethutils"
 	"github.com/videocoin/cloud-pkg/grpcutil"
-	"github.com/videocoin/cloud-pkg/tracer"
+	"github.com/videocoin/cloud-pkg/logger"
 	bridge "github.com/videocoin/go-bridge/client"
 	staking "github.com/videocoin/go-staking"
 	"github.com/videocoin/transcode/caller"
@@ -262,41 +261,8 @@ func main() {
 }
 
 func runMineCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
-
-	sentryDSN := os.Getenv("SENTRY_DSN")
-	if sentryDSN != "" {
-		sentryLevels := []logrus.Level{
-			logrus.PanicLevel,
-			logrus.FatalLevel,
-			logrus.ErrorLevel,
-		}
-		sentryTags := map[string]string{
-			"service": ServiceName,
-			"version": Version,
-		}
-		sentryHook, err := logrussentry.NewAsyncWithTagsSentryHook(
-			sentryDSN,
-			sentryTags,
-			sentryLevels,
-		)
-		sentryHook.StacktraceConfiguration.Enable = true
-		sentryHook.Timeout = 5 * time.Second
-		sentryHook.SetRelease(Version)
-
-		if err != nil {
-			log.Warning(err)
-		} else {
-			log.Logger.AddHook(sentryHook)
-		}
-	}
-
-	closer, err := tracer.NewTracer(ServiceName)
-	if err != nil {
-		log.Info(err.Error())
-	} else {
-		defer closer.Close()
-	}
+	log := logger.NewLogrusLogger(ServiceName, Version)
+	cfg.Logger = log
 
 	svc, err := service.NewService(cfg)
 	if err != nil {
@@ -387,7 +353,7 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 }
 
 func runStakeCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
+	log := logger.NewLogrusLogger(ServiceName, Version)
 
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
@@ -404,7 +370,8 @@ func runStakeCommand(cmd *cobra.Command, args []string) {
 }
 
 func runStakeAddCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
+	log := logger.NewLogrusLogger(ServiceName, Version)
+
 	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -454,7 +421,8 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 }
 
 func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
+	log := logger.NewLogrusLogger(ServiceName, Version)
+
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -493,7 +461,8 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 }
 
 func runDelegateCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
+	log := logger.NewLogrusLogger(ServiceName, Version)
+
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -510,7 +479,8 @@ func runDelegateCommand(cmd *cobra.Command, args []string) {
 }
 
 func runDelegateAddCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
+	log := logger.NewLogrusLogger(ServiceName, Version)
+
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -534,7 +504,8 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 }
 
 func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
+	log := logger.NewLogrusLogger(ServiceName, Version)
+
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -584,7 +555,8 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 }
 
 func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
-	log := cfg.Logger
+	log := logger.NewLogrusLogger(ServiceName, Version)
+
 	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
