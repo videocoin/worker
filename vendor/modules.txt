@@ -224,8 +224,6 @@ github.com/status-im/keycard-go/derivationpath
 github.com/steakknife/bloomfilter
 # github.com/steakknife/hamming v0.0.0-20180906055917-c99c65617cd3
 github.com/steakknife/hamming
-# github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
-github.com/streadway/amqp
 # github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
 github.com/syndtr/goleveldb/leveldb
 github.com/syndtr/goleveldb/leveldb/cache
@@ -242,27 +240,6 @@ github.com/syndtr/goleveldb/leveldb/util
 # github.com/tyler-smith/go-bip39 v1.0.1-0.20181017060643-dbb3b84ba2ef
 github.com/tyler-smith/go-bip39
 github.com/tyler-smith/go-bip39/wordlists
-# github.com/uber/jaeger-client-go v2.22.1+incompatible
-github.com/uber/jaeger-client-go
-github.com/uber/jaeger-client-go/config
-github.com/uber/jaeger-client-go/internal/baggage
-github.com/uber/jaeger-client-go/internal/baggage/remote
-github.com/uber/jaeger-client-go/internal/reporterstats
-github.com/uber/jaeger-client-go/internal/spanlog
-github.com/uber/jaeger-client-go/internal/throttler
-github.com/uber/jaeger-client-go/internal/throttler/remote
-github.com/uber/jaeger-client-go/log
-github.com/uber/jaeger-client-go/rpcmetrics
-github.com/uber/jaeger-client-go/thrift
-github.com/uber/jaeger-client-go/thrift-gen/agent
-github.com/uber/jaeger-client-go/thrift-gen/baggage
-github.com/uber/jaeger-client-go/thrift-gen/jaeger
-github.com/uber/jaeger-client-go/thrift-gen/sampling
-github.com/uber/jaeger-client-go/thrift-gen/zipkincore
-github.com/uber/jaeger-client-go/transport
-github.com/uber/jaeger-client-go/utils
-# github.com/uber/jaeger-lib v2.2.0+incompatible
-github.com/uber/jaeger-lib/metrics
 # github.com/videocoin/cloud-api v0.3.0 => ../cloud-api
 ## explicit
 github.com/videocoin/cloud-api/dispatcher/v1
@@ -274,10 +251,9 @@ github.com/videocoin/cloud-api/validator/v1
 ## explicit
 github.com/videocoin/cloud-pkg/ethutils
 github.com/videocoin/cloud-pkg/grpcutil
-github.com/videocoin/cloud-pkg/mqmux
+github.com/videocoin/cloud-pkg/logger
 github.com/videocoin/cloud-pkg/retry
 github.com/videocoin/cloud-pkg/stream
-github.com/videocoin/cloud-pkg/tracer
 # github.com/videocoin/go-bridge v0.0.2
 ## explicit
 github.com/videocoin/go-bridge/client
@@ -309,8 +285,6 @@ go.opencensus.io/trace
 go.opencensus.io/trace/internal
 go.opencensus.io/trace/propagation
 go.opencensus.io/trace/tracestate
-# go.uber.org/atomic v1.6.0
-go.uber.org/atomic
 # golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
 golang.org/x/crypto/curve25519
 golang.org/x/crypto/pbkdf2
