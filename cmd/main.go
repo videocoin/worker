@@ -279,7 +279,7 @@ func runMineCommand(cmd *cobra.Command, args []string) {
 		sig := <-signals
 
 		log.Infof("received signal %s", sig)
-		svc.Pause()
+		_ = svc.Pause()
 		exit <- true
 	}()
 
