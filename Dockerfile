@@ -19,6 +19,8 @@ RUN apt-get install -y --no-install-recommends \
     apt-transport-https \
     ca-certificates
 
+EXPOSE 8888
+
 WORKDIR /
 
 ENTRYPOINT ["transcoder"]
