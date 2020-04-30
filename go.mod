@@ -17,6 +17,7 @@ require (
 	github.com/videocoin/cloud-api v0.3.0
 	github.com/videocoin/cloud-pkg v0.0.7
 	github.com/videocoin/go-bridge v0.0.2
+	github.com/videocoin/go-protocol v0.0.6
 	github.com/videocoin/go-staking v0.0.0-20200410180201-6944f4d9a28b
 	golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6 // indirect
 	google.golang.org/api v0.20.0 // indirect

@@ -2,18 +2,18 @@ package stream
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/videocoin/cloud-pkg/stream"
+	"github.com/videocoin/go-protocol/streams"
 	"github.com/videocoin/transcode/caller"
 )
 
 type Contract struct {
-	instance *stream.Stream
+	instance *streams.Stream
 	common.Address
 }
 
 func NewContract(streamAddr string, caller *caller.Caller) (*Contract, error) {
 	addr := common.HexToAddress(streamAddr)
-	instance, err := stream.NewStream(addr, caller.NatClient())
+	instance, err := streams.NewStream(addr, caller.NatClient())
 	if err != nil {
 		return nil, err
 	}

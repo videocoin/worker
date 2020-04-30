@@ -262,7 +262,6 @@ github.com/videocoin/cloud-pkg/ethutils
 github.com/videocoin/cloud-pkg/grpcutil
 github.com/videocoin/cloud-pkg/logger
 github.com/videocoin/cloud-pkg/retry
-github.com/videocoin/cloud-pkg/stream
 # github.com/videocoin/go-bridge v0.0.2
 ## explicit
 github.com/videocoin/go-bridge/client
@@ -271,7 +270,9 @@ github.com/videocoin/go-bridge/nativebridge
 github.com/videocoin/go-bridge/nativeproxy
 github.com/videocoin/go-bridge/remotebridge
 # github.com/videocoin/go-protocol v0.0.6
+## explicit
 github.com/videocoin/go-protocol/staking
+github.com/videocoin/go-protocol/streams
 # github.com/videocoin/go-staking v0.0.0-20200410180201-6944f4d9a28b
 ## explicit
 github.com/videocoin/go-staking
