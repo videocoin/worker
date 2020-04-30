@@ -67,6 +67,18 @@ func (t *Transcoder) Start() error {
 	return err
 }
 
+func (t *Transcoder) Pause() error {
+	t.logger.Infof("pausing")
+	if t.task != nil {
+		taskReq := &v1.TaskRequest{ID: t.task.ID}
+		_, err := t.dispatcher.MarkTaskAsPaused(context.Background(), taskReq)
+		if err != nil {
+			t.logger.WithError(err).Error("failed to mark task as paused")
+		}
+	}
+	return nil
+}
+
 func (t *Transcoder) Stop() error {
 	t.logger.Infof("stopping transcoder")
 	if t.t != nil {

@@ -184,6 +184,10 @@ func (s *Service) Stop() error {
 	return nil
 }
 
+func (s *Service) Pause() error {
+	return s.transcoder.Pause()
+}
+
 func (s *Service) markAsRunningOnGCE() error {
 	if metadata.OnGCE() {
 		project, err := metadata.ProjectID()
