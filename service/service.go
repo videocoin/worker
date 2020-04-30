@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"cloud.google.com/go/compute/metadata"
 	"github.com/ethereum/go-ethereum/ethclient"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
@@ -12,11 +11,9 @@ import (
 	"github.com/videocoin/cloud-api/rpc"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/capacity"
+	"github.com/videocoin/transcode/health"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
-	"golang.org/x/oauth2/google"
-	computev1 "google.golang.org/api/compute/v1"
-	"google.golang.org/api/option"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
@@ -26,6 +23,7 @@ type Service struct {
 	dispatcher dispatcherv1.DispatcherServiceClient
 	transcoder *transcoder.Transcoder
 	pinger     *pinger.Pinger
+	health     *health.Health
 }
 
 func NewService(cfg *Config) (*Service, error) {
@@ -156,6 +154,13 @@ func NewService(cfg *Config) (*Service, error) {
 		pinger:     pinger,
 	}
 
+	if cfg.Internal {
+		svc.health, err = health.NewHealth(cfg.HealthAddr)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return svc, nil
 }
 
@@ -164,12 +169,13 @@ func (s *Service) Start(errCh chan error) {
 		errCh <- s.transcoder.Start()
 	}()
 
-	s.pinger.Start()
+	go func() {
+		if s.health != nil {
+			errCh <- s.health.Start()
+		}
+	}()
 
-	err := s.markAsRunningOnGCE()
-	if err != nil {
-		errCh <- err
-	}
+	s.pinger.Start()
 }
 
 func (s *Service) Stop() error {
@@ -177,72 +183,22 @@ func (s *Service) Stop() error {
 	if err != nil {
 		return err
 	}
+
+	if s.health != nil {
+		err := s.health.Stop()
+		if err != nil {
+			return err
+		}
+	}
+
 	err = s.pinger.Stop()
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (s *Service) Pause() error {
 	return s.transcoder.Pause()
-}
-
-func (s *Service) markAsRunningOnGCE() error {
-	if metadata.OnGCE() {
-		project, err := metadata.ProjectID()
-		if err != nil {
-			s.cfg.Logger.Error(err)
-			return err
-		}
-
-		zone, err := metadata.Zone()
-		if err != nil {
-			s.cfg.Logger.Error(err)
-			return err
-		}
-
-		instanceID, err := metadata.InstanceID()
-		if err != nil {
-			s.cfg.Logger.Error(err)
-			return err
-		}
-
-		gctx := context.Background()
-		computeCli, err := google.DefaultClient(gctx, computev1.ComputeScope)
-		if err != nil {
-			s.cfg.Logger.Error(err)
-			return err
-		}
-		ctx := context.Background()
-		computeSvc, err := computev1.NewService(ctx, option.WithHTTPClient(computeCli))
-		if err != nil {
-			s.cfg.Logger.Error(err)
-			return err
-		}
-
-		instance, err := computeSvc.Instances.Get(project, zone, instanceID).Do()
-		if err != nil {
-			s.cfg.Logger.Error(err)
-			return err
-		}
-
-		fingerprint := instance.Metadata.Fingerprint
-
-		md := &computev1.Metadata{
-			Fingerprint: fingerprint,
-			Items: []*computev1.MetadataItems{
-				{
-					Key: "vc-running",
-				},
-			},
-		}
-		_, err = computeSvc.Instances.SetMetadata(project, zone, instanceID, md).Context(gctx).Do()
-		if err != nil {
-			s.cfg.Logger.Error(err)
-			return err
-		}
-	}
-
-	return nil
 }
