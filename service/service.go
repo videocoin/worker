@@ -5,15 +5,18 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	ethrpc "github.com/ethereum/go-ethereum/rpc"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	"github.com/videocoin/cloud-api/rpc"
+	vcoauth2 "github.com/videocoin/oauth2/videocoin"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/capacity"
 	"github.com/videocoin/transcode/health"
 	"github.com/videocoin/transcode/pinger"
 	"github.com/videocoin/transcode/transcoder"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
@@ -91,11 +94,18 @@ func NewService(cfg *Config) (*Service, error) {
 	cfg.RPCNodeURL = configResp.RPCNodeURL
 	cfg.SyncerURL = configResp.SyncerURL
 
-	natClient, err := ethclient.Dial(cfg.RPCNodeURL)
+	symphonyTS, err := vcoauth2.JWTAccessTokenSourceFromJSON([]byte(configResp.AccessKey), cfg.RPCNodeURL)
 	if err != nil {
 		return nil, err
 	}
 
+	symphonyCli := oauth2.NewClient(oauth2.NoContext, symphonyTS)
+	symphonyRPCCli, err := ethrpc.DialHTTPWithClient(cfg.RPCNodeURL, symphonyCli)
+	if err != nil {
+		return nil, err
+	}
+
+	natClient := ethclient.NewClient(symphonyRPCCli)
 	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient)
 	if err != nil {
 		return nil, err
