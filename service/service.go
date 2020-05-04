@@ -111,6 +111,7 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
+	cfg.Logger = cfg.Logger.WithField("cid", cfg.ClientID)
 	cfg.Logger.Info("registering")
 
 	_, err = dispatcher.Register(
