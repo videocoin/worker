@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	cloud.google.com/go v0.51.0 // indirect
-	github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
+	github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e // indirect
 	github.com/ethereum/go-ethereum v1.9.12
 	github.com/evalphobia/logrus_sentry v0.8.2 // indirect
 	github.com/golang/protobuf v1.4.0 // indirect

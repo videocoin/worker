@@ -8,7 +8,6 @@ github.com/VictoriaMetrics/fastcache
 github.com/aristanetworks/goarista/monotime
 # github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
 ## explicit
-github.com/armon/circbuf
 # github.com/beorn7/perks v1.0.1
 github.com/beorn7/perks/quantile
 # github.com/btcsuite/btcd v0.0.0-20190605094302-a0d1e3e36d50
