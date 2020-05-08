@@ -13,6 +13,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	ethrpc "github.com/ethereum/go-ethereum/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
@@ -21,8 +22,10 @@ import (
 	"github.com/videocoin/cloud-pkg/logger"
 	bridge "github.com/videocoin/go-bridge/client"
 	staking "github.com/videocoin/go-staking"
+	vcoauth2 "github.com/videocoin/oauth2/videocoin"
 	"github.com/videocoin/transcode/caller"
 	"github.com/videocoin/transcode/service"
+	"golang.org/x/oauth2"
 )
 
 var (
@@ -312,7 +315,7 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 	dispatcher := dispatcherv1.NewDispatcherServiceClient(conn)
 
 	configReq := new(dispatcherv1.ConfigRequest)
-	configResp, err := dispatcher.GetConfig(
+	configResp, err := dispatcher.GetDelegatorConfig(
 		context.Background(),
 		configReq,
 	)
@@ -320,22 +323,29 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 		return nil, nil, nil, err
 	}
 
-	natClient, err := ethclient.Dial(configResp.RPCNodeURL)
+	symphonyTS, err := vcoauth2.JWTAccessTokenSourceFromJSON([]byte(configResp.AccessKey), configResp.RPCNodeURL)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	stakingClient, err := staking.NewClient(natClient, common.HexToAddress(cfg.StakingManagerAddr))
+	symphonyCli := oauth2.NewClient(oauth2.NoContext, symphonyTS)
+	symphonyRPCCli, err := ethrpc.DialHTTPWithClient(configResp.RPCNodeURL, symphonyCli)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
+	natClient := ethclient.NewClient(symphonyRPCCli)
 	ethClient, err := ethclient.Dial(cfg.ETHNodeURL)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
 	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	stakingClient, err := staking.NewClient(natClient, common.HexToAddress(cfg.StakingManagerAddr))
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -385,6 +395,9 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
+	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
+	weiAmount := ethutils.EthToWei(fAmount)
+
 	if err := sClient.RegisterTranscoder(context.Background(), caller.PrivateKey(), 0); err != nil && !errors.Is(err, staking.ErrAlreadyRegistered) {
 		log.Fatal(err.Error())
 	}
@@ -394,27 +407,24 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 		log.Fatal(err.Error())
 	}
 
-	requiredStake, err := sClient.GetRequiredSelfStake(context.Background())
+	requiredStakeAmount, err := sClient.GetRequiredSelfStake(context.Background())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	fVidValue, _ := ethutils.WeiToEth(requiredStake)
-	vidValue, _ := fVidValue.Int(nil)
-	if t.SelfStake.Uint64() == 0 && vidValue.Cmp(tokenAmount) > 0 {
+	if t.SelfStake.Uint64() == 0 && requiredStakeAmount.Cmp(weiAmount) > 0 {
 		log.Fatal("stake amount is insufficient")
 	}
 
+	// TODO: check for delegate stake
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	_, err = bClient.WaitDeposit(ctx, caller.PrivateKey(), common.HexToAddress(cfg.TokenBankAddr), tokenAmount)
+	_, err = bClient.WaitDeposit(ctx, caller.PrivateKey(), common.HexToAddress(cfg.TokenBankAddr), weiAmount)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	cancel()
 
-	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
-	amount := ethutils.EthToWei(fAmount)
-	if err := sClient.Delegate(context.Background(), caller.PrivateKey(), caller.Addr(), amount); err != nil {
+	if err := sClient.Delegate(context.Background(), caller.PrivateKey(), caller.Addr(), weiAmount); err != nil {
 		log.Fatal(err.Error())
 	}
 
@@ -441,13 +451,13 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 	}
 
 	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
-	amount := ethutils.EthToWei(fAmount)
+	weiAmount := ethutils.EthToWei(fAmount)
 
-	if amount.Cmp(t.SelfStake) > 0 {
+	if weiAmount.Cmp(t.SelfStake) > 0 {
 		log.Fatal(fmt.Errorf("amount to withdraw is bigger than existent stake"))
 	}
 
-	if _, err := sClient.RequestWithdrawal(context.Background(), caller.PrivateKey(), caller.Addr(), amount); err != nil {
+	if _, err := sClient.RequestWithdrawal(context.Background(), caller.PrivateKey(), caller.Addr(), weiAmount); err != nil {
 		log.Fatal(err.Error())
 	}
 
@@ -496,8 +506,18 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 	}
 
 	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
-	amount := ethutils.EthToWei(fAmount)
-	if err := sClient.Delegate(context.Background(), caller.PrivateKey(), addr, amount); err != nil {
+	weiAmount := ethutils.EthToWei(fAmount)
+
+	minAmount, err := sClient.GetMinDelegation(context.Background())
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	if minAmount.Cmp(weiAmount) > 0 {
+		log.Fatal("minimum amount to delegate is %s", minAmount.String())
+	}
+
+	if err := sClient.Delegate(context.Background(), caller.PrivateKey(), addr, weiAmount); err != nil {
 		log.Fatal(err.Error())
 	}
 
@@ -530,18 +550,18 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 	}
 
 	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
-	amount := ethutils.EthToWei(fAmount)
+	weiAmount := ethutils.EthToWei(fAmount)
 
 	stake, err := sClient.GetDelegatorStake(context.Background(), addr, caller.Addr())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	if amount.Cmp(stake) > 0 {
+	if weiAmount.Cmp(stake) > 0 {
 		log.Fatal(fmt.Errorf("amount to withdraw is bigger than existent stake"))
 	}
 
-	if _, err := sClient.RequestWithdrawal(context.Background(), caller.PrivateKey(), addr, amount); err != nil {
+	if _, err := sClient.RequestWithdrawal(context.Background(), caller.PrivateKey(), addr, weiAmount); err != nil {
 		log.Fatal(err.Error())
 	}
 
