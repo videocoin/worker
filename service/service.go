@@ -94,7 +94,7 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	symphonyCli := oauth2.NewClient(oauth2.NoContext, symphonyTS)
+	symphonyCli := oauth2.NewClient(context.Background(), symphonyTS)
 	symphonyRPCCli, err := ethrpc.DialHTTPWithClient(cfg.RPCNodeURL, symphonyCli)
 	if err != nil {
 		return nil, err
