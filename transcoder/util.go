@@ -112,29 +112,36 @@ func (t *Transcoder) submitAndValidateProof(segment *hlswatcher.SegmentInfo) {
 		ChunkId:               outChunkID.Bytes(),
 	}
 
-	tx, err := t.sc.SubmitProof(inChunkID, outChunkID, profileID)
-	if err != nil {
-		logger.Errorf("failed to submit proof: %s", err)
-		return
+	if !t.task.HasSubmitProof {
+		logger.Info("submiting proof")
+
+		tx, err := t.sc.SubmitProof(inChunkID, outChunkID, profileID)
+		if err != nil {
+			logger.Errorf("failed to submit proof: %s", err)
+			return
+		}
+
+		vpReq.SubmitProofTx = tx.Hash().String()
+		vpReq.SubmitProofTxStatus = emitterv1.ReceiptStatusSuccess
+
+		err = t.sc.WaitMinedAndCheck(tx)
+		if err != nil {
+			vpReq.SubmitProofTxStatus = emitterv1.ReceiptStatusFailed
+			logger.Errorf("failed to submit proof: %s", err)
+		}
+
+		logger.Debugf("submit proof tx %+v", vpReq.SubmitProofTx)
 	}
 
-	vpReq.SubmitProofTx = tx.Hash().String()
-	vpReq.SubmitProofTxStatus = emitterv1.ReceiptStatusSuccess
+	if !t.task.HasValidateProof && !t.task.HasScrapProof {
+		logger.Info("validating proof")
 
-	err = t.sc.WaitMinedAndCheck(tx)
-	if err != nil {
-		vpReq.SubmitProofTxStatus = emitterv1.ReceiptStatusFailed
-		logger.Errorf("failed to submit proof: %s", err)
-	}
-
-	logger.Debugf("submit proof tx %+v\n", vpReq.SubmitProofTx)
-	logger.Info("validating proof")
-
-	ctx := context.Background()
-	_, err = t.dispatcher.ValidateProof(ctx, vpReq)
-	if err != nil {
-		logger.Errorf("failed to validate proof: %s", err)
-		return
+		ctx := context.Background()
+		_, err := t.dispatcher.ValidateProof(ctx, vpReq)
+		if err != nil {
+			logger.Errorf("failed to validate proof: %s", err)
+			return
+		}
 	}
 }
 
