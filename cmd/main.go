@@ -78,7 +78,7 @@ func validateFlags(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if cmd.Name() == "mine" {
+	if cmd.Name() == "start" {
 		if !cfg.Internal {
 			val, err := cmd.Flags().GetString("client-id")
 			if val == "" || err != nil {
@@ -99,9 +99,9 @@ func validateFlags(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func validateStakeOps(cmd *cobra.Command, args []string) error {
+func validateAmountOps(cmd *cobra.Command, args []string) error {
 	if len(args) < 1 {
-		if cmd.Name() == "add" || cmd.Name() == "withdraw" {
+		if cmd.Name() == "fund" || cmd.Name() == "add" || cmd.Name() == "withdraw" {
 			return errors.New("requires an amount (tokens value) argument")
 		}
 	}
@@ -164,12 +164,21 @@ func main() {
 		Use: "",
 	}
 
-	var mineCmd = &cobra.Command{
-		Use:              "mine",
-		Short:            "start miner function",
+	var startCmd = &cobra.Command{
+		Use:              "start",
+		Short:            "start worker",
 		TraverseChildren: true,
 		PreRunE:          validateFlags,
-		Run:              runMineCommand,
+		Run:              runStartCommand,
+	}
+
+	var fundCmd = &cobra.Command{
+		Use:              "fund",
+		Short:            "fund native account",
+		TraverseChildren: true,
+		Args:             validateAmountOps,
+		PreRunE:          validateFlags,
+		Run:              runFundCommand,
 	}
 
 	var stakeCmd = &cobra.Command{
@@ -184,7 +193,7 @@ func main() {
 		Use:              "add",
 		Short:            "add stake of specified VideoCoin token amount",
 		TraverseChildren: true,
-		Args:             validateStakeOps,
+		Args:             validateAmountOps,
 		PreRunE:          validateFlags,
 		Run:              runStakeAddCommand,
 	}
@@ -193,7 +202,7 @@ func main() {
 		Use:              "withdraw",
 		Short:            "withdraw stake of specified tokens amount",
 		TraverseChildren: true,
-		Args:             validateStakeOps,
+		Args:             validateAmountOps,
 		PreRunE:          validateFlags,
 		Run:              runStakeWithdrawCommand,
 	}
@@ -239,14 +248,12 @@ func main() {
 	rootCmd.PersistentFlags().StringP("key", "k", "", "utc key file json content")
 	rootCmd.PersistentFlags().StringP("secret", "s", "", "password to decrypt key file")
 
-	// mine command initialize
-	mineCmd.Flags().StringP("client-id", "c", "", "unique client id assigned to miner (required)")
-
-	// withdraw command initialize
-	withdrawCmd.Flags().Int64("amount", 0, "amount to withdraw")
+	// start command initialize
+	startCmd.Flags().StringP("client-id", "c", "", "unique client id assigned to worker (required)")
 
 	// add commands and execute
-	rootCmd.AddCommand(mineCmd)
+	rootCmd.AddCommand(startCmd)
+	rootCmd.AddCommand(fundCmd)
 	rootCmd.AddCommand(stakeCmd)
 	stakeCmd.AddCommand(withdrawCmd)
 	stakeCmd.AddCommand(addCmd)
@@ -263,7 +270,7 @@ func main() {
 	}
 }
 
-func runMineCommand(cmd *cobra.Command, args []string) {
+func runStartCommand(cmd *cobra.Command, args []string) {
 	log := logger.NewLogrusLogger(ServiceName, Version)
 	cfg.Logger = log
 
@@ -361,6 +368,34 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 	}
 
 	return stakingClient, bridgeClient, caller, nil
+}
+
+func runFundCommand(cmd *cobra.Command, args []string) {
+	log := logger.NewLogrusLogger(ServiceName, Version)
+
+	_, bClient, caller, err := getClients(cfg)
+	if err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+
+	tokenAmount := new(big.Int)
+	tokenAmount, ok := tokenAmount.SetString(args[0], 10)
+	if !ok {
+		log.Fatal(err.Error())
+	}
+
+	fAmount, _ := new(big.Float).SetInt(tokenAmount).Float64()
+	weiAmount := ethutils.EthToWei(fAmount)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	_, err = bClient.WaitDeposit(ctx, caller.PrivateKey(), common.HexToAddress(cfg.TokenBankAddr), weiAmount)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	cancel()
+
+	log.Infof("account %s has been successfully funded on native network", caller.Addr().String())
 }
 
 func runStakeCommand(cmd *cobra.Command, args []string) {
@@ -492,7 +527,7 @@ func runDelegateCommand(cmd *cobra.Command, args []string) {
 func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 	log := logger.NewLogrusLogger(ServiceName, Version)
 
-	sClient, _, caller, err := getClients(cfg)
+	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -516,6 +551,13 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 	if minAmount.Cmp(weiAmount) > 0 {
 		log.Fatal("minimum amount to delegate is %s", minAmount.String())
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	_, err = bClient.WaitDeposit(ctx, caller.PrivateKey(), common.HexToAddress(cfg.TokenBankAddr), weiAmount)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	cancel()
 
 	if err := sClient.Delegate(context.Background(), caller.PrivateKey(), addr, weiAmount); err != nil {
 		log.Fatal(err.Error())
@@ -597,13 +639,13 @@ func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		fVidValue, _ := ethutils.WeiToEth(winfo.Amount)
-		vidValue, _ := fVidValue.Int(nil)
-
-		_, err := bClient.WaitWithdraw(ctx, caller.PrivateKey(), common.HexToAddress(cfg.NativeBankAddr), vidValue)
+		_, err := bClient.WaitWithdraw(ctx, caller.PrivateKey(), common.HexToAddress(cfg.NativeBankAddr), winfo.Amount)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+
+		fVidValue, _ := ethutils.WeiToEth(winfo.Amount)
+		vidValue, _ := fVidValue.Int(nil)
 
 		log.Infof("stake withdraw of amount %s tokens have been successfully completed", vidValue.String())
 	}
