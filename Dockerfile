@@ -24,4 +24,4 @@ EXPOSE 8888
 WORKDIR /
 
 ENTRYPOINT ["transcoder"]
-CMD ["mine"]
+CMD ["start"]

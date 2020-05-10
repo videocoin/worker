@@ -335,7 +335,7 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 		return nil, nil, nil, err
 	}
 
-	symphonyCli := oauth2.NewClient(oauth2.NoContext, symphonyTS)
+	symphonyCli := oauth2.NewClient(context.Background(), symphonyTS)
 	symphonyRPCCli, err := ethrpc.DialHTTPWithClient(configResp.RPCNodeURL, symphonyCli)
 	if err != nil {
 		return nil, nil, nil, err
@@ -549,7 +549,7 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 	}
 
 	if minAmount.Cmp(weiAmount) > 0 {
-		log.Fatal("minimum amount to delegate is %s", minAmount.String())
+		log.Fatalf("minimum amount to delegate is %s", minAmount.String())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
