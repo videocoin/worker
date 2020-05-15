@@ -274,6 +274,34 @@ func runStartCommand(cmd *cobra.Command, args []string) {
 	log := logger.NewLogrusLogger(ServiceName, Version)
 	cfg.Logger = log
 
+	if !cfg.Internal {
+		sClient, _, caller, err := getClients(cfg)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		t, err := sClient.GetTranscoder(context.Background(), caller.Addr())
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		if t.State != staking.StateBonded {
+			state := ""
+			if t.State == staking.StateBonding {
+				state = "BONDING"
+			} else if t.State == staking.StateUnbonded {
+				state = "UNBONDED"
+			} else if t.State == staking.StateUnbonding {
+				state = "UNBONDING"
+			}
+
+			log.Infof("current state is %s", state)
+			log.Fatalf("failed to start, state must be BONDED")
+		} else {
+			log.Info("current state is BONDED")
+		}
+	}
+
 	svc, err := service.NewService(cfg)
 	if err != nil {
 		log.Fatal(err.Error())
