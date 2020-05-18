@@ -1,5 +1,8 @@
 # cloud.google.com/go v0.51.0
 ## explicit
+# github.com/AlekSi/pointer v1.1.0
+## explicit
+github.com/AlekSi/pointer
 # github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6
 github.com/StackExchange/wmi
 # github.com/VictoriaMetrics/fastcache v1.5.3
@@ -207,6 +210,8 @@ github.com/prometheus/tsdb/fileutil
 github.com/rjeczalik/notify
 # github.com/rs/cors v1.6.0
 github.com/rs/cors
+# github.com/schoentoon/logrus-loki v0.0.0-20191021224953-4928b3c6b192
+github.com/schoentoon/logrus-loki
 # github.com/shirou/gopsutil v2.20.2+incompatible
 ## explicit
 github.com/shirou/gopsutil/cpu

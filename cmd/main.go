@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/AlekSi/pointer"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	ethrpc "github.com/ethereum/go-ethereum/rpc"
@@ -36,19 +37,6 @@ var (
 var cfg *service.Config
 
 func validateFlags(cmd *cobra.Command, args []string) error {
-	loglevel, _ := cmd.Flags().GetString("loglevel")
-	level, err := logrus.ParseLevel(loglevel)
-	if err != nil {
-		loglevel = logrus.InfoLevel.String()
-		level, _ = logrus.ParseLevel(loglevel)
-	}
-
-	l := logrus.New()
-	l.SetLevel(level)
-	l.SetFormatter(&logrus.TextFormatter{TimestampFormat: time.RFC3339Nano})
-
-	cfg.Logger = l.WithField("version", cfg.Version)
-
 	if !cfg.Internal {
 		val, err := cmd.Flags().GetString("key")
 		if val == "" || err != nil {
@@ -154,11 +142,6 @@ func main() {
 	cfg = service.LoadConfig()
 	cfg.Name = ServiceName
 	cfg.Version = Version
-
-	log := logrus.WithFields(logrus.Fields{
-		"service": ServiceName,
-		"version": Version,
-	})
 
 	var rootCmd = &cobra.Command{
 		Use: "",
@@ -266,12 +249,18 @@ func main() {
 
 	err := rootCmd.Execute()
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }
 
 func runStartCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	var lokiURL *string
+
+	if cfg.Internal {
+		lokiURL = pointer.ToString(cfg.LokiURL)
+	}
+
+	log := logger.NewLogrusLogger(ServiceName, Version, lokiURL)
 	cfg.Logger = log
 
 	if !cfg.Internal {
@@ -399,7 +388,7 @@ func getClients(cfg *service.Config) (*staking.Client, *bridge.Client, *caller.C
 }
 
 func runFundCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	_, bClient, caller, err := getClients(cfg)
 	if err != nil {
@@ -427,7 +416,7 @@ func runFundCommand(cmd *cobra.Command, args []string) {
 }
 
 func runStakeCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
@@ -444,7 +433,7 @@ func runStakeCommand(cmd *cobra.Command, args []string) {
 }
 
 func runStakeAddCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {
@@ -495,7 +484,7 @@ func runStakeAddCommand(cmd *cobra.Command, args []string) {
 }
 
 func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
@@ -535,7 +524,7 @@ func runStakeWithdrawCommand(cmd *cobra.Command, args []string) {
 }
 
 func runDelegateCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
@@ -553,7 +542,7 @@ func runDelegateCommand(cmd *cobra.Command, args []string) {
 }
 
 func runDelegateAddCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {
@@ -595,7 +584,7 @@ func runDelegateAddCommand(cmd *cobra.Command, args []string) {
 }
 
 func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	sClient, _, caller, err := getClients(cfg)
 	if err != nil {
@@ -646,7 +635,7 @@ func runDelegateWithdrawCommand(cmd *cobra.Command, args []string) {
 }
 
 func runWithdrawCompleteCommand(cmd *cobra.Command, args []string) {
-	log := logger.NewLogrusLogger(ServiceName, Version)
+	log := logger.NewLogrusLogger(ServiceName, Version, nil)
 
 	sClient, bClient, caller, err := getClients(cfg)
 	if err != nil {

@@ -20,6 +20,7 @@ type Config struct {
 	DispatcherRPCAddr string `envconfig:"DISPATCHER_ADDR" default:"d.dev.videocoin.network:5008"`
 	OutputDir         string `envconfig:"OUTPUT_DIR" default:"/tmp"`
 	HealthAddr        string `envconfig:"HEALTH_ADDR" default:"0.0.0.0:8888"`
+	LokiURL           string `envconfig:"LOKI_URL"`
 
 	StakingManagerAddr string `envconfig:"STAKING_MANAGER_ADDR" default:"0x74feC37C1CEe00F2EA987080D27e370d79cb46dd"`
 	ProxyAddr          string `envconfig:"PROXY_ADDR" default:"0xc16De466447e348b6Cd1B678d604990e6DB3057C"`
