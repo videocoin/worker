@@ -21,7 +21,7 @@ type Config struct {
 	OutputDir         string `envconfig:"OUTPUT_DIR" default:"/tmp"`
 	HealthAddr        string `envconfig:"HEALTH_ADDR" default:"0.0.0.0:8888"`
 
-	StakingManagerAddr string `envconfig:"STAKING_MANAGER_ADDR" default:"0x8105E17A7534C400E298c7FF972a389C6c93BEb4"`
+	StakingManagerAddr string `envconfig:"STAKING_MANAGER_ADDR" default:"0x74feC37C1CEe00F2EA987080D27e370d79cb46dd"`
 	ProxyAddr          string `envconfig:"PROXY_ADDR" default:"0xc16De466447e348b6Cd1B678d604990e6DB3057C"`
 	ERC20Addr          string `envconfig:"ERC20_ADDR" default:"0x7bc345BE17AF288a0CFcFF8E673714635C847aa0"`
 	LocalBridgeAddr    string `envconfig:"LOCAL_BRIDGE_ADDR" default:"0xb067b9A2eb0bd087F859F836e0AC23E0691Ca62e"`
