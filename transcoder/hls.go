@@ -6,7 +6,7 @@ import (
 	"time"
 
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
-	"github.com/videocoin/transcode/transcoder/hlswatcher"
+	"github.com/videocoin/worker/transcoder/hlswatcher"
 )
 
 type SegmentRecvFunc func(*hlswatcher.SegmentInfo) error

@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := push
 DOCKER_REGISTRY = gcr.io
 PROJECT_ID= videocoin-network
-SERVICE_NAME = transcoder
+SERVICE_NAME = worker
 BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
@@ -59,9 +59,7 @@ docker-latest:
 clean:
 	rm -rf bin/*
 
-deploy:
-	ENV=${ENV} deploy/deploy.sh
 
 release: docker docker-push docker-latest
 
-.PHONY : build deps test push clean docker deploy release
+.PHONY : build deps test push clean docker release

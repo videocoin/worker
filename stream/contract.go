@@ -3,7 +3,7 @@ package stream
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/videocoin/go-protocol/streams"
-	"github.com/videocoin/transcode/caller"
+	"github.com/videocoin/worker/caller"
 )
 
 type Contract struct {

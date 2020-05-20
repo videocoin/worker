@@ -264,17 +264,11 @@ github.com/videocoin/cloud-api/rpc
 github.com/videocoin/cloud-api/validator/v1
 # github.com/videocoin/cloud-pkg v0.0.7 => ../cloud-pkg
 ## explicit
-github.com/videocoin/cloud-pkg/ethutils
 github.com/videocoin/cloud-pkg/grpcutil
 github.com/videocoin/cloud-pkg/logger
 github.com/videocoin/cloud-pkg/retry
 # github.com/videocoin/go-bridge v0.0.2
 ## explicit
-github.com/videocoin/go-bridge/client
-github.com/videocoin/go-bridge/erc20
-github.com/videocoin/go-bridge/nativebridge
-github.com/videocoin/go-bridge/nativeproxy
-github.com/videocoin/go-bridge/remotebridge
 # github.com/videocoin/go-protocol v0.0.6
 ## explicit
 github.com/videocoin/go-protocol/staking

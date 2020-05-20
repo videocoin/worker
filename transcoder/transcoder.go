@@ -18,9 +18,9 @@ import (
 	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	"github.com/videocoin/cloud-pkg/retry"
-	"github.com/videocoin/transcode/caller"
-	"github.com/videocoin/transcode/stream"
-	"github.com/videocoin/transcode/transcoder/hlswatcher"
+	"github.com/videocoin/worker/caller"
+	"github.com/videocoin/worker/stream"
+	"github.com/videocoin/worker/transcoder/hlswatcher"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

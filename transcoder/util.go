@@ -14,7 +14,7 @@ import (
 	emitterv1 "github.com/videocoin/cloud-api/emitter/v1"
 	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-pkg/retry"
-	"github.com/videocoin/transcode/transcoder/hlswatcher"
+	"github.com/videocoin/worker/transcoder/hlswatcher"
 )
 
 func checkSource(url string) error {

@@ -33,7 +33,7 @@ restore_repo: &restore_repo
       - v1-repo
 
 defaults: &defaults
-  working_directory: /go/src/github.com/videocoin/transcode
+  working_directory: /go/src/github.com/videocoin/worker
   docker: *base_docker_image
 
 version: 2

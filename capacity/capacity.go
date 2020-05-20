@@ -8,7 +8,7 @@ import (
 
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/sirupsen/logrus"
-	"github.com/videocoin/transcode/transcoder"
+	"github.com/videocoin/worker/transcoder"
 )
 
 const testSamplePath = "/opt/capacity_test.mp4"

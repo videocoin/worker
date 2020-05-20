@@ -6,7 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	types "github.com/ethereum/go-ethereum/core/types"
-	"github.com/videocoin/transcode/caller"
+	"github.com/videocoin/worker/caller"
 )
 
 type Client struct {

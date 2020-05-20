@@ -7,8 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 	v1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
-	"github.com/videocoin/transcode/capacity"
-	"github.com/videocoin/transcode/sysinfo"
+	"github.com/videocoin/worker/capacity"
+	"github.com/videocoin/worker/sysinfo"
 )
 
 type Pinger struct {
