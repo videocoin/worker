@@ -1,5 +1,3 @@
-# cloud.google.com/go v0.51.0
-## explicit
 # github.com/AlekSi/pointer v1.1.0
 ## explicit
 github.com/AlekSi/pointer
@@ -9,8 +7,6 @@ github.com/StackExchange/wmi
 github.com/VictoriaMetrics/fastcache
 # github.com/aristanetworks/goarista v0.0.0-20200306225906-e0480e715858
 github.com/aristanetworks/goarista/monotime
-# github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e
-## explicit
 # github.com/beorn7/perks v1.0.1
 github.com/beorn7/perks/quantile
 # github.com/btcsuite/btcd v0.0.0-20190605094302-a0d1e3e36d50
@@ -85,7 +81,6 @@ github.com/ethereum/go-ethereum/signer/core
 github.com/ethereum/go-ethereum/signer/storage
 github.com/ethereum/go-ethereum/trie
 # github.com/evalphobia/logrus_sentry v0.8.2
-## explicit
 github.com/evalphobia/logrus_sentry
 # github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff
 github.com/gballet/go-libpcsclite
@@ -146,6 +141,7 @@ github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options
 github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
 # github.com/hashicorp/golang-lru v0.5.1
+## explicit
 github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
 # github.com/huin/goupnp v1.0.0
@@ -228,6 +224,7 @@ github.com/sirupsen/logrus
 ## explicit
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
+## explicit
 github.com/spf13/pflag
 # github.com/status-im/keycard-go v0.0.0-20190316090335-8537d3370df4
 github.com/status-im/keycard-go/derivationpath
@@ -267,8 +264,6 @@ github.com/videocoin/cloud-api/validator/v1
 github.com/videocoin/cloud-pkg/grpcutil
 github.com/videocoin/cloud-pkg/logger
 github.com/videocoin/cloud-pkg/retry
-# github.com/videocoin/go-bridge v0.0.2
-## explicit
 # github.com/videocoin/go-protocol v0.0.6
 ## explicit
 github.com/videocoin/go-protocol/staking
@@ -335,8 +330,6 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# google.golang.org/api v0.20.0
-## explicit
 # google.golang.org/appengine v1.6.6
 ## explicit
 google.golang.org/appengine/internal
