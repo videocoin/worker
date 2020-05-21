@@ -1,13 +1,15 @@
 .NOTPARALLEL:
 .DEFAULT_GOAL := push
-DOCKER_REGISTRY = gcr.io
-PROJECT_ID= videocoin-network
-SERVICE_NAME = worker
-BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 
+GOOS = linux
+GOARCH = amd64
+GCP_PROJECT = videocoin-network
+NAME = worker
+BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
 VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
-IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):$(VERSION)
-LATEST_IMAGE_TAG=$(DOCKER_REGISTRY)/$(PROJECT_ID)/$(SERVICE_NAME):latest
+
+IMAGE_TAG=gcr.io/$(GCP_PROJECT)/$(NAME):$(VERSION)
+LATEST_IMAGE_TAG=gcr.io/$(GCP_PROJECT)/$(NAME):latest
 
 ENV?=dev
 
@@ -35,7 +37,7 @@ docker-lint:
 
 build:
 	@echo "==> Building..."
-	go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(SERVICE_NAME) cmd/main.go
+	go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME) cmd/main.go
 
 test:
 	@echo "==> Running tests..."
@@ -61,5 +63,10 @@ clean:
 
 
 release: docker docker-push docker-latest
+
+publish:
+	gsutil cp bin/staker gs://videocoin-releases/worker/${VERSION}/worker
+	gsutil acl ch -u AllUsers:R gs://videocoin-releases/worker/${VERSION}/worker
+
 
 .PHONY : build deps test push clean docker release
