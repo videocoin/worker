@@ -48,13 +48,12 @@ func (c *Caller) NatClient() *ethclient.Client {
 }
 
 func (c *Caller) Opts(amount *big.Int) *bind.TransactOpts {
-	gasPrice, _ := c.natClient.SuggestGasPrice(context.Background())
-
 	opts := bind.NewKeyedTransactor(c.key.PrivateKey)
 	opts.Nonce = nil
 	opts.Value = amount
+
+	gasPrice, _ := c.natClient.SuggestGasPrice(context.Background())
 	opts.GasPrice = gasPrice
-	opts.GasLimit = uint64(8000000)
 
 	return opts
 }
