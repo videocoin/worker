@@ -6,7 +6,7 @@ GOARCH = amd64
 GCP_PROJECT = videocoin-network
 NAME = worker
 BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
-VERSION=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
+VERSION?=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
 
 IMAGE_TAG=gcr.io/$(GCP_PROJECT)/$(NAME):$(VERSION)
 LATEST_IMAGE_TAG=gcr.io/$(GCP_PROJECT)/$(NAME):latest
@@ -65,8 +65,12 @@ clean:
 release: docker docker-push docker-latest
 
 publish:
-	gsutil cp bin/staker gs://videocoin-releases/worker/${VERSION}/worker
-	gsutil acl ch -u AllUsers:R gs://videocoin-releases/worker/${VERSION}/worker
+	@echo "==> Building..."
+	GOOS=linux GOARCH=amd64 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-amd64 cmd/main.go
+	gsutil cp bin/worker-linux-amd64 gs://videocoin-releases/worker/${VERSION}/worker-linux-amd64
+	gsutil acl ch -u AllUsers:R gs://videocoin-releases/worker/${VERSION}/worker-linux-amd64
+	gsutil cp capacity_test.mp4 gs://videocoin-releases/worker/${VERSION}/capacity_test.mp4
+	gsutil acl ch -u AllUsers:R gs://videocoin-releases/worker/${VERSION}/capacity_test.mp4
 
 
 .PHONY : build deps test push clean docker release
