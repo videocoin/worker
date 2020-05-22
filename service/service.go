@@ -114,6 +114,7 @@ func NewService(cfg *Config) (*Service, error) {
 		&minersv1.RegistrationRequest{
 			ClientID: cfg.ClientID,
 			Address:  caller.Addr().String(),
+			Version:  cfg.Version,
 		},
 	)
 	if err != nil {
@@ -128,6 +129,7 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg.OutputDir,
 		caller,
 		cfg.SyncerURL,
+		cfg.Version,
 	)
 	if err != nil {
 		return nil, err

@@ -27,10 +27,11 @@ import (
 
 type Transcoder struct {
 	logger         *logrus.Entry
-	t              *time.Ticker
 	clientID       string
-	dispatcher     v1.DispatcherServiceClient
 	outputDir      string
+	version        string
+	t              *time.Ticker
+	dispatcher     v1.DispatcherServiceClient
 	cmd            *exec.Cmd
 	caller         *caller.Caller
 	sc             *stream.Client
@@ -47,12 +48,14 @@ func NewTranscoder(
 	outputDir string,
 	caller *caller.Caller,
 	syncerAddr string,
+	version string,
 ) (*Transcoder, error) {
 	return &Transcoder{
 		logger:     logger,
 		clientID:   clientID,
 		dispatcher: dispatcher,
 		outputDir:  outputDir,
+		version:    version,
 		caller:     caller,
 		sc:         &stream.Client{},
 		syncerAddr: syncerAddr,
@@ -96,7 +99,9 @@ func (t *Transcoder) IsWorking() bool {
 }
 
 func (t *Transcoder) dispatch() error {
-	req := &v1.TaskPendingRequest{}
+	req := &v1.TaskPendingRequest{
+		Version: t.version,
+	}
 
 	for range t.t.C {
 		t.logger.Info("waiting task...")

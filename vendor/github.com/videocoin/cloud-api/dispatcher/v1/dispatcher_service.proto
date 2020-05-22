@@ -31,12 +31,18 @@ service DispatcherService {
   rpc MarkTaskAsFailed(TaskRequest) returns (cloud.api.dispatcher.v1.Task) {}
   rpc MarkTaskAsPaused(TaskRequest) returns (cloud.api.dispatcher.v1.Task) {}
   rpc MarkSegmentAsTranscoded(TaskSegmentRequest) returns (google.protobuf.Empty) {}
-    
+
   rpc ValidateProof(cloud.api.validator.v1.ValidateProofRequest) returns (cloud.api.validator.v1.ValidateProofResponse) {}
   rpc AddInputChunk(AddInputChunkRequest) returns (AddInputChunkResponse) {}
 }
 
-message TaskPendingRequest {}
+message TaskPendingRequest {
+  double total_stake = 1;
+  double capacity_encode = 2;
+  double capacity_cpu = 3;
+  string worker_state = 4;
+  string version = 5;
+}
 
 message TaskRequest {
   string id = 1 [(gogoproto.customname) = "ID"];
