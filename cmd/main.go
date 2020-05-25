@@ -1,27 +1,18 @@
 package main
 
 import (
-	"context"
 	"errors"
 	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/AlekSi/pointer"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
-	ethrpc "github.com/ethereum/go-ethereum/rpc"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
-	"github.com/videocoin/cloud-pkg/grpcutil"
 	"github.com/videocoin/cloud-pkg/logger"
-	staking "github.com/videocoin/go-staking"
-	vcoauth2 "github.com/videocoin/oauth2/videocoin"
-	"github.com/videocoin/worker/caller"
 	"github.com/videocoin/worker/service"
-	"golang.org/x/oauth2"
 )
 
 var (
@@ -124,35 +115,13 @@ func runStartCommand(cmd *cobra.Command, args []string) {
 	}
 
 	log := logger.NewLogrusLogger(ServiceName, Version, lokiURL)
-	cfg.Logger = log
 
 	if !cfg.Internal {
-		stakingCli, caller, err := connect(cfg)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-
-		t, err := stakingCli.GetTranscoder(context.Background(), caller.Addr())
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-
-		if t.State != staking.StateBonded {
-			state := ""
-			if t.State == staking.StateBonding {
-				state = "BONDING"
-			} else if t.State == staking.StateUnbonded {
-				state = "UNBONDED"
-			} else if t.State == staking.StateUnbonding {
-				state = "UNBONDING"
-			}
-
-			log.Infof("current state is %s", state)
-			log.Fatalf("failed to start, state must be BONDED")
-		} else {
-			log.Info("current state is BONDED")
-		}
+		log = log.Logger.WithField("version", Version)
+		log.Logger.SetFormatter(&logrus.TextFormatter{TimestampFormat: time.RFC3339Nano})
 	}
+
+	cfg.Logger = log
 
 	svc, err := service.NewService(cfg)
 	if err != nil {
@@ -192,46 +161,4 @@ func runStartCommand(cmd *cobra.Command, args []string) {
 	}
 
 	log.Info("stopped")
-}
-
-func connect(cfg *service.Config) (*staking.Client, *caller.Caller, error) {
-	conn, err := grpcutil.Connect(cfg.DispatcherRPCAddr, cfg.Logger.WithField("system", "dispatcher"))
-	if err != nil {
-		return nil, nil, err
-	}
-	dispatcher := dispatcherv1.NewDispatcherServiceClient(conn)
-
-	configReq := new(dispatcherv1.ConfigRequest)
-	configResp, err := dispatcher.GetDelegatorConfig(
-		context.Background(),
-		configReq,
-	)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	symphonyTS, err := vcoauth2.JWTAccessTokenSourceFromJSON([]byte(configResp.AccessKey), configResp.RPCNodeURL)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	symphonyCli := oauth2.NewClient(context.Background(), symphonyTS)
-	symphonyRPCCli, err := ethrpc.DialHTTPWithClient(configResp.RPCNodeURL, symphonyCli)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	natClient := ethclient.NewClient(symphonyRPCCli)
-
-	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	stakingClient, err := staking.NewClient(natClient, common.HexToAddress(cfg.StakingManagerAddr))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return stakingClient, caller, nil
 }

@@ -2,14 +2,17 @@ package service
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	ethrpc "github.com/ethereum/go-ethereum/rpc"
 	grpclogrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	"github.com/videocoin/cloud-api/rpc"
+	"github.com/videocoin/go-staking"
 	vcoauth2 "github.com/videocoin/oauth2/videocoin"
 	"github.com/videocoin/worker/caller"
 	"github.com/videocoin/worker/capacity"
@@ -88,6 +91,7 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 	cfg.RPCNodeURL = configResp.RPCNodeURL
 	cfg.SyncerURL = configResp.SyncerURL
+	cfg.StakingManagerAddr = configResp.StakingManagerAddress
 
 	symphonyTS, err := vcoauth2.JWTAccessTokenSourceFromJSON([]byte(configResp.AccessKey), cfg.RPCNodeURL)
 	if err != nil {
@@ -104,6 +108,34 @@ func NewService(cfg *Config) (*Service, error) {
 	caller, err := caller.NewCaller(cfg.Key, cfg.Secret, natClient)
 	if err != nil {
 		return nil, err
+	}
+
+	if !cfg.Internal {
+		stakingCli, err := staking.NewClient(natClient, common.HexToAddress(cfg.StakingManagerAddr))
+		if err != nil {
+			return nil, err
+		}
+
+		t, err := stakingCli.GetTranscoder(context.Background(), caller.Addr())
+		if err != nil {
+			return nil, err
+		}
+
+		if t.State != staking.StateBonded {
+			state := ""
+			if t.State == staking.StateBonding {
+				state = "BONDING"
+			} else if t.State == staking.StateUnbonded {
+				state = "UNBONDED"
+			} else if t.State == staking.StateUnbonding {
+				state = "UNBONDING"
+			}
+
+			cfg.Logger.Infof("current state is %s", state)
+			return nil, errors.New("failed to start, state must be BONDED")
+		}
+
+		cfg.Logger.Info("current state is BONDED")
 	}
 
 	cfg.Logger = cfg.Logger.WithField("cid", cfg.ClientID)
