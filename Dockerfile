@@ -6,11 +6,11 @@ WORKDIR /go/src/github.com/videocoin/worker
 
 ADD ./ ./
 
-RUN make build
+RUN make build-linux-amd
 
 FROM jrottenberg/ffmpeg:4.1-ubuntu AS release
 
-COPY --from=builder /go/src/github.com/videocoin/worker/bin/worker /bin/worker
+COPY --from=builder /go/src/github.com/videocoin/worker/bin/worker-linux-amd64 /bin/worker-linux-amd64
 COPY --from=builder /go/src/github.com/videocoin/worker/capacity_test.mp4 /opt/capacity_test.mp4
 
 RUN apt-get update
@@ -23,5 +23,5 @@ EXPOSE 8888
 
 WORKDIR /
 
-ENTRYPOINT ["worker"]
+ENTRYPOINT ["worker-linux-amd64"]
 CMD ["start"]
