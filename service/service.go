@@ -18,6 +18,7 @@ import (
 	"github.com/videocoin/worker/capacity"
 	"github.com/videocoin/worker/health"
 	"github.com/videocoin/worker/pinger"
+	"github.com/videocoin/worker/pkg/hw"
 	"github.com/videocoin/worker/transcoder"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
@@ -144,9 +145,11 @@ func NewService(cfg *Config) (*Service, error) {
 	_, err = dispatcher.Register(
 		context.Background(),
 		&minersv1.RegistrationRequest{
-			ClientID: cfg.ClientID,
-			Address:  caller.Addr().String(),
-			Version:  cfg.Version,
+			ClientID:    cfg.ClientID,
+			Address:     caller.Addr().String(),
+			Version:     cfg.Version,
+			IsRaspberry: hw.IsRaspberry(),
+			IsJetson:    hw.IsJetson(),
 		},
 	)
 	if err != nil {
