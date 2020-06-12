@@ -99,8 +99,15 @@ func (t *Transcoder) IsWorking() bool {
 }
 
 func (t *Transcoder) dispatch() error {
+	taskTypeStr := os.Getenv("TASK_TYPE")
+	taskType := v1.TaskTypeVOD
+	if taskTypeStr == v1.TaskTypeLive.String() {
+		taskType = v1.TaskTypeLive
+	}
+
 	req := &v1.TaskPendingRequest{
 		Version: t.version,
+		Type:    taskType,
 	}
 
 	for range t.t.C {
