@@ -43,8 +43,8 @@ build-darwin:
 
 build-linux-arm:
 	@echo "==> Building for linux arm..."
-	GOOS=linux GOARCH=arm go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm cmd/main.go
-	GOOS=linux GOARCH=arm64 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm64 cmd/main.go
+	GOOS=linux GOARCH=arm GOARM=7 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm cmd/main.go
+	GOOS=linux GOARCH=arm64 GOARM=7 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm64 cmd/main.go
 
 build-linux-amd:
 	@echo "==> Building for linux amd64..."
