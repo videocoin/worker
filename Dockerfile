@@ -8,7 +8,7 @@ ADD ./ ./
 
 RUN make build-linux-amd
 
-FROM jrottenberg/ffmpeg:4.1-ubuntu AS release
+FROM jrottenberg/ffmpeg:4.3-nvidia1804 AS release
 
 COPY --from=builder /go/src/github.com/videocoin/worker/bin/worker-linux-amd64 /bin/worker-linux-amd64
 COPY --from=builder /go/src/github.com/videocoin/worker/capacity_test.mp4 /opt/capacity_test.mp4
