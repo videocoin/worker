@@ -1,12 +1,11 @@
 .NOTPARALLEL:
 .DEFAULT_GOAL := push
 
-GOOS = linux
-GOARCH = amd64
-GCP_PROJECT ?= videocoin-network
-NAME = worker
-BRANCH=$$(git branch | grep \* | cut -d ' ' -f2)
-VERSION?=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
+GOOS=linux
+GOARCH=amd64
+GCP_PROJECT?=videocoin-network
+NAME=worker
+VERSION?=$$(git rev-parse HEAD)
 
 IMAGE_TAG=gcr.io/$(GCP_PROJECT)/$(NAME):$(VERSION)
 LATEST_IMAGE_TAG=gcr.io/$(GCP_PROJECT)/$(NAME):latest
