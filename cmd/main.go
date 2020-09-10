@@ -11,6 +11,7 @@ import (
 	"github.com/AlekSi/pointer"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/videocoin/cloud-api/rpc"
 	"github.com/videocoin/cloud-pkg/logger"
 	"github.com/videocoin/worker/service"
 )
@@ -125,6 +126,9 @@ func runStartCommand(cmd *cobra.Command, args []string) {
 
 	svc, err := service.NewService(cfg)
 	if err != nil {
+		if errors.Is(err, rpc.ErrRpcUnauthenticated) {
+			log.Fatal("Authentication failed: invalid client-id (-c / --client-id)")
+		}
 		log.Fatal(err.Error())
 	}
 
