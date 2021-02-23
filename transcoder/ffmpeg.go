@@ -1,6 +1,7 @@
 package transcoder
 
 import (
+	"bytes"
 	"fmt"
 	"sync"
 )
@@ -18,9 +19,14 @@ func (t *Transcoder) runFFmpeg(wg *sync.WaitGroup, errCh chan error) {
 	t.logger.Debugf("starting ffmpeg")
 	t.logger.Debugf("%s", t.task.Cmdline)
 
+	var stdout, stderr bytes.Buffer
+
+	t.cmd.Stdout = &stdout
+	t.cmd.Stderr = &stderr
+
 	err := t.cmd.Start()
 	if err != nil {
-		fmtErr := fmt.Errorf("ffmpeg: %s", err)
+		fmtErr := fmt.Errorf("ffmpeg: %s\nstdout: %s\nstderr: %s\n", err, stdout.String(), stderr.String())
 		errCh <- fmtErr
 		return
 	}
@@ -33,7 +39,7 @@ func (t *Transcoder) runFFmpeg(wg *sync.WaitGroup, errCh chan error) {
 		if ErrExitStatusInterrupt.Error() == err.Error() {
 			t.logger.Warning("ffmpeg execution has been canceled")
 		} else {
-			fmtErr = fmt.Errorf("ffmpeg: %s", err)
+			fmtErr = fmt.Errorf("ffmpeg: %s\nstdout: %s\nstderr: %s\n", err, stdout.String(), stderr.String())
 		}
 
 		errCh <- fmtErr

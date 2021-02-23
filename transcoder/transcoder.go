@@ -211,6 +211,9 @@ func (t *Transcoder) runTask() error {
 		return err
 	}
 
+	chunks, err := t.sc.GetInChunks()
+	logger.Debug(chunks)
+
 	wg := &sync.WaitGroup{}
 	errCh := make(chan error, 1)
 
