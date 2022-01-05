@@ -359,8 +359,8 @@ func (t *Transcoder) uploadSegmentViaHTTP(task *v1.Task, segment *hlswatcher.Seg
 		Debug("uploading segment via http")
 
 	params := map[string]string{
-		"path":        fmt.Sprintf("%s/%d.ts", task.StreamID, segment.Num),
-		"ct":          "video/MP2T",
+		"path":        fmt.Sprintf("%s/%d.mp4", task.StreamID, segment.Num),
+		"ct":          "video/mp4",
 		"segment_num": strconv.FormatInt(int64(segment.Num), 10),
 		"duration":    fmt.Sprintf("%f", segment.Duration),
 	}

@@ -66,5 +66,6 @@ func (s *Task) IsOutputHLS() bool {
 }
 
 func (s *Task) IsOutputFile() bool {
-	return strings.HasSuffix(s.Cmdline, ".ts")
+	return strings.HasSuffix(s.Cmdline, ".ts") ||
+		strings.HasSuffix(s.Cmdline, ".mp4")
 }

@@ -23,6 +23,9 @@ func NewLogrusLogger(serviceName string, serviceVersion string, lokiURL *string)
 
 	l.SetLevel(level)
 	l.SetFormatter(&logrus.JSONFormatter{TimestampFormat: time.RFC3339Nano})
+	if level == logrus.DebugLevel {
+		l.SetFormatter(&logrus.TextFormatter{TimestampFormat: time.RFC3339Nano})
+	}
 
 	sentryDSN = os.Getenv("SENTRY_DSN")
 	if sentryDSN != "" {
