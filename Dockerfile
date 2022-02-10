@@ -1,4 +1,4 @@
-FROM golang:1.13 AS builder
+FROM golang:1.17 AS builder
 
 LABEL maintainer="VideoCoin" description="Transcoding Worker"
 
@@ -8,7 +8,7 @@ ADD ./ ./
 
 RUN make build-linux-amd
 
-FROM jrottenberg/ffmpeg:4.1-ubuntu AS release
+FROM jrottenberg/ffmpeg:4.4-ubuntu AS release
 
 COPY --from=builder /go/src/github.com/videocoin/worker/bin/worker-linux-amd64 /bin/worker-linux-amd64
 COPY --from=builder /go/src/github.com/videocoin/worker/capacity_test.mp4 /opt/capacity_test.mp4

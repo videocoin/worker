@@ -39,16 +39,16 @@ build: build-linux-amd build-linux-arm build-darwin
 
 build-darwin:
 	@echo "==> Building for darwin..."
-	GOOS=darwin GOARCH=amd64 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-darwin-amd64 cmd/main.go
+	GOOS=darwin GOARCH=amd64 go build -mod vendor -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-darwin-amd64 cmd/main.go
 
 build-linux-arm:
 	@echo "==> Building for linux arm..."
-	GOOS=linux GOARCH=arm GOARM=7 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm cmd/main.go
-	GOOS=linux GOARCH=arm64 GOARM=7 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm64 cmd/main.go
+	GOOS=linux GOARCH=arm GOARM=7 go build -mod vendor -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm cmd/main.go
+	GOOS=linux GOARCH=arm64 GOARM=7 go build -mod vendor -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-arm64 cmd/main.go
 
 build-linux-amd:
 	@echo "==> Building for linux amd64..."
-	GOOS=linux GOARCH=amd64 go build -mod vendor -a -installsuffix cgo -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-amd64 cmd/main.go
+	GOOS=linux GOARCH=amd64 go build -mod vendor -a -ldflags="-w -s -X main.Version=${VERSION}" -o bin/$(NAME)-linux-amd64 cmd/main.go
 
 test:
 	@echo "==> Running tests..."
