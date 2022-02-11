@@ -13,14 +13,12 @@ import (
 	minersv1 "github.com/videocoin/cloud-api/miners/v1"
 	"github.com/videocoin/cloud-api/rpc"
 	"github.com/videocoin/go-staking"
-	vcoauth2 "github.com/videocoin/oauth2/videocoin"
 	"github.com/videocoin/worker/caller"
 	"github.com/videocoin/worker/capacity"
 	"github.com/videocoin/worker/health"
 	"github.com/videocoin/worker/pinger"
 	"github.com/videocoin/worker/pkg/hw"
 	"github.com/videocoin/worker/transcoder"
-	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 )
@@ -94,13 +92,7 @@ func NewService(cfg *Config) (*Service, error) {
 	cfg.SyncerURL = configResp.SyncerURL
 	cfg.StakingManagerAddr = configResp.StakingManagerAddress
 
-	symphonyTS, err := vcoauth2.JWTAccessTokenSourceFromJSON([]byte(configResp.AccessKey), cfg.RPCNodeURL)
-	if err != nil {
-		return nil, err
-	}
-
-	symphonyCli := oauth2.NewClient(context.Background(), symphonyTS)
-	symphonyRPCCli, err := ethrpc.DialHTTPWithClient(cfg.RPCNodeURL, symphonyCli)
+	symphonyRPCCli, err := ethrpc.Dial(cfg.RPCNodeURL)
 	if err != nil {
 		return nil, err
 	}
